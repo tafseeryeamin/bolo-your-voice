@@ -1,0 +1,66 @@
+import { Card } from "@/components/ui/card";
+import { Building2, Users, Headphones, MessageSquare, BarChart, Shield } from "lucide-react";
+
+const FeaturesSection = () => {
+  const features = [
+    {
+      icon: Building2,
+      title: "Company Representation",
+      description: "Let AI voice assistants introduce your company, share your mission, and communicate your values to potential customers and partners."
+    },
+    {
+      icon: Users,
+      title: "Personal Branding",
+      description: "Create a voice presence that represents you professionally, sharing your expertise and building meaningful connections."
+    },
+    {
+      icon: Headphones,
+      title: "24/7 Availability",
+      description: "Your voice assistant works around the clock, ensuring no opportunity is missed to connect with your audience."
+    },
+    {
+      icon: MessageSquare,
+      title: "Intelligent Conversations",
+      description: "Advanced AI understands context and provides relevant information about your business or personal brand."
+    },
+    {
+      icon: BarChart,
+      title: "Analytics & Insights",
+      description: "Track engagement metrics and understand how people interact with your voice assistant to optimize performance."
+    },
+    {
+      icon: Shield,
+      title: "Secure & Reliable",
+      description: "Enterprise-grade security ensures your brand information and user interactions remain protected."
+    }
+  ];
+
+  return (
+    <section className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">
+            Powerful Voice AI Features
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Everything you need to create an intelligent voice presence that represents your brand and connects with your audience.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-border/50 hover:border-voice-accent/30 transition-all duration-300 hover:shadow-lg group">
+              <div className="w-16 h-16 rounded-full bg-voice-accent/20 flex items-center justify-center mb-6 group-hover:bg-voice-accent/30 transition-colors">
+                <feature.icon className="w-8 h-8 text-voice-accent" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
+              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default FeaturesSection;
