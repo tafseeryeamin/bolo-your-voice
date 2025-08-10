@@ -2,17 +2,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Mic, Zap } from "lucide-react";
 import heroImage from "@/assets/hero-voice-ai.jpg";
 import AnimatedBackground from "@/components/AnimatedBackground";
-
 const HeroSection = () => {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
       <AnimatedBackground />
       {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      />
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20" style={{
+      backgroundImage: `url(${heroImage})`
+    }} />
       
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-primary/20" />
@@ -41,10 +38,7 @@ const HeroSection = () => {
             <ArrowRight className="w-5 h-5" />
           </Button>
           
-          <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-voice-accent/30 hover:border-voice-accent">
-            Learn More
-            <Zap className="w-5 h-5" />
-          </Button>
+          
         </div>
         
         {/* Features Preview */}
@@ -74,8 +68,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
