@@ -31,6 +31,13 @@ All colors MUST be HSL.
     --voice-accent: 180 100% 50%;
     --voice-accent-muted: 180 100% 20%;
 
+    /* Animation Colors */
+    --anim-purple: 280 100% 70%;
+    --anim-yellow: 45 100% 60%;
+    --anim-green: 120 100% 60%;
+    --anim-orange: 25 100% 60%;
+    --anim-pink: 320 100% 70%;
+
     --muted: 220 20% 12%;
     --muted-foreground: 215 15% 65%;
 

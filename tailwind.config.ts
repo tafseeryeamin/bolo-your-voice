@@ -37,6 +37,13 @@ export default {
 					accent: 'hsl(var(--voice-accent))',
 					muted: 'hsl(var(--voice-accent-muted))'
 				},
+				animation: {
+					purple: 'hsl(var(--anim-purple))',
+					yellow: 'hsl(var(--anim-yellow))',
+					green: 'hsl(var(--anim-green))',
+					orange: 'hsl(var(--anim-orange))',
+					pink: 'hsl(var(--anim-pink))'
+				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
@@ -89,11 +96,55 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float-up': {
+					'0%': {
+						transform: 'translateY(100vh) scale(0)',
+						opacity: '0'
+					},
+					'10%': {
+						opacity: '1'
+					},
+					'90%': {
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateY(-20vh) scale(1)',
+						opacity: '0'
+					}
+				},
+				'float-up-delayed': {
+					'0%': {
+						transform: 'translateY(100vh) scale(0)',
+						opacity: '0'
+					},
+					'15%': {
+						opacity: '1'
+					},
+					'85%': {
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateY(-20vh) scale(1)',
+						opacity: '0'
+					}
+				},
+				'pulse-glow': {
+					'0%': {
+						boxShadow: '0 0 20px hsl(var(--voice-accent) / 0.3)'
+					},
+					'100%': {
+						boxShadow: '0 0 40px hsl(var(--voice-accent) / 0.6)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float-up': 'float-up 8s linear infinite',
+				'float-up-delayed': 'float-up-delayed 10s linear infinite',
+				'float-up-slow': 'float-up 12s linear infinite',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite alternate'
 			}
 		}
 	},

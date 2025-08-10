@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mic, Zap } from "lucide-react";
 import heroImage from "@/assets/hero-voice-ai.jpg";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Animated Background */}
+      <AnimatedBackground />
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
