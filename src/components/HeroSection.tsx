@@ -1,14 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mic, Zap } from "lucide-react";
-import { useState } from "react";
 import heroImage from "@/assets/hero-voice-ai.jpg";
 import AnimatedBackground from "@/components/AnimatedBackground";
-import BookingModal from "@/components/BookingModal";
 const HeroSection = () => {
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-
   return (
-    <>
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
       <AnimatedBackground />
@@ -43,7 +38,9 @@ const HeroSection = () => {
             variant="hero" 
             size="lg" 
             className="text-lg px-8 py-6"
-            onClick={() => setIsBookingModalOpen(true)}
+            data-cal-link="tafser-yeamin-8jqc8u/bolo"
+            data-cal-namespace="bolo"
+            data-cal-config='{"layout":"month_view"}'
           >
             Book a Demo
             <ArrowRight className="w-5 h-5" />
@@ -78,12 +75,6 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
-    
-    <BookingModal 
-      isOpen={isBookingModalOpen} 
-      onClose={() => setIsBookingModalOpen(false)} 
-    />
-    </>
   );
 };
 export default HeroSection;

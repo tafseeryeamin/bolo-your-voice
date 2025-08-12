@@ -1,9 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Mic } from "lucide-react";
-import { useState } from "react";
-import BookingModal from "@/components/BookingModal";
 const Header = () => {
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   return (
     <>
@@ -26,18 +23,15 @@ const Header = () => {
           </Button>
           <Button 
             variant="voice"
-            onClick={() => setIsBookingModalOpen(true)}
+            data-cal-link="tafser-yeamin-8jqc8u/bolo"
+            data-cal-namespace="bolo"
+            data-cal-config='{"layout":"month_view"}'
           >
             Get Started
           </Button>
         </div>
       </div>
     </header>
-    
-    <BookingModal 
-      isOpen={isBookingModalOpen} 
-      onClose={() => setIsBookingModalOpen(false)} 
-    />
     </>
   );
 };
