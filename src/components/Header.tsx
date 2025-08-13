@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Mic } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 const Header = () => {
+  const navigate = useNavigate();
 
   return (
     <>
@@ -18,7 +20,11 @@ const Header = () => {
         
         
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="hidden sm:inline-flex">
+          <Button 
+            variant="ghost" 
+            className="hidden sm:inline-flex"
+            onClick={() => navigate("/signin")}
+          >
             Sign In
           </Button>
           <Button 
