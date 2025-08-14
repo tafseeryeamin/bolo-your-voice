@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, UserPlus, Users } from "lucide-react";
+import { LogOut, UserPlus, Users, Eye } from "lucide-react";
 
 const Admin = () => {
   const [email, setEmail] = useState("");
@@ -89,10 +89,20 @@ const Admin = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          <Button onClick={handleSignOut} variant="outline" size="sm">
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Button 
+              onClick={() => navigate("/dashboard")} 
+              variant="voice" 
+              size="sm"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              View Customer Page
+            </Button>
+            <Button onClick={handleSignOut} variant="outline" size="sm">
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
