@@ -4,15 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, UserPlus, Users, Eye } from "lucide-react";
+import { LogOut, UserPlus, Users, Eye, Shield } from "lucide-react";
 
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
+  const [roleUpdateLoading, setRoleUpdateLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -30,11 +32,27 @@ const Admin = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.auth.admin.listUsers();
-      if (error) {
-        console.error("Error fetching users:", error);
+      // Fetch users from profiles table with their roles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          email,
+          first_name,
+          last_name,
+          created_at,
+          user_roles(role)
+        `);
+
+      if (profilesError) {
+        console.error("Error fetching users:", profilesError);
+        toast({
+          title: "Error fetching users",
+          description: profilesError.message,
+          variant: "destructive",
+        });
       } else {
-        setUsers(data.users || []);
+        setUsers(profiles || []);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -75,6 +93,47 @@ const Admin = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: "admin" | "moderator" | "user") => {
+    setRoleUpdateLoading(userId);
+    
+    try {
+      // First, remove existing roles for this user
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      // Then add the new role
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: newRole });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      toast({
+        title: "Role Updated",
+        description: `User role has been updated to ${newRole}.`,
+      });
+
+      // Refresh the user list
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Role Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setRoleUpdateLoading(null);
     }
   };
 
@@ -173,30 +232,61 @@ const Admin = () => {
                     No users found
                   </p>
                 ) : (
-                  users.map((user) => (
-                    <div
-                      key={user.id}
-                      className="p-3 bg-muted rounded-lg border border-border"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-foreground">{user.email}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Created: {new Date(user.created_at).toLocaleDateString()}
-                          </p>
+                  users.map((user) => {
+                    const currentRole = user.user_roles?.[0]?.role || "user";
+                    return (
+                      <div
+                        key={user.id}
+                        className="p-3 bg-muted rounded-lg border border-border space-y-3"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="font-medium text-foreground">{user.email}</p>
+                            {(user.first_name || user.last_name) && (
+                              <p className="text-sm text-muted-foreground">
+                                {user.first_name} {user.last_name}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              Created: {new Date(user.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              currentRole === "admin"
+                                ? "bg-destructive text-destructive-foreground"
+                                : currentRole === "moderator"
+                                ? "bg-voice-muted text-primary-foreground"
+                                : "bg-secondary text-secondary-foreground"
+                            }`}
+                          >
+                            {currentRole}
+                          </span>
                         </div>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            user.email_confirmed_at
-                              ? "bg-voice-muted text-primary-foreground"
-                              : "bg-destructive text-destructive-foreground"
-                          }`}
-                        >
-                          {user.email_confirmed_at ? "Verified" : "Pending"}
-                        </span>
+                        
+                        <div className="flex items-center justify-between pt-2 border-t border-border">
+                          <div className="flex items-center space-x-2">
+                            <Shield className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Role:</span>
+                          </div>
+                          <Select
+                            value={currentRole}
+                            onValueChange={(newRole) => handleRoleChange(user.id, newRole as "admin" | "moderator" | "user")}
+                            disabled={roleUpdateLoading === user.id}
+                          >
+                            <SelectTrigger className="w-32 h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="moderator">Moderator</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </CardContent>
