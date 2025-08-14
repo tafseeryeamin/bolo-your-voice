@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mic, Zap, LogOut } from "lucide-react";
+import { ArrowRight, Mic, Zap, LogOut, Settings } from "lucide-react";
 import heroImage from "@/assets/hero-voice-ai.jpg";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import VoiceInterface from "@/components/VoiceInterface";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 interface CustomerHeroSectionProps {
   user: any;
@@ -12,6 +13,22 @@ interface CustomerHeroSectionProps {
 
 const CustomerHeroSection = ({ user }: CustomerHeroSectionProps) => {
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAdminRole();
+  }, [user]);
+
+  const checkAdminRole = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .rpc('has_role', { _user_id: user.id, _role: 'admin' });
+    
+    if (!error && data) {
+      setIsAdmin(true);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -43,6 +60,12 @@ const CustomerHeroSection = ({ user }: CustomerHeroSectionProps) => {
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
+            {isAdmin && (
+              <Button onClick={() => navigate("/admin")} variant="outline" size="sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Admin Dashboard
+              </Button>
+            )}
             <Button onClick={handleSignOut} variant="outline" size="sm">
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
