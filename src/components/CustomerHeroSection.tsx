@@ -6,43 +6,41 @@ import VoiceInterface from "@/components/VoiceInterface";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-
 interface CustomerHeroSectionProps {
   user: any;
 }
-
-const CustomerHeroSection = ({ user }: CustomerHeroSectionProps) => {
+const CustomerHeroSection = ({
+  user
+}: CustomerHeroSectionProps) => {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
-
   useEffect(() => {
     checkAdminRole();
   }, [user]);
-
   const checkAdminRole = async () => {
     if (!user) return;
-    
-    const { data, error } = await supabase
-      .rpc('has_role', { _user_id: user.id, _role: 'admin' });
-    
+    const {
+      data,
+      error
+    } = await supabase.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin'
+    });
     if (!error && data) {
       setIsAdmin(true);
     }
   };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/signin");
   };
-
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
       <AnimatedBackground />
       {/* Background Image */}
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20" style={{
-        backgroundImage: `url(${heroImage})`
-      }} />
+      backgroundImage: `url(${heroImage})`
+    }} />
       
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-primary/20" />
@@ -54,18 +52,14 @@ const CustomerHeroSection = ({ user }: CustomerHeroSectionProps) => {
             <div className="p-2 rounded-lg bg-voice-accent/20">
               <Mic className="w-6 h-6 text-voice-accent" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">
-              Bolo AI
-            </span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO</span>
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
-            {isAdmin && (
-              <Button onClick={() => navigate("/admin")} variant="outline" size="sm">
+            {isAdmin && <Button onClick={() => navigate("/admin")} variant="outline" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
                 Admin Dashboard
-              </Button>
-            )}
+              </Button>}
             <Button onClick={handleSignOut} variant="outline" size="sm">
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
@@ -117,8 +111,6 @@ const CustomerHeroSection = ({ user }: CustomerHeroSectionProps) => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default CustomerHeroSection;
