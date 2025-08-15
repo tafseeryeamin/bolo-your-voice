@@ -3,22 +3,16 @@ import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import CTASection from "@/components/CTASection";
 import VoiceCallButton from "@/components/VoiceCallButton";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       <main>
         <HeroSection />
         <FeaturesSection />
         <CTASection />
         {/* Add the voice call button */}
-        <div className="flex justify-center py-8">
-          <VoiceCallButton />
-        </div>
+        
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
