@@ -1,100 +1,154 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
+import { RetellWebClient } from "retell-client-js-sdk";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VoiceInterfaceProps {
   className?: string;
 }
 
 const VoiceInterface = ({ className }: VoiceInterfaceProps) => {
-  const [isListening, setIsListening] = useState(false);
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyzerRef = useRef<AnalyserNode | null>(null);
-  const animationRef = useRef<number | null>(null);
+  const retellWebClientRef = useRef<RetellWebClient | null>(null);
+  const { toast } = useToast();
 
+  const AGENT_ID = "agent_d313b6aafa5f9cd6fc6b4eac4d";
+
+  // Initialize Retell client
   useEffect(() => {
+    retellWebClientRef.current = new RetellWebClient();
+    
+    const client = retellWebClientRef.current;
+
+    // Set up event listeners
+    client.on("call_started", () => {
+      console.log("Call started");
+      setIsCallActive(true);
+      setIsConnecting(false);
+      toast({
+        title: "Call Started",
+        description: "Voice call is now active",
+      });
+    });
+
+    client.on("call_ended", () => {
+      console.log("Call ended");
+      setIsCallActive(false);
+      setIsConnecting(false);
+      setAudioLevel(0);
+      toast({
+        title: "Call Ended",
+        description: "Voice call has been terminated",
+      });
+    });
+
+    client.on("agent_start_talking", () => {
+      console.log("Agent started talking");
+      setAudioLevel(0.8);
+    });
+
+    client.on("agent_stop_talking", () => {
+      console.log("Agent stopped talking");
+      setAudioLevel(0);
+    });
+
+    client.on("update", (update) => {
+      console.log("Call update:", update);
+      // Handle transcript updates if needed
+    });
+
+    client.on("metadata", (metadata) => {
+      console.log("Call metadata:", metadata);
+    });
+
+    client.on("error", (error) => {
+      console.error("Retell error:", error);
+      setIsCallActive(false);
+      setIsConnecting(false);
+      setAudioLevel(0);
+      toast({
+        title: "Call Error",
+        description: error.message || "An error occurred during the call",
+        variant: "destructive",
+      });
+    });
+
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
+      if (client) {
+        client.stopCall();
       }
     };
-  }, []);
+  }, [toast]);
 
-  const startListening = async () => {
+  const startCall = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setIsConnecting(true);
       
-      // Set up audio analysis
-      audioContextRef.current = new AudioContext();
-      analyzerRef.current = audioContextRef.current.createAnalyser();
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      source.connect(analyzerRef.current);
-      
-      analyzerRef.current.fftSize = 256;
-      const bufferLength = analyzerRef.current.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
+      // Call our Supabase edge function to create web call
+      const { data, error } = await supabase.functions.invoke('create-retell-call', {
+        body: { agent_id: AGENT_ID }
+      });
 
-      // Set up MediaRecorder
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      
-      const analyzeAudio = () => {
-        if (analyzerRef.current && isListening) {
-          analyzerRef.current.getByteFrequencyData(dataArray);
-          const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
-          setAudioLevel(average / 255); // Normalize to 0-1
-          animationRef.current = requestAnimationFrame(analyzeAudio);
-        }
-      };
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      setIsListening(true);
-      mediaRecorderRef.current.start();
-      analyzeAudio();
+      if (!data?.access_token) {
+        throw new Error('Failed to get access token from server');
+      }
+
+      console.log('Starting call with access token...');
+      
+      // Start the call with Retell
+      await retellWebClientRef.current?.startCall({
+        accessToken: data.access_token,
+        sampleRate: 24000,
+        captureDeviceId: "default",
+        playbackDeviceId: "default",
+      });
 
     } catch (error) {
-      console.error("Error accessing microphone:", error);
+      console.error('Error starting call:', error);
+      setIsConnecting(false);
+      toast({
+        title: "Connection Failed",
+        description: error instanceof Error ? error.message : 'Failed to start voice call',
+        variant: "destructive",
+      });
     }
-  };
+  }, [toast]);
 
-  const stopListening = () => {
-    setIsListening(false);
-    setAudioLevel(0);
-    
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
+  const stopCall = useCallback(() => {
+    if (retellWebClientRef.current) {
+      retellWebClientRef.current.stopCall();
     }
-    
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-    
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-    }
-  };
+  }, []);
 
-  const handleTestBolo = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
+  const handleTestBolo = useCallback(() => {
+    if (isCallActive) {
+      stopCall();
+    } else if (!isConnecting) {
+      startCall();
     }
-  };
+  }, [isCallActive, isConnecting, startCall, stopCall]);
 
   const getMicScale = () => {
-    if (!isListening) return 1;
-    return 1 + (audioLevel * 0.5); // Scale from 1 to 1.5 based on audio level
+    if (isConnecting) return 1.1;
+    if (isCallActive) return 1 + (audioLevel * 0.5);
+    return 1;
   };
 
   const getMicGlow = () => {
-    if (!isListening) return '0 0 20px hsl(var(--voice-accent) / 0.3)';
-    const intensity = 0.3 + (audioLevel * 0.7); // Glow from 0.3 to 1.0 opacity
-    return `0 0 ${20 + (audioLevel * 30)}px hsl(var(--voice-accent) / ${intensity})`;
+    if (isConnecting) return "0 0 20px hsl(var(--voice-accent) / 0.5)";
+    if (isCallActive && audioLevel > 0) {
+      return `0 0 ${20 + audioLevel * 30}px hsl(var(--voice-accent) / ${0.3 + audioLevel * 0.7})`;
+    }
+    return "0 0 20px hsl(var(--voice-accent) / 0.3)";
   };
 
   return (
@@ -106,22 +160,24 @@ const VoiceInterface = ({ className }: VoiceInterfaceProps) => {
             "w-32 h-32 rounded-full bg-gradient-to-br from-voice-accent/20 to-voice-accent/40",
             "flex items-center justify-center transition-all duration-200 ease-out",
             "border-2 border-voice-accent/50",
-            isListening && "animate-pulse-glow"
+            (isCallActive || isConnecting) && "animate-pulse-glow"
           )}
           style={{
             transform: `scale(${getMicScale()})`,
             boxShadow: getMicGlow(),
           }}
-        >
-          {isListening ? (
-            <Mic className="w-12 h-12 text-voice-accent" />
-          ) : (
-            <MicOff className="w-12 h-12 text-muted-foreground" />
-          )}
+         >
+           {isConnecting ? (
+             <div className="w-6 h-6 border-2 border-voice-accent border-t-transparent rounded-full animate-spin" />
+           ) : isCallActive ? (
+             <Mic className="w-12 h-12 text-voice-accent" />
+           ) : (
+             <MicOff className="w-12 h-12 text-muted-foreground" />
+           )}
         </div>
 
         {/* Audio Level Rings */}
-        {isListening && (
+        {isCallActive && (
           <>
             <div 
               className="absolute inset-0 rounded-full border-2 border-voice-accent/30 animate-ping"
@@ -145,6 +201,7 @@ const VoiceInterface = ({ className }: VoiceInterfaceProps) => {
       {/* Test Bolo Button */}
       <Button
         onClick={handleTestBolo}
+        disabled={isConnecting}
         size="lg"
         className={cn(
           "px-8 py-3 text-lg font-semibold transition-all duration-300",
@@ -152,22 +209,25 @@ const VoiceInterface = ({ className }: VoiceInterfaceProps) => {
           "hover:from-voice-accent to-voice-accent/90",
           "text-primary-foreground border-0",
           "hover:scale-105 hover:shadow-lg",
-          isListening && "animate-pulse-glow"
+          "disabled:opacity-50 disabled:cursor-not-allowed",
+          (isCallActive || isConnecting) && "animate-pulse-glow"
         )}
       >
-        {isListening ? "Stop Listening" : "Test Bolo"}
+        {isConnecting ? "Connecting..." : isCallActive ? "End Call" : "Test Bolo"}
       </Button>
 
       {/* Status Text */}
       <p className="text-sm text-muted-foreground text-center max-w-xs">
-        {isListening 
-          ? "Listening... Speak now to test Bolo AI" 
+        {isConnecting 
+          ? "Connecting to voice assistant..." 
+          : isCallActive 
+          ? "Voice call active - Speak to interact with Bolo AI" 
           : "Click 'Test Bolo' to start voice interaction"
         }
       </p>
 
       {/* Audio Level Indicator */}
-      {isListening && (
+      {isCallActive && (
         <div className="w-64 h-2 bg-muted rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-voice-accent/60 to-voice-accent transition-all duration-100"
