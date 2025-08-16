@@ -8,12 +8,14 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
+import FloatingElements from "./components/FloatingElements";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <FloatingElements />
       <Toaster />
       <Sonner />
       <BrowserRouter>
