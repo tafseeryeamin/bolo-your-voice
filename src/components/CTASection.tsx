@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail } from "lucide-react";
 const CTASection = () => {
-  return <section className="py-20 px-6 bg-gradient-to-br from-primary/5 to-voice-accent/5">
+  return (
+    <section className="py-20 px-6 bg-gradient-to-br from-primary/5 to-voice-accent/5">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">
           Ready to Transform Your Business?
@@ -14,9 +15,13 @@ const CTASection = () => {
             Get Started Today
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
-          
+          <Button variant="outline" size="lg">
+            <Mail className="w-4 h-4 mr-2" />
+            Contact Sales
+          </Button>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default CTASection;
