@@ -1,8 +1,37 @@
 import { Button } from "@/components/ui/button";
-import { Mic } from "lucide-react";
+import { Mic, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 const Header = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUser(user);
+      checkAdminRole(user);
+    }
+  };
+
+  const checkAdminRole = async (currentUser: any) => {
+    if (!currentUser) return;
+    
+    const { data, error } = await supabase.rpc('has_role', {
+      _user_id: currentUser.id,
+      _role: 'admin'
+    });
+    
+    if (!error && data) {
+      setIsAdmin(true);
+    }
+  };
   return <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -17,6 +46,12 @@ const Header = () => {
           <Button variant="ghost" onClick={() => navigate("/sign-in/pricing")}>
             Pricing
           </Button>
+          {isAdmin && (
+            <Button variant="ghost" onClick={() => navigate("/agent-config")}>
+              <Settings className="w-4 h-4 mr-2" />
+              Agent Config
+            </Button>
+          )}
         </nav>
         
         <div className="flex items-center space-x-4">
