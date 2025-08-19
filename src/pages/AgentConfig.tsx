@@ -240,6 +240,41 @@ const AgentConfig = () => {
   };
 
   const handleSave = async () => {
+    console.log("Starting handleSave function");
+    console.log("All state variables:", {
+      agentName,
+      agentPrompt,
+      selectedVoice,
+      fallbackVoiceIds,
+      voiceTemperature,
+      voiceSpeed,
+      volume,
+      responsiveness,
+      interruptionSensitivity,
+      enableBackchannel,
+      backchannelFrequency,
+      backchannelWords,
+      reminderTriggerMs,
+      reminderMaxCount,
+      ambientSound,
+      ambientSoundVolume,
+      beginMessageDelayMs,
+      ringDurationMs,
+      sttMode,
+      vocabSpecialization,
+      allowUserDtmf,
+      dtmfDigitLimit,
+      dtmfTerminationKey,
+      dtmfTimeoutMs,
+      denoisingMode,
+      boostedKeywords,
+      postCallAnalysisData,
+      speaksFirst,
+      aiFirstMessage,
+      tools,
+      webhookUrl
+    });
+    
     const config = {
       agent_name: agentName,
       agent_prompt: agentPrompt,
