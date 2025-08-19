@@ -116,14 +116,53 @@ const DeploymentSection = () => {
           {[3, 4].map(index => <div key={index} className="col-span-6 row-span-2 group relative animate-fade-in" style={{
           animationDelay: features[index].delay
         }}>
-              
+              <div className="relative h-full p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-500 hover:bg-white/10 hover:scale-105">
+                <div className="flex items-center gap-4 h-full">
+                  <div className="p-4 rounded-xl bg-primary/20 backdrop-blur-sm">
+                    {(() => {
+                      const IconComponent = features[index].icon;
+                      return <IconComponent className="w-8 h-8 text-white" />;
+                    })()}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-white mb-3">
+                      {features[index].title}
+                    </h3>
+                    <p className="text-white/70 leading-relaxed">
+                      {features[index].description}
+                    </p>
+                  </div>
+                  <div className="w-32 h-20 rounded-lg bg-primary/20 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                    <span className="text-white/60 text-sm">
+                      {features[index].mockup}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              </div>
             </div>)}
 
           {/* Small feature - 3x2 */}
           <div className="col-span-3 row-span-2 group relative animate-fade-in" style={{
           animationDelay: features[5].delay
         }}>
-            
+            <div className="relative h-full p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-500 hover:bg-white/10 hover:scale-105">
+              <div className="p-3 rounded-xl bg-primary/20 backdrop-blur-sm w-fit mb-4">
+                {(() => {
+                  const IconComponent = features[5].icon;
+                  return <IconComponent className="w-6 h-6 text-white" />;
+                })()}
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-3">
+                {features[5].title}
+              </h3>
+              <p className="text-white/70 text-sm leading-relaxed">
+                {features[5].description}
+              </p>
+              
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            </div>
           </div>
         </div>
       </div>
