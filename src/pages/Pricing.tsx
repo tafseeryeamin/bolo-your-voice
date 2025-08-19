@@ -41,14 +41,14 @@ const Pricing = () => {
     description: "Perfect for testing and small projects",
     price: "$0.20",
     unit: "per minute",
-    features: ["Up to 1,000 minutes/month", "WebRTC voice calls", "Basic analytics", "Email support", "Standard voice quality"]
+    features: ["WebRTC voice calls", "Basic analytics", "Email support", "Standard voice quality"]
   }, {
     name: "Professional",
     description: "Best for growing businesses",
     price: "$0.30",
     unit: "per minute",
     popular: true,
-    features: ["Unlimited minutes", "Premium voice quality", "Advanced analytics", "Priority support", "Custom voice training", "API rate limiting: 100 RPS"]
+    features: ["Premium voice quality", "Advanced analytics", "Priority support", "Custom voice training", "Navigation to pages on your website through voice control"]
   }, {
     name: "Enterprise",
     description: "For large-scale deployments",
