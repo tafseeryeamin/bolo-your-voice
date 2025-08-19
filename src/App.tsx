@@ -12,6 +12,7 @@ import Pricing from "./pages/Pricing";
 import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
 import TestAgent from "./pages/TestAgent";
+import DemoTesting from "./pages/DemoTesting";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingElements from "./components/FloatingElements";
 
@@ -43,6 +44,11 @@ const App = () => (
           <Route path="/agent-config" element={
             <ProtectedRoute>
               <AgentConfig />
+            </ProtectedRoute>
+          } />
+          <Route path="/demo-testing" element={
+            <ProtectedRoute>
+              <DemoTesting />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
