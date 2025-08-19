@@ -65,7 +65,7 @@ const Pricing = () => {
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
               Pay-As-You-Go
-              <span className="block text-primary">Voice Calling</span>
+              <span className="block text-teal-400">Voice Calling</span>
             </h1>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
               Scale your voice AI applications with transparent, usage-based pricing. 
