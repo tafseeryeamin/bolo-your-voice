@@ -14,13 +14,13 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          <Button variant="ghost" onClick={() => navigate("/pricing")}>
+          <Button variant="ghost" onClick={() => navigate("/sign-in/pricing")}>
             Pricing
           </Button>
         </nav>
         
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/signin")}>
+          <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/sign-in")}>
             Sign In
           </Button>
           <Button variant="voice" data-cal-link="tafser-yeamin-8jqc8u/bolo" data-cal-namespace="bolo" data-cal-config='{"layout":"month_view"}'>

@@ -26,7 +26,7 @@ const Admin = () => {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || user.email !== "tafser.yeamin.tiu@gmail.com") {
-      navigate("/signin");
+      navigate("/sign-in");
     }
   };
 
@@ -139,7 +139,7 @@ const Admin = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/signin");
+    navigate("/sign-in");
   };
 
   return (

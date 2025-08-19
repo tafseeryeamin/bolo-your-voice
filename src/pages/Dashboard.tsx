@@ -16,7 +16,7 @@ const Dashboard = () => {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      navigate("/signin");
+      navigate("/sign-in");
     } else {
       setUser(user);
     }

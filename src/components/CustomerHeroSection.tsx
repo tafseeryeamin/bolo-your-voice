@@ -32,7 +32,7 @@ const CustomerHeroSection = ({
   };
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/signin");
+    navigate("/sign-in");
   };
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
