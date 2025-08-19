@@ -38,18 +38,11 @@ const Admin = () => {
   };
   const fetchUsers = async () => {
     try {
-      // Fetch users from profiles table with their roles
-      const {
-        data: profiles,
-        error: profilesError
-      } = await supabase.from('profiles').select(`
-          id,
-          email,
-          first_name,
-          last_name,
-          created_at,
-          user_roles(role)
-        `);
+      // Fetch users from profiles table
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+
       if (profilesError) {
         console.error("Error fetching users:", profilesError);
         toast({
@@ -57,9 +50,25 @@ const Admin = () => {
           description: profilesError.message,
           variant: "destructive"
         });
-      } else {
-        setUsers(profiles || []);
+        return;
       }
+
+      // Fetch user roles separately
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      if (rolesError) {
+        console.error("Error fetching user roles:", rolesError);
+      }
+
+      // Combine profiles with their roles
+      const usersWithRoles = profiles?.map(profile => ({
+        ...profile,
+        user_roles: userRoles?.filter(role => role.user_id === profile.id) || []
+      })) || [];
+
+      setUsers(usersWithRoles);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -67,19 +76,33 @@ const Admin = () => {
 
   const fetchAgents = async () => {
     try {
-      const { data: agents, error } = await supabase
+      // Fetch agents
+      const { data: agents, error: agentsError } = await supabase
         .from('agents')
-        .select(`
-          *,
-          profiles(email, first_name, last_name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) {
-        console.error("Error fetching agents:", error);
-      } else {
-        setAgents(agents || []);
+      if (agentsError) {
+        console.error("Error fetching agents:", agentsError);
+        return;
       }
+
+      // Fetch profiles separately
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+      }
+
+      // Combine agents with their owner profiles
+      const agentsWithProfiles = agents?.map(agent => ({
+        ...agent,
+        profiles: profiles?.find(profile => profile.id === agent.user_id) || null
+      })) || [];
+
+      setAgents(agentsWithProfiles);
     } catch (error) {
       console.error("Error fetching agents:", error);
     }
@@ -87,21 +110,42 @@ const Admin = () => {
 
   const fetchActivityLogs = async () => {
     try {
-      const { data: logs, error } = await supabase
+      // Fetch activity logs
+      const { data: logs, error: logsError } = await supabase
         .from('activity_logs')
-        .select(`
-          *,
-          profiles(email, first_name, last_name),
-          agents(name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
       
-      if (error) {
-        console.error("Error fetching activity logs:", error);
-      } else {
-        setActivityLogs(logs || []);
+      if (logsError) {
+        console.error("Error fetching activity logs:", logsError);
+        return;
       }
+
+      // Fetch profiles and agents separately
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+
+      const { data: agents, error: agentsError } = await supabase
+        .from('agents')
+        .select('*');
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+      }
+      if (agentsError) {
+        console.error("Error fetching agents:", agentsError);
+      }
+
+      // Combine logs with their related data
+      const logsWithRelations = logs?.map(log => ({
+        ...log,
+        profiles: profiles?.find(profile => profile.id === log.user_id) || null,
+        agents: agents?.find(agent => agent.id === log.agent_id) || null
+      })) || [];
+
+      setActivityLogs(logsWithRelations);
     } catch (error) {
       console.error("Error fetching activity logs:", error);
     }
