@@ -173,7 +173,7 @@ const AgentConfig = () => {
                       {voices.map((voice) => (
                         <SelectItem key={voice.id} value={voice.id}>
                           <div className="flex flex-col">
-                            <span className="font-medium">{voice.name}</span>
+                            <span className="font-medium">{voice.id}</span>
                             <span className="text-sm text-muted-foreground">{voice.trait}</span>
                           </div>
                         </SelectItem>
