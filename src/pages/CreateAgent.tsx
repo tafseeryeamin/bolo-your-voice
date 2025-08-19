@@ -34,16 +34,23 @@ const CreateAgent = () => {
       navigate("/sign-in");
     } else {
       setUser(user);
-      // For now, we'll use mock data. In production, this would fetch from database
-      loadAgents();
+      // Wait for user to be set, then load agents
+      await loadAgents(user);
     }
   };
-  const loadAgents = async () => {
+
+  const loadAgents = async (currentUser = user) => {
     try {
+      if (!currentUser) {
+        console.error("No user found");
+        setLoading(false);
+        return;
+      }
+
       const { data: agents, error } = await supabase
         .from('agents')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -81,6 +88,15 @@ const CreateAgent = () => {
   };
   const handleDeleteAgent = async (agentId: string) => {
     try {
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to delete agents",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('agents')
         .delete()
