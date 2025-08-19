@@ -46,10 +46,10 @@ const Header = () => {
           <Button variant="ghost" onClick={() => navigate("/sign-in/pricing")}>
             Pricing
           </Button>
-          {isAdmin && (
-            <Button variant="ghost" onClick={() => navigate("/agent-config")}>
+          {user && (
+            <Button variant="ghost" onClick={() => navigate("/create-agent")}>
               <Settings className="w-4 h-4 mr-2" />
-              Agent Config
+              My Agents
             </Button>
           )}
         </nav>

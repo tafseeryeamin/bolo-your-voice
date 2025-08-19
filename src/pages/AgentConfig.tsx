@@ -66,6 +66,8 @@ interface Tool {
 
 const AgentConfig = () => {
   const [selectedVoice, setSelectedVoice] = useState("");
+  const [speaksFirst, setSpeaksFirst] = useState("ai");
+  const [aiFirstMessage, setAiFirstMessage] = useState("");
   const [agentPrompt, setAgentPrompt] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [tools, setTools] = useState<Tool[]>([]);
@@ -93,6 +95,8 @@ const AgentConfig = () => {
     const config = {
       agentPrompt,
       selectedVoice,
+      speaksFirst,
+      aiFirstMessage,
       webhookUrl,
       tools,
     };
@@ -163,6 +167,48 @@ const AgentConfig = () => {
                     <p className="text-sm">
                       <span className="font-medium">Selected:</span>{" "}
                       {voices.find(v => v.id === selectedVoice)?.name} - {voices.find(v => v.id === selectedVoice)?.trait}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Conversation Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Mic className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Conversation Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Speaking Order */}
+                <div>
+                  <Label htmlFor="speaks-first">Who Speaks First</Label>
+                  <Select value={speaksFirst} onValueChange={setSpeaksFirst}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select who speaks first" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ai">AI Speaks First</SelectItem>
+                      <SelectItem value="human">Human Speaks First</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* AI First Message */}
+                {speaksFirst === "ai" && (
+                  <div>
+                    <Label htmlFor="ai-first-message">AI First Message</Label>
+                    <Textarea
+                      id="ai-first-message"
+                      placeholder="Enter the first message the AI should say..."
+                      value={aiFirstMessage}
+                      onChange={(e) => setAiFirstMessage(e.target.value)}
+                      className="min-h-[100px] mt-2"
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      This message will be spoken when the conversation starts.
                     </p>
                   </div>
                 )}
