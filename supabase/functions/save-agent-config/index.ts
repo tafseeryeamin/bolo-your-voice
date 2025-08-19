@@ -40,8 +40,8 @@ serve(async (req) => {
       reminder_max_count: agentConfig.reminder_max_count,
       ambient_sound: agentConfig.background_sound,
       ambient_sound_volume: agentConfig.background_sound_volume,
-      language: "en-US", // Set to multilingual as requested
-      webhook_url: agentConfig.webhook_url,
+      language: "en-US", // Set as requested
+      webhook_url: agentConfig.webhook_url || "https://your-webhook-url.com", // Add default webhook
       begin_message_delay_ms: agentConfig.begin_message_delay_ms,
       ring_duration_ms: agentConfig.ring_duration_ms,
       stt_mode: agentConfig.stt_mode,
@@ -52,13 +52,30 @@ serve(async (req) => {
       fallback_voice_ids: agentConfig.fallback_voice_ids || [],
       boosted_keywords: agentConfig.boosted_keywords || [],
       version: 0,
-      // Add default response_engine if not provided
+      // Add required response_engine for create operations
       response_engine: agentConfig.response_engine || {
         type: "retell-llm",
-        llm_id: "llm_default",
+        llm_id: "llm_b89dc1ed4b3ad1b6b0dd99b5a5e24e", // Use a default LLM ID
         version: 0
-      }
+      },
+      // Add other required fields for create
+      opt_out_sensitive_data_storage: false,
+      opt_in_signed_url: false,
+      normalize_for_speech: true,
+      end_call_after_silence_ms: 600000,
+      max_call_duration_ms: 3600000
     };
+
+    // Remove fields that are not allowed in UPDATE operations
+    if (agentId) {
+      delete retellPayload.response_engine;
+      delete retellPayload.version;
+      delete retellPayload.opt_out_sensitive_data_storage;
+      delete retellPayload.opt_in_signed_url;
+      delete retellPayload.normalize_for_speech;
+      delete retellPayload.end_call_after_silence_ms;
+      delete retellPayload.max_call_duration_ms;
+    }
 
     console.log('Sending to Retell AI:', retellPayload);
 
@@ -85,6 +102,8 @@ serve(async (req) => {
     console.log('Retell AI response text:', responseText);
 
     if (!response.ok) {
+      console.error(`Retell AI API error: ${response.status} - ${responseText}`);
+      console.error('Request payload was:', JSON.stringify(retellPayload, null, 2));
       throw new Error(`Retell AI API error: ${response.status} - ${responseText}`);
     }
 
