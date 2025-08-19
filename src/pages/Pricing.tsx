@@ -51,7 +51,7 @@ const Pricing = () => {
     {
       name: "Starter",
       description: "Perfect for testing and small projects",
-      price: "$0.08",
+      price: "$0.20",
       unit: "per minute",
       features: [
         "Up to 1,000 minutes/month",
