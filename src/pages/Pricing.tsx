@@ -72,18 +72,9 @@ const Pricing = () => {
               Only pay for what you use with no hidden fees or minimum commitments.
             </p>
             <div className="flex items-center justify-center gap-4 text-sm text-white/60">
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-primary" />
-                No setup fees
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-primary" />
-                No monthly minimums
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-primary" />
-                Cancel anytime
-              </span>
+              
+              
+              
             </div>
           </div>
         </section>
