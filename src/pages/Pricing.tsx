@@ -64,7 +64,7 @@ const Pricing = () => {
     {
       name: "Professional",
       description: "Best for growing businesses",
-      price: "$0.06",
+      price: "$0.15",
       unit: "per minute",
       popular: true,
       features: [
