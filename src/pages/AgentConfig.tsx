@@ -6,7 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Webhook, Wrench, Mic, Plus, Trash2, Play } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Settings, Webhook, Wrench, Mic, Plus, Trash2, Play, User, Volume2, Gauge, Zap, MessageSquare, Clock, Music, Globe, TrendingUp, BarChart3 } from "lucide-react";
 import Header from "@/components/Header";
 
 // Voice data with all the voices you specified
@@ -58,20 +60,84 @@ const voices = [
   { name: "Zuri", trait: "American, Old, Retell", id: "11labs-Zuri" },
 ];
 
+const ambientSounds = [
+  { name: "Coffee Shop", value: "coffee-shop" },
+  { name: "Convention Hall", value: "convention-hall" },
+  { name: "Summer Outdoor", value: "summer-outdoor" },
+  { name: "Mountain Outdoor", value: "mountain-outdoor" },
+  { name: "Static Noise", value: "static-noise" },
+  { name: "Call Center", value: "call-center" },
+  { name: "None", value: "none" },
+];
+
+const languages = [
+  { name: "English (US)", value: "en-US" },
+  { name: "English (UK)", value: "en-GB" },
+  { name: "Spanish", value: "es-ES" },
+  { name: "French", value: "fr-FR" },
+  { name: "German", value: "de-DE" },
+  { name: "Italian", value: "it-IT" },
+  { name: "Portuguese", value: "pt-PT" },
+  { name: "Dutch", value: "nl-NL" },
+  { name: "Polish", value: "pl-PL" },
+  { name: "Russian", value: "ru-RU" },
+  { name: "Japanese", value: "ja-JP" },
+  { name: "Korean", value: "ko-KR" },
+  { name: "Chinese", value: "zh-CN" },
+  { name: "Hindi", value: "hi-IN" },
+];
+
 interface Tool {
   id: string;
   name: string;
   description: string;
 }
 
+interface PostCallAnalysisData {
+  id: string;
+  type: string;
+  name: string;
+  description: string;
+}
+
 const AgentConfig = () => {
+  // Basic settings
+  const [agentName, setAgentName] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("");
+  const [fallbackVoiceIds, setFallbackVoiceIds] = useState<string[]>([]);
   const [speaksFirst, setSpeaksFirst] = useState("ai");
   const [aiFirstMessage, setAiFirstMessage] = useState("");
   const [agentPrompt, setAgentPrompt] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [tools, setTools] = useState<Tool[]>([]);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+
+  // Voice settings
+  const [voiceTemperature, setVoiceTemperature] = useState([1]);
+  const [voiceSpeed, setVoiceSpeed] = useState([1]);
+  const [volume, setVolume] = useState([1]);
+  const [responsiveness, setResponsiveness] = useState([1]);
+  const [interruptionSensitivity, setInterruptionSensitivity] = useState([1]);
+
+  // Backchannel settings
+  const [enableBackchannel, setEnableBackchannel] = useState(true);
+  const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
+  const [backchannelWords, setBackchannelWords] = useState("yeah,uh-huh");
+
+  // Reminder settings
+  const [reminderTriggerMs, setReminderTriggerMs] = useState(10000);
+  const [reminderMaxCount, setReminderMaxCount] = useState(2);
+
+  // Ambient sound settings
+  const [ambientSound, setAmbientSound] = useState("coffee-shop");
+  const [ambientSoundVolume, setAmbientSoundVolume] = useState([1]);
+
+  // Language and keywords
+  const [language, setLanguage] = useState("en-US");
+  const [boostedKeywords, setBoostedKeywords] = useState("retell,kroger");
+
+  // Post call analysis
+  const [postCallAnalysisData, setPostCallAnalysisData] = useState<PostCallAnalysisData[]>([]);
 
   const addTool = () => {
     const newTool: Tool = {
@@ -90,6 +156,34 @@ const AgentConfig = () => {
     setTools(tools.map(tool => 
       tool.id === id ? { ...tool, [field]: value } : tool
     ));
+  };
+
+  const addPostCallAnalysisData = () => {
+    const newData: PostCallAnalysisData = {
+      id: Date.now().toString(),
+      type: "string",
+      name: "",
+      description: "",
+    };
+    setPostCallAnalysisData([...postCallAnalysisData, newData]);
+  };
+
+  const removePostCallAnalysisData = (id: string) => {
+    setPostCallAnalysisData(postCallAnalysisData.filter(data => data.id !== id));
+  };
+
+  const updatePostCallAnalysisData = (id: string, field: keyof PostCallAnalysisData, value: string) => {
+    setPostCallAnalysisData(postCallAnalysisData.map(data => 
+      data.id === id ? { ...data, [field]: value } : data
+    ));
+  };
+
+  const handleFallbackVoiceChange = (voiceId: string, checked: boolean) => {
+    if (checked && fallbackVoiceIds.length < 2) {
+      setFallbackVoiceIds([...fallbackVoiceIds, voiceId]);
+    } else if (!checked) {
+      setFallbackVoiceIds(fallbackVoiceIds.filter(id => id !== voiceId));
+    }
   };
 
   const playVoicePreview = async (voiceId: string) => {
@@ -136,11 +230,32 @@ const AgentConfig = () => {
 
   const handleSave = async () => {
     const config = {
-      agentPrompt,
-      selectedVoice,
-      speaksFirst,
-      aiFirstMessage,
-      webhookUrl,
+      agent_name: agentName,
+      agent_prompt: agentPrompt,
+      voice_id: selectedVoice,
+      fallback_voice_ids: fallbackVoiceIds,
+      voice_temperature: voiceTemperature[0],
+      voice_speed: voiceSpeed[0],
+      volume: volume[0],
+      responsiveness: responsiveness[0],
+      interruption_sensitivity: interruptionSensitivity[0],
+      enable_backchannel: enableBackchannel,
+      backchannel_frequency: backchannelFrequency[0],
+      backchannel_words: backchannelWords.split(',').map(word => word.trim()),
+      reminder_trigger_ms: reminderTriggerMs,
+      reminder_max_count: reminderMaxCount,
+      ambient_sound: ambientSound,
+      ambient_sound_volume: ambientSoundVolume[0],
+      language: language,
+      webhook_url: webhookUrl,
+      boosted_keywords: boostedKeywords.split(',').map(keyword => keyword.trim()),
+      post_call_analysis_data: postCallAnalysisData.map(data => ({
+        type: data.type,
+        name: data.name,
+        description: data.description,
+      })),
+      speaks_first: speaksFirst,
+      ai_first_message: aiFirstMessage,
       tools,
     };
     
@@ -176,14 +291,24 @@ const AgentConfig = () => {
         </div>
 
         <div className="space-y-6">
-          {/* Agent Prompt Section */}
+          {/* Basic Information */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-              <Settings className="w-5 h-5 text-voice-accent mr-2" />
-              <CardTitle>Agent Prompt</CardTitle>
+              <User className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Basic Information</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                <div>
+                  <Label htmlFor="agent-name">Agent Name</Label>
+                  <Input
+                    id="agent-name"
+                    placeholder="Enter a name for your agent"
+                    value={agentName}
+                    onChange={(e) => setAgentName(e.target.value)}
+                    className="mt-2"
+                  />
+                </div>
                 <div>
                   <Label htmlFor="prompt">System Prompt</Label>
                   <Textarea
@@ -207,7 +332,7 @@ const AgentConfig = () => {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="voice">Select Voice</Label>
+                  <Label htmlFor="voice">Primary Voice</Label>
                   <Select value={selectedVoice} onValueChange={setSelectedVoice}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Choose a voice for your agent" />
@@ -239,6 +364,28 @@ const AgentConfig = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                <div>
+                  <Label>Fallback Voices (Select up to 2)</Label>
+                  <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto border border-border rounded-lg p-3">
+                    {voices.map((voice) => (
+                      <div key={voice.id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`fallback-${voice.id}`}
+                          checked={fallbackVoiceIds.includes(voice.id)}
+                          onChange={(e) => handleFallbackVoiceChange(voice.id, e.target.checked)}
+                          disabled={!fallbackVoiceIds.includes(voice.id) && fallbackVoiceIds.length >= 2}
+                          className="rounded"
+                        />
+                        <Label htmlFor={`fallback-${voice.id}`} className="text-sm">
+                          {voice.id}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
                 {selectedVoice && (
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm">
@@ -251,10 +398,77 @@ const AgentConfig = () => {
             </CardContent>
           </Card>
 
+          {/* Voice Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Volume2 className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Voice Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Voice Temperature: {voiceTemperature[0]}</Label>
+                  <Slider
+                    value={voiceTemperature}
+                    onValueChange={setVoiceTemperature}
+                    max={2}
+                    min={0}
+                    step={0.1}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label>Voice Speed: {voiceSpeed[0]}</Label>
+                  <Slider
+                    value={voiceSpeed}
+                    onValueChange={setVoiceSpeed}
+                    max={2}
+                    min={0.5}
+                    step={0.1}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label>Volume: {volume[0]}</Label>
+                  <Slider
+                    value={volume}
+                    onValueChange={setVolume}
+                    max={2}
+                    min={0}
+                    step={0.1}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label>Responsiveness: {responsiveness[0]}</Label>
+                  <Slider
+                    value={responsiveness}
+                    onValueChange={setResponsiveness}
+                    max={2}
+                    min={0}
+                    step={0.1}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label>Interruption Sensitivity: {interruptionSensitivity[0]}</Label>
+                  <Slider
+                    value={interruptionSensitivity}
+                    onValueChange={setInterruptionSensitivity}
+                    max={2}
+                    min={0}
+                    step={0.1}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Conversation Settings */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-              <Mic className="w-5 h-5 text-voice-accent mr-2" />
+              <MessageSquare className="w-5 h-5 text-voice-accent mr-2" />
               <CardTitle>Conversation Settings</CardTitle>
             </CardHeader>
             <CardContent>
@@ -284,11 +498,159 @@ const AgentConfig = () => {
                       onChange={(e) => setAiFirstMessage(e.target.value)}
                       className="min-h-[100px] mt-2"
                     />
-                    <p className="text-sm text-muted-foreground mt-1">
-                      This message will be spoken when the conversation starts.
-                    </p>
                   </div>
                 )}
+
+                {/* Language */}
+                <div>
+                  <Label htmlFor="language">Language</Label>
+                  <Select value={language} onValueChange={setLanguage}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {languages.map((lang) => (
+                        <SelectItem key={lang.value} value={lang.value}>
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Boosted Keywords */}
+                <div>
+                  <Label htmlFor="boosted-keywords">Boosted Keywords</Label>
+                  <Input
+                    id="boosted-keywords"
+                    placeholder="Enter keywords separated by commas"
+                    value={boostedKeywords}
+                    onChange={(e) => setBoostedKeywords(e.target.value)}
+                    className="mt-2"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Keywords that the agent should pay special attention to.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Backchannel Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Zap className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Backchannel Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="enable-backchannel"
+                    checked={enableBackchannel}
+                    onCheckedChange={setEnableBackchannel}
+                  />
+                  <Label htmlFor="enable-backchannel">Enable Backchannel</Label>
+                </div>
+                
+                {enableBackchannel && (
+                  <>
+                    <div>
+                      <Label>Backchannel Frequency: {backchannelFrequency[0]}</Label>
+                      <Slider
+                        value={backchannelFrequency}
+                        onValueChange={setBackchannelFrequency}
+                        max={1}
+                        min={0}
+                        step={0.1}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="backchannel-words">Backchannel Words</Label>
+                      <Input
+                        id="backchannel-words"
+                        placeholder="Enter words separated by commas"
+                        value={backchannelWords}
+                        onChange={(e) => setBackchannelWords(e.target.value)}
+                        className="mt-2"
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Words like "yeah", "uh-huh" that show the agent is listening.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Reminder Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Clock className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Reminder Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="reminder-trigger">Reminder Trigger (ms)</Label>
+                  <Input
+                    id="reminder-trigger"
+                    type="number"
+                    value={reminderTriggerMs}
+                    onChange={(e) => setReminderTriggerMs(Number(e.target.value))}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reminder-max-count">Max Reminder Count</Label>
+                  <Input
+                    id="reminder-max-count"
+                    type="number"
+                    value={reminderMaxCount}
+                    onChange={(e) => setReminderMaxCount(Number(e.target.value))}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Ambient Sound Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Music className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Ambient Sound Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="ambient-sound">Background Sound</Label>
+                  <Select value={ambientSound} onValueChange={setAmbientSound}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select ambient sound" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ambientSounds.map((sound) => (
+                        <SelectItem key={sound.value} value={sound.value}>
+                          {sound.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Ambient Sound Volume: {ambientSoundVolume[0]}</Label>
+                  <Slider
+                    value={ambientSoundVolume}
+                    onValueChange={setAmbientSoundVolume}
+                    max={1}
+                    min={0}
+                    step={0.1}
+                    className="mt-2"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -344,6 +706,85 @@ const AgentConfig = () => {
                             placeholder="Brief description of the tool"
                             value={tool.description}
                             onChange={(e) => updateTool(tool.id, 'description', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Post Call Analysis */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <div className="flex items-center">
+                <BarChart3 className="w-5 h-5 text-voice-accent mr-2" />
+                <CardTitle>Post Call Analysis Data</CardTitle>
+              </div>
+              <Button onClick={addPostCallAnalysisData} size="sm" className="h-8">
+                <Plus className="w-4 h-4 mr-1" />
+                Add Analysis Field
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {postCallAnalysisData.length === 0 ? (
+                <div className="text-center py-8">
+                  <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No analysis fields configured yet. Click "Add Analysis Field" to get started.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {postCallAnalysisData.map((data, index) => (
+                    <div key={data.id} className="p-4 border border-border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Analysis Field {index + 1}</h4>
+                        <Button
+                          onClick={() => removePostCallAnalysisData(data.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor={`analysis-type-${data.id}`}>Type</Label>
+                          <Select 
+                            value={data.type} 
+                            onValueChange={(value) => updatePostCallAnalysisData(data.id, 'type', value)}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="string">String</SelectItem>
+                              <SelectItem value="number">Number</SelectItem>
+                              <SelectItem value="boolean">Boolean</SelectItem>
+                              <SelectItem value="array">Array</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor={`analysis-name-${data.id}`}>Field Name</Label>
+                          <Input
+                            id={`analysis-name-${data.id}`}
+                            placeholder="e.g., customer_name"
+                            value={data.name}
+                            onChange={(e) => updatePostCallAnalysisData(data.id, 'name', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`analysis-desc-${data.id}`}>Description</Label>
+                          <Input
+                            id={`analysis-desc-${data.id}`}
+                            placeholder="Brief description"
+                            value={data.description}
+                            onChange={(e) => updatePostCallAnalysisData(data.id, 'description', e.target.value)}
                             className="mt-1"
                           />
                         </div>
