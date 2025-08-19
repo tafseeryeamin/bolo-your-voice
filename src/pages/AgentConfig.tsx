@@ -70,21 +70,22 @@ const ambientSounds = [
   { name: "None", value: "none" },
 ];
 
-const languages = [
-  { name: "English (US)", value: "en-US" },
-  { name: "English (UK)", value: "en-GB" },
-  { name: "Spanish", value: "es-ES" },
-  { name: "French", value: "fr-FR" },
-  { name: "German", value: "de-DE" },
-  { name: "Italian", value: "it-IT" },
-  { name: "Portuguese", value: "pt-PT" },
-  { name: "Dutch", value: "nl-NL" },
-  { name: "Polish", value: "pl-PL" },
-  { name: "Russian", value: "ru-RU" },
-  { name: "Japanese", value: "ja-JP" },
-  { name: "Korean", value: "ko-KR" },
-  { name: "Chinese", value: "zh-CN" },
-  { name: "Hindi", value: "hi-IN" },
+const sttModes = [
+  { name: "Fast", value: "fast" },
+  { name: "Accurate", value: "accurate" },
+];
+
+const vocabSpecializations = [
+  { name: "General", value: "general" },
+  { name: "Finance", value: "finance" },
+  { name: "Medical", value: "medical" },
+  { name: "Legal", value: "legal" },
+];
+
+const denoisingModes = [
+  { name: "Noise Cancellation", value: "noise-cancellation" },
+  { name: "Echo Cancellation", value: "echo-cancellation" },
+  { name: "None", value: "none" },
 ];
 
 interface Tool {
@@ -132,8 +133,18 @@ const AgentConfig = () => {
   const [ambientSound, setAmbientSound] = useState("coffee-shop");
   const [ambientSoundVolume, setAmbientSoundVolume] = useState([1]);
 
-  // Language and keywords
-  const [language, setLanguage] = useState("en-US");
+  // New advanced settings
+  const [beginMessageDelayMs, setBeginMessageDelayMs] = useState(1000);
+  const [ringDurationMs, setRingDurationMs] = useState(30000);
+  const [sttMode, setSttMode] = useState("fast");
+  const [vocabSpecialization, setVocabSpecialization] = useState("general");
+  const [allowUserDtmf, setAllowUserDtmf] = useState(true);
+  const [dtmfDigitLimit, setDtmfDigitLimit] = useState(25);
+  const [dtmfTerminationKey, setDtmfTerminationKey] = useState("#");
+  const [dtmfTimeoutMs, setDtmfTimeoutMs] = useState(8000);
+  const [denoisingMode, setDenoisingMode] = useState("noise-cancellation");
+
+  // Keywords
   const [boostedKeywords, setBoostedKeywords] = useState("retell,kroger");
 
   // Post call analysis
@@ -246,7 +257,18 @@ const AgentConfig = () => {
       reminder_max_count: reminderMaxCount,
       ambient_sound: ambientSound,
       ambient_sound_volume: ambientSoundVolume[0],
-      language: language,
+      begin_message_delay_ms: beginMessageDelayMs,
+      ring_duration_ms: ringDurationMs,
+      stt_mode: sttMode,
+      vocab_specialization: vocabSpecialization,
+      allow_user_dtmf: allowUserDtmf,
+      user_dtmf_options: {
+        digit_limit: dtmfDigitLimit,
+        termination_key: dtmfTerminationKey,
+        timeout_ms: dtmfTimeoutMs
+      },
+      denoising_mode: denoisingMode,
+      language: "multilingual",
       webhook_url: webhookUrl,
       boosted_keywords: boostedKeywords.split(',').map(keyword => keyword.trim()),
       post_call_analysis_data: postCallAnalysisData.map(data => ({
@@ -501,23 +523,6 @@ const AgentConfig = () => {
                   </div>
                 )}
 
-                {/* Language */}
-                <div>
-                  <Label htmlFor="language">Language</Label>
-                  <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {languages.map((lang) => (
-                        <SelectItem key={lang.value} value={lang.value}>
-                          {lang.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 {/* Boosted Keywords */}
                 <div>
                   <Label htmlFor="boosted-keywords">Boosted Keywords</Label>
@@ -532,6 +537,138 @@ const AgentConfig = () => {
                     Keywords that the agent should pay special attention to.
                   </p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Advanced Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Settings className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>Advanced Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="begin-message-delay">Begin Message Delay (ms)</Label>
+                  <Input
+                    id="begin-message-delay"
+                    type="number"
+                    value={beginMessageDelayMs}
+                    onChange={(e) => setBeginMessageDelayMs(Number(e.target.value))}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ring-duration">Ring Duration (ms)</Label>
+                  <Input
+                    id="ring-duration"
+                    type="number"
+                    value={ringDurationMs}
+                    onChange={(e) => setRingDurationMs(Number(e.target.value))}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="stt-mode">STT Mode</Label>
+                  <Select value={sttMode} onValueChange={setSttMode}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select STT mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sttModes.map((mode) => (
+                        <SelectItem key={mode.value} value={mode.value}>
+                          {mode.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="vocab-specialization">Vocab Specialization</Label>
+                  <Select value={vocabSpecialization} onValueChange={setVocabSpecialization}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select vocab specialization" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vocabSpecializations.map((spec) => (
+                        <SelectItem key={spec.value} value={spec.value}>
+                          {spec.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="denoising-mode">Denoising Mode</Label>
+                  <Select value={denoisingMode} onValueChange={setDenoisingMode}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select denoising mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {denoisingModes.map((mode) => (
+                        <SelectItem key={mode.value} value={mode.value}>
+                          {mode.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* DTMF Settings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+              <Gauge className="w-5 h-5 text-voice-accent mr-2" />
+              <CardTitle>DTMF Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="allow-user-dtmf"
+                    checked={allowUserDtmf}
+                    onCheckedChange={setAllowUserDtmf}
+                  />
+                  <Label htmlFor="allow-user-dtmf">Allow User DTMF</Label>
+                </div>
+                
+                {allowUserDtmf && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="dtmf-digit-limit">Digit Limit</Label>
+                      <Input
+                        id="dtmf-digit-limit"
+                        type="number"
+                        value={dtmfDigitLimit}
+                        onChange={(e) => setDtmfDigitLimit(Number(e.target.value))}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="dtmf-termination-key">Termination Key</Label>
+                      <Input
+                        id="dtmf-termination-key"
+                        value={dtmfTerminationKey}
+                        onChange={(e) => setDtmfTerminationKey(e.target.value)}
+                        className="mt-2"
+                        maxLength={1}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="dtmf-timeout">Timeout (ms)</Label>
+                      <Input
+                        id="dtmf-timeout"
+                        type="number"
+                        value={dtmfTimeoutMs}
+                        onChange={(e) => setDtmfTimeoutMs(Number(e.target.value))}
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
