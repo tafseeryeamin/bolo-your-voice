@@ -267,61 +267,97 @@ const AgentConfig = () => {
     try {
       console.log("Saving agent configuration...");
       
-      const configData = {
-        agentId: existingAgentId, // Include existing agent ID for updates
-        agent_name: agentName,
-        voice_id: selectedVoice,
-        voice_model: "eleven_turbo_v2", // Default voice model
-        voice_temperature: voiceTemperature[0],
-        voice_speed: voiceSpeed[0],
-        volume: volume[0],
-        responsiveness: responsiveness[0],
-        interruption_sensitivity: interruptionSensitivity[0],
-        enable_backchannel: enableBackchannel,
-        backchannel_frequency: backchannelFrequency[0],
-        backchannel_words: backchannelWords.split(',').map(word => word.trim()),
-        reminder_trigger_ms: reminderTriggerMs,
-        reminder_max_count: reminderMaxCount,
-        background_sound: ambientSound, // Sends values like "static-noise", "coffee-shop", etc.
-        background_sound_volume: ambientSoundVolume[0],
-        webhook_url: webhookUrl,
-        begin_message_delay_ms: beginMessageDelayMs,
-        ring_duration_ms: ringDurationMs,
-        stt_mode: sttMode,
-        vocab_specialization: vocabSpecialization,
-        allow_user_dtmf: allowUserDtmf,
-        user_dtmf_options: {
-          digit_limit: dtmfDigitLimit,
-          termination_key: dtmfTerminationKey,
-          timeout_ms: dtmfTimeoutMs
-        },
-        denoising_mode: denoisingMode,
-        fallback_voice_ids: fallbackVoiceIds,
-        boosted_keywords: boostedKeywords.split(',').map(keyword => keyword.trim()).filter(k => k),
-      };
-
-      console.log("Config data to send:", configData);
-
-      // Send to your webhook URL
-      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/955d68ca-7f0e-46d8-9835-b0bbf8a8b0eb', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(configData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save agents",
+          variant: "destructive",
+        });
+        return;
       }
 
-      const data = await response.json();
-      console.log("Webhook response:", data);
+      const agentData = {
+        name: agentName,
+        user_id: user.id,
+        voice_id: selectedVoice,
+        language: 'en', // Default to English
+        description: agentPrompt,
+        prompt: agentPrompt,
+        begin_message: speaksFirst === 'ai' ? aiFirstMessage : null,
+        response_engine: JSON.stringify({
+          voice_model: "eleven_turbo_v2",
+          voice_temperature: voiceTemperature[0],
+          voice_speed: voiceSpeed[0],
+          volume: volume[0],
+          responsiveness: responsiveness[0],
+          interruption_sensitivity: interruptionSensitivity[0],
+          enable_backchannel: enableBackchannel,
+          backchannel_frequency: backchannelFrequency[0],
+          backchannel_words: backchannelWords.split(',').map(word => word.trim()),
+          reminder_trigger_ms: reminderTriggerMs,
+          reminder_max_count: reminderMaxCount,
+          background_sound: ambientSound,
+          background_sound_volume: ambientSoundVolume[0],
+          begin_message_delay_ms: beginMessageDelayMs,
+          ring_duration_ms: ringDurationMs,
+          stt_mode: sttMode,
+          vocab_specialization: vocabSpecialization,
+          allow_user_dtmf: allowUserDtmf,
+          user_dtmf_options: {
+            digit_limit: dtmfDigitLimit,
+            termination_key: dtmfTerminationKey,
+            timeout_ms: dtmfTimeoutMs
+          },
+          denoising_mode: denoisingMode,
+          fallback_voice_ids: fallbackVoiceIds,
+          boosted_keywords: boostedKeywords.split(',').map(keyword => keyword.trim()).filter(k => k),
+          tools: tools,
+          post_call_analysis_data: postCallAnalysisData
+        }),
+        llm_websocket_url: webhookUrl || null
+      };
+
+      // Save to Supabase database
+      let result;
+      if (existingAgentId) {
+        // Update existing agent
+        result = await supabase
+          .from('agents')
+          .update(agentData)
+          .eq('id', existingAgentId)
+          .eq('user_id', user.id)
+          .select();
+      } else {
+        // Create new agent
+        result = await supabase
+          .from('agents')
+          .insert(agentData)
+          .select();
+      }
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
+
+      // Log activity
+      await supabase
+        .from('activity_logs')
+        .insert([{
+          user_id: user.id,
+          agent_id: result.data[0].id,
+          action: existingAgentId ? 'agent_updated' : 'agent_created',
+          details: { agent_name: agentName }
+        }]);
 
       toast({
         title: "Success",
-        description: "Thanks for onboarding! Your widget will be tested by our team and get ready",
+        description: existingAgentId ? "Agent updated successfully!" : "Agent created successfully!",
       });
+
+      // Redirect to agents page
+      navigate("/agents");
 
     } catch (error) {
       console.error("Error saving agent configuration:", error);

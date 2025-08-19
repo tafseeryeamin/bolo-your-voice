@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Mic, Settings, Trash2 } from "lucide-react";
 import Header from "@/components/Header";
+import { useToast } from "@/hooks/use-toast";
 interface Agent {
   id: string;
   name: string;
@@ -19,6 +20,7 @@ const CreateAgent = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
   useEffect(() => {
     checkAuth();
   }, []);
@@ -37,23 +39,39 @@ const CreateAgent = () => {
     }
   };
   const loadAgents = async () => {
-    // Mock data for now - in production this would be a database call
-    const mockAgents: Agent[] = [{
-      id: "1",
-      name: "Customer Support Agent",
-      voice: "Emily",
-      speaksFirst: "ai",
-      aiFirstMessage: "Hello! How can I help you today?",
-      createdAt: new Date().toISOString()
-    }, {
-      id: "2",
-      name: "Sales Assistant",
-      voice: "Brian",
-      speaksFirst: "human",
-      createdAt: new Date().toISOString()
-    }];
-    setAgents(mockAgents);
-    setLoading(false);
+    try {
+      const { data: agents, error } = await supabase
+        .from('agents')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching agents:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load agents",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Transform database agents to match the interface
+      const transformedAgents = agents.map(agent => ({
+        id: agent.id,
+        name: agent.name,
+        voice: agent.voice_id || 'Unknown',
+        speaksFirst: agent.begin_message ? 'ai' : 'human',
+        aiFirstMessage: agent.begin_message,
+        createdAt: agent.created_at
+      }));
+
+      setAgents(transformedAgents);
+    } catch (error) {
+      console.error("Error loading agents:", error);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleCreateNew = () => {
     navigate("/agent-config");
@@ -62,8 +80,41 @@ const CreateAgent = () => {
     navigate(`/agent-config?id=${agentId}`);
   };
   const handleDeleteAgent = async (agentId: string) => {
-    // In production, this would delete from database
-    setAgents(agents.filter(agent => agent.id !== agentId));
+    try {
+      const { error } = await supabase
+        .from('agents')
+        .delete()
+        .eq('id', agentId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error("Error deleting agent:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete agent",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Log activity
+      await supabase
+        .from('activity_logs')
+        .insert([{
+          user_id: user.id,
+          agent_id: agentId,
+          action: 'agent_deleted',
+          details: { agent_id: agentId }
+        }]);
+
+      setAgents(agents.filter(agent => agent.id !== agentId));
+      toast({
+        title: "Success",
+        description: "Agent deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting agent:", error);
+    }
   };
   if (loading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
