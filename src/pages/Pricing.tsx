@@ -45,7 +45,7 @@ const Pricing = () => {
   }, {
     name: "Professional",
     description: "Best for growing businesses",
-    price: "$0.15",
+    price: "$0.30",
     unit: "per minute",
     popular: true,
     features: ["Unlimited minutes", "Premium voice quality", "Advanced analytics", "Priority support", "Custom voice training", "API rate limiting: 100 RPS"]
