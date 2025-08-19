@@ -52,7 +52,7 @@ const CustomerHeroSection = ({
             <div className="p-2 rounded-lg bg-voice-accent/20">
               <Mic className="w-6 h-6 text-voice-accent" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">bolo voice</span>
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>

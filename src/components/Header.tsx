@@ -10,7 +10,7 @@ const Header = () => {
           <div className="p-2 rounded-lg bg-voice-accent/20">
             <Mic className="w-6 h-6 text-voice-accent" />
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">bolo voice</span>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
