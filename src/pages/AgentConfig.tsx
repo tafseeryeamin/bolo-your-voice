@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Webhook, Wrench, Mic, Plus, Trash2 } from "lucide-react";
+import { Settings, Webhook, Wrench, Mic, Plus, Trash2, Play } from "lucide-react";
 import Header from "@/components/Header";
 
 // Voice data with all the voices you specified
@@ -71,6 +71,7 @@ const AgentConfig = () => {
   const [agentPrompt, setAgentPrompt] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [tools, setTools] = useState<Tool[]>([]);
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
 
   const addTool = () => {
     const newTool: Tool = {
@@ -89,6 +90,25 @@ const AgentConfig = () => {
     setTools(tools.map(tool => 
       tool.id === id ? { ...tool, [field]: value } : tool
     ));
+  };
+
+  const playVoicePreview = async (voiceId: string) => {
+    try {
+      setPlayingVoice(voiceId);
+      // Fetch voice preview from API
+      const response = await fetch(`https://awake-cockatoo-naturally.ngrok-free.app/api/voice-preview/${voiceId}`);
+      const data = await response.json();
+      
+      if (data.preview_audio_url) {
+        const audio = new Audio(data.preview_audio_url);
+        audio.onended = () => setPlayingVoice(null);
+        audio.onerror = () => setPlayingVoice(null);
+        await audio.play();
+      }
+    } catch (error) {
+      console.error('Error playing voice preview:', error);
+      setPlayingVoice(null);
+    }
   };
 
   const handleSave = async () => {
@@ -172,9 +192,24 @@ const AgentConfig = () => {
                     <SelectContent className="max-h-60 bg-card border-border">
                       {voices.map((voice) => (
                         <SelectItem key={voice.id} value={voice.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{voice.id}</span>
-                            <span className="text-sm text-muted-foreground">{voice.trait}</span>
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex flex-col">
+                              <span className="font-medium">{voice.id}</span>
+                              <span className="text-sm text-muted-foreground">{voice.trait}</span>
+                            </div>
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                playVoicePreview(voice.id);
+                              }}
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 ml-2"
+                              disabled={playingVoice === voice.id}
+                            >
+                              <Play className="w-4 h-4" />
+                            </Button>
                           </div>
                         </SelectItem>
                       ))}
