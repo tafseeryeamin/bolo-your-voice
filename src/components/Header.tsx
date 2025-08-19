@@ -10,6 +10,21 @@ const Header = () => {
 
   useEffect(() => {
     checkAuth();
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          checkAdminRole(session.user);
+        } else {
+          setUser(null);
+          setIsAdmin(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const checkAuth = async () => {
