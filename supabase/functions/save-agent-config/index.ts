@@ -25,56 +25,46 @@ serve(async (req) => {
 
     // Validate required fields and provide defaults
     const agentName = agentConfig.agent_name || "My Agent";
-    const voiceId = agentConfig.voice_id || "9BWtsMINqrJLrRacOk9x"; // Default to Aria voice
-    const voiceModel = agentConfig.voice_model || "eleven_turbo_v2";
+    const voiceId = agentConfig.voice_id || "11labs-Adrian"; // Use 11labs-Adrian as default
     
-    // Map the configuration to Retell AI format with proper validation
+    // Create base payload matching Retell SDK structure
     const retellPayload = {
       agent_name: agentName,
       voice_id: voiceId,
-      voice_model: voiceModel,
-      voice_temperature: agentConfig.voice_temperature || 1,
-      voice_speed: agentConfig.voice_speed || 1,
-      volume: agentConfig.volume || 1,
-      responsiveness: agentConfig.responsiveness || 1,
-      interruption_sensitivity: agentConfig.interruption_sensitivity || 1,
-      enable_backchannel: agentConfig.enable_backchannel || false,
-      backchannel_frequency: agentConfig.backchannel_frequency || 0.9,
-      backchannel_words: agentConfig.backchannel_words || ["yeah", "uh-huh"],
-      reminder_trigger_ms: agentConfig.reminder_trigger_ms || 10000,
-      reminder_max_count: agentConfig.reminder_max_count || 2,
-      ambient_sound: agentConfig.background_sound || "off",
-      ambient_sound_volume: agentConfig.background_sound_volume || 1,
-      language: "en-US",
-      webhook_url: agentConfig.webhook_url || "https://your-webhook-url.com",
-      begin_message_delay_ms: agentConfig.begin_message_delay_ms || 1000,
-      ring_duration_ms: agentConfig.ring_duration_ms || 30000,
-      stt_mode: agentConfig.stt_mode || "fast",
-      vocab_specialization: agentConfig.vocab_specialization || "general",
-      allow_user_dtmf: agentConfig.allow_user_dtmf || true,
-      user_dtmf_options: agentConfig.user_dtmf_options || {
-        digit_limit: 25,
-        termination_key: "#",
-        timeout_ms: 8000
-      },
-      denoising_mode: agentConfig.denoising_mode || "noise-cancellation",
-      fallback_voice_ids: Array.isArray(agentConfig.fallback_voice_ids) ? agentConfig.fallback_voice_ids : [],
-      boosted_keywords: Array.isArray(agentConfig.boosted_keywords) ? agentConfig.boosted_keywords : []
+      response_engine: {
+        type: "retell-llm",
+        llm_id: "public_key_7ce8fc237e97788ef867f"
+      }
     };
 
-    // Add create-only fields
-    if (!agentId) {
-      retellPayload.version = 0;
-      retellPayload.response_engine = {
-        type: "retell-llm",
-        llm_id: "public_key_7ce8fc237e97788ef867f",
-        version: 0
-      };
-      retellPayload.opt_out_sensitive_data_storage = false;
-      retellPayload.opt_in_signed_url = false;
-      retellPayload.normalize_for_speech = true;
-      retellPayload.end_call_after_silence_ms = 600000;
-      retellPayload.max_call_duration_ms = 3600000;
+    // Only add optional fields if they are provided and not undefined
+    if (agentConfig.voice_model) retellPayload.voice_model = agentConfig.voice_model;
+    if (agentConfig.voice_temperature !== undefined) retellPayload.voice_temperature = agentConfig.voice_temperature;
+    if (agentConfig.voice_speed !== undefined) retellPayload.voice_speed = agentConfig.voice_speed;
+    if (agentConfig.volume !== undefined) retellPayload.volume = agentConfig.volume;
+    if (agentConfig.responsiveness !== undefined) retellPayload.responsiveness = agentConfig.responsiveness;
+    if (agentConfig.interruption_sensitivity !== undefined) retellPayload.interruption_sensitivity = agentConfig.interruption_sensitivity;
+    if (agentConfig.enable_backchannel !== undefined) retellPayload.enable_backchannel = agentConfig.enable_backchannel;
+    if (agentConfig.backchannel_frequency !== undefined) retellPayload.backchannel_frequency = agentConfig.backchannel_frequency;
+    if (agentConfig.backchannel_words && agentConfig.backchannel_words.length > 0) retellPayload.backchannel_words = agentConfig.backchannel_words;
+    if (agentConfig.reminder_trigger_ms !== undefined) retellPayload.reminder_trigger_ms = agentConfig.reminder_trigger_ms;
+    if (agentConfig.reminder_max_count !== undefined) retellPayload.reminder_max_count = agentConfig.reminder_max_count;
+    if (agentConfig.background_sound && agentConfig.background_sound !== "off") retellPayload.ambient_sound = agentConfig.background_sound;
+    if (agentConfig.background_sound_volume !== undefined) retellPayload.ambient_sound_volume = agentConfig.background_sound_volume;
+    if (agentConfig.webhook_url) retellPayload.webhook_url = agentConfig.webhook_url;
+    if (agentConfig.begin_message_delay_ms !== undefined) retellPayload.begin_message_delay_ms = agentConfig.begin_message_delay_ms;
+    if (agentConfig.ring_duration_ms !== undefined) retellPayload.ring_duration_ms = agentConfig.ring_duration_ms;
+    if (agentConfig.stt_mode) retellPayload.stt_mode = agentConfig.stt_mode;
+    if (agentConfig.vocab_specialization) retellPayload.vocab_specialization = agentConfig.vocab_specialization;
+    if (agentConfig.allow_user_dtmf !== undefined) retellPayload.allow_user_dtmf = agentConfig.allow_user_dtmf;
+    if (agentConfig.user_dtmf_options) retellPayload.user_dtmf_options = agentConfig.user_dtmf_options;
+    if (agentConfig.denoising_mode) retellPayload.denoising_mode = agentConfig.denoising_mode;
+    if (agentConfig.fallback_voice_ids && agentConfig.fallback_voice_ids.length > 0) retellPayload.fallback_voice_ids = agentConfig.fallback_voice_ids;
+    if (agentConfig.boosted_keywords && agentConfig.boosted_keywords.length > 0) retellPayload.boosted_keywords = agentConfig.boosted_keywords;
+
+    // For UPDATE operations, remove response_engine as it's not allowed
+    if (agentId) {
+      delete retellPayload.response_engine;
     }
 
     console.log('Sending to Retell AI:', retellPayload);
@@ -121,6 +111,10 @@ serve(async (req) => {
     }
 
     const result = JSON.parse(responseText);
+    
+    // Log the agent_id like in your Python example
+    console.log('Agent ID:', result.agent_id);
+    console.log('Full response:', result);
 
     return new Response(JSON.stringify({ 
       success: true, 
