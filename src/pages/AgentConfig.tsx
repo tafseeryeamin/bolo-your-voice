@@ -302,33 +302,27 @@ const AgentConfig = () => {
 
       console.log("Config data to send:", configData);
 
-      const { data, error } = await supabase.functions.invoke('save-agent-config', {
-        body: configData
+      // Send to your webhook URL
+      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/955d68ca-7f0e-46d8-9835-b0bbf8a8b0eb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(configData)
       });
 
-      if (error) {
-        console.error("Supabase function error:", error);
-        throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      console.log("Save response:", data);
+      const data = await response.json();
+      console.log("Webhook response:", data);
 
-      if (data.success) {
-        const isUpdate = data.isUpdate;
-        const agentId = data.agent.agent_id;
-        
-        toast({
-          title: "Success",
-          description: data.message,
-        });
+      toast({
+        title: "Success",
+        description: "Thanks for onboarding! Your widget will be tested by our team and get ready",
+      });
 
-        // If this was a new agent creation, redirect to test page
-        if (!isUpdate && agentId) {
-          navigate(`/test-agent?agent_id=${agentId}&agent_name=${encodeURIComponent(agentName)}`);
-        }
-      } else {
-        throw new Error(data.error || "Failed to save configuration");
-      }
     } catch (error) {
       console.error("Error saving agent configuration:", error);
       toast({
