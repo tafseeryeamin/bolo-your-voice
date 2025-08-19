@@ -240,55 +240,81 @@ const DemoTesting = () => {
             </div>
 
             <div className="flex flex-col items-center space-y-6">
-              {/* Large Microphone Icon */}
+              {/* Large Interactive Microphone */}
               <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Mic className="w-12 h-12 text-primary" />
+                <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isConnected 
+                    ? 'bg-green-500/20 border-4 border-green-500 shadow-lg shadow-green-500/30' 
+                    : isConnecting 
+                      ? 'bg-yellow-500/20 border-4 border-yellow-500 animate-pulse'
+                      : 'bg-primary/10 border-4 border-primary/30 hover:bg-primary/20 hover:border-primary/50'
+                }`}>
+                  {isConnected ? (
+                    <Mic className="w-16 h-16 text-green-600 animate-pulse" />
+                  ) : isConnecting ? (
+                    <Mic className="w-16 h-16 text-yellow-600" />
+                  ) : (
+                    <Mic className="w-16 h-16 text-primary" />
+                  )}
                 </div>
+                
+                {/* Status Indicator */}
                 {isConnected && (
-                  <div className="absolute -top-2 -right-2">
-                    <div className="w-6 h-6 bg-green-500 rounded-full animate-pulse flex items-center justify-center">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                  <div className="absolute -top-3 -right-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full animate-pulse flex items-center justify-center shadow-lg">
+                      <div className="w-4 h-4 bg-white rounded-full"></div>
                     </div>
                   </div>
                 )}
+                
+                {/* Audio Level Rings */}
+                {isConnected && (
+                  <>
+                    <div className="absolute inset-0 border-2 border-green-500/40 rounded-full animate-ping"></div>
+                    <div className="absolute inset-2 border-2 border-green-500/30 rounded-full animate-ping animation-delay-200"></div>
+                  </>
+                )}
               </div>
 
-              {!isConnected && !isConnecting && (
-                <Button
-                  onClick={handleTest}
-                  className="bg-primary hover:bg-primary/90 text-white px-8 py-3"
-                  disabled={!apiKey.trim() || !agentId.trim()}
-                >
-                  <Mic className="w-5 h-5 mr-2" />
-                  Start Test Call
-                </Button>
-              )}
+              {/* Status Text */}
+              <div className="text-center">
+                <p className={`text-lg font-medium ${
+                  isConnected ? 'text-green-600' : isConnecting ? 'text-yellow-600' : 'text-muted-foreground'
+                }`}>
+                  {isConnected ? 'Call Active - Speaking...' : isConnecting ? 'Connecting to Agent...' : 'Ready to Start Call'}
+                </p>
+              </div>
 
-              {isConnecting && (
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                  <p className="text-muted-foreground">Connecting...</p>
-                </div>
-              )}
+              {/* Control Buttons */}
+              <div className="flex flex-col items-center space-y-4">
+                {!isConnected && !isConnecting && (
+                  <Button
+                    onClick={handleTest}
+                    className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 text-lg font-medium rounded-xl shadow-lg"
+                    disabled={!apiKey.trim() || !agentId.trim()}
+                  >
+                    <Mic className="w-6 h-6 mr-3" />
+                    Start Voice Call
+                  </Button>
+                )}
 
-              {isConnected && (
-                <div className="text-center space-y-4">
-                  <div className="flex items-center justify-center">
-                    <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                    <span className="text-green-600 font-medium">Call Active</span>
+                {isConnecting && (
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-3"></div>
+                    <p className="text-yellow-600 font-medium">Establishing Connection...</p>
                   </div>
-                  
+                )}
+
+                {isConnected && (
                   <Button
                     onClick={handleStopCall}
-                    variant="destructive"
-                    className="px-8 py-3"
+                    className="bg-red-600 hover:bg-red-700 text-white px-12 py-4 text-lg font-medium rounded-xl shadow-lg"
                   >
-                    <MicOff className="w-5 h-5 mr-2" />
+                    <MicOff className="w-6 h-6 mr-3" />
                     End Call
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <div className="bg-muted/50 p-4 rounded-lg">
