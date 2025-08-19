@@ -95,16 +95,39 @@ const AgentConfig = () => {
   const playVoicePreview = async (voiceId: string) => {
     try {
       setPlayingVoice(voiceId);
-      // Fetch voice preview from API
-      const response = await fetch(`https://awake-cockatoo-naturally.ngrok-free.app/api/voice-preview/${voiceId}`);
-      const data = await response.json();
       
-      if (data.preview_audio_url) {
-        const audio = new Audio(data.preview_audio_url);
-        audio.onended = () => setPlayingVoice(null);
-        audio.onerror = () => setPlayingVoice(null);
-        await audio.play();
+      // Create a simple voice preview using Speech Synthesis API
+      const utterance = new SpeechSynthesisUtterance("Hello, this is a preview of my voice. How can I help you today?");
+      
+      // Try to match voice characteristics based on the voice data
+      const voice = voices.find(v => v.id === voiceId);
+      const availableVoices = speechSynthesis.getVoices();
+      
+      if (voice && availableVoices.length > 0) {
+        // Try to find a suitable voice based on traits
+        let selectedVoice = availableVoices[0]; // Default
+        
+        if (voice.trait.includes('British')) {
+          selectedVoice = availableVoices.find(v => v.lang.includes('en-GB')) || selectedVoice;
+        } else if (voice.trait.includes('Australian')) {
+          selectedVoice = availableVoices.find(v => v.lang.includes('en-AU')) || selectedVoice;
+        } else if (voice.trait.includes('German')) {
+          selectedVoice = availableVoices.find(v => v.lang.includes('de')) || selectedVoice;
+        } else if (voice.trait.includes('Spanish')) {
+          selectedVoice = availableVoices.find(v => v.lang.includes('es')) || selectedVoice;
+        } else if (voice.trait.includes('Indian')) {
+          selectedVoice = availableVoices.find(v => v.lang.includes('en-IN')) || selectedVoice;
+        }
+        
+        utterance.voice = selectedVoice;
+        utterance.rate = 0.9;
+        utterance.pitch = voice.trait.includes('Young') ? 1.1 : voice.trait.includes('Old') ? 0.9 : 1.0;
       }
+      
+      utterance.onend = () => setPlayingVoice(null);
+      utterance.onerror = () => setPlayingVoice(null);
+      
+      speechSynthesis.speak(utterance);
     } catch (error) {
       console.error('Error playing voice preview:', error);
       setPlayingVoice(null);
