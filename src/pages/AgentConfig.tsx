@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -106,9 +105,6 @@ interface PostCallAnalysisData {
 
 const AgentConfig = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [existingAgentId, setExistingAgentId] = useState<string | null>(null);
   // Basic settings
   const [agentName, setAgentName] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("");
@@ -156,23 +152,6 @@ const AgentConfig = () => {
 
   // Post call analysis
   const [postCallAnalysisData, setPostCallAnalysisData] = useState<PostCallAnalysisData[]>([]);
-
-  useEffect(() => {
-    console.log("AgentConfig component mounted");
-    
-    // Check if we have an existing agent ID from URL params
-    const agentId = searchParams.get('agent_id');
-    const agentName = searchParams.get('agent_name');
-    
-    if (agentId) {
-      setExistingAgentId(agentId);
-      console.log("Found existing agent ID:", agentId);
-      
-      if (agentName) {
-        setAgentName(decodeURIComponent(agentName));
-      }
-    }
-  }, [searchParams]);
 
   const addTool = () => {
     const newTool: Tool = {
@@ -268,7 +247,6 @@ const AgentConfig = () => {
       console.log("Saving agent configuration...");
       
       const configData = {
-        agentId: existingAgentId, // Include existing agent ID for updates
         agent_name: agentName,
         voice_id: selectedVoice,
         voice_model: "eleven_turbo_v2", // Default voice model
@@ -314,18 +292,10 @@ const AgentConfig = () => {
       console.log("Save response:", data);
 
       if (data.success) {
-        const isUpdate = data.isUpdate;
-        const agentId = data.agent.agent_id;
-        
         toast({
           title: "Success",
-          description: data.message,
+          description: "Agent configuration saved successfully to Retell AI!",
         });
-
-        // If this was a new agent creation, redirect to test page
-        if (!isUpdate && agentId) {
-          navigate(`/test-agent?agent_id=${agentId}&agent_name=${encodeURIComponent(agentName)}`);
-        }
       } else {
         throw new Error(data.error || "Failed to save configuration");
       }
