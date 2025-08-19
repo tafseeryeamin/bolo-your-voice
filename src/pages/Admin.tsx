@@ -5,22 +5,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, UserPlus, Users, Eye, Shield } from "lucide-react";
+import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity } from "lucide-react";
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
+  const [agents, setAgents] = useState<any[]>([]);
+  const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [roleUpdateLoading, setRoleUpdateLoading] = useState<string | null>(null);
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   useEffect(() => {
     checkAuth();
     fetchUsers();
+    fetchAgents();
+    fetchActivityLogs();
   }, []);
   const checkAuth = async () => {
     const {
@@ -58,6 +62,48 @@ const Admin = () => {
       }
     } catch (error) {
       console.error("Error fetching users:", error);
+    }
+  };
+
+  const fetchAgents = async () => {
+    try {
+      const { data: agents, error } = await supabase
+        .from('agents')
+        .select(`
+          *,
+          profiles(email, first_name, last_name)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching agents:", error);
+      } else {
+        setAgents(agents || []);
+      }
+    } catch (error) {
+      console.error("Error fetching agents:", error);
+    }
+  };
+
+  const fetchActivityLogs = async () => {
+    try {
+      const { data: logs, error } = await supabase
+        .from('activity_logs')
+        .select(`
+          *,
+          profiles(email, first_name, last_name),
+          agents(name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (error) {
+        console.error("Error fetching activity logs:", error);
+      } else {
+        setActivityLogs(logs || []);
+      }
+    } catch (error) {
+      console.error("Error fetching activity logs:", error);
     }
   };
   const handleCreateUser = async (e: React.FormEvent) => {
@@ -156,38 +202,167 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Create User Form */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center">
-                <UserPlus className="w-5 h-5 mr-2" />
-                Create New User
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Add a new user to the system
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-email" className="text-foreground">Email</Label>
-                  <Input id="new-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user email" required className="bg-input border-border text-foreground" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-password" className="text-foreground">Password</Label>
-                  <Input id="new-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter user password" required className="bg-input border-border text-foreground" />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading} variant="default">
-                  {loading ? "Creating user..." : "Create User"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="agents">Agents</TabsTrigger>
+            <TabsTrigger value="activity">Activity Logs</TabsTrigger>
+            <TabsTrigger value="create-user">Create User</TabsTrigger>
+          </TabsList>
 
-          {/* Users List */}
-          
-        </div>
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="w-5 h-5 mr-2" />
+                  All Users
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}</TableCell>
+                        <TableCell>
+                          <Select
+                            value={user.user_roles?.[0]?.role || 'user'}
+                            onValueChange={(value) => handleRoleChange(user.id, value as any)}
+                            disabled={roleUpdateLoading === user.id}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="moderator">Moderator</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {roleUpdateLoading === user.id && "Updating..."}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="agents" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Bot className="w-5 h-5 mr-2" />
+                  All Agent Configurations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Owner</TableHead>
+                      <TableHead>Language</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {agents.map((agent) => (
+                      <TableRow key={agent.id}>
+                        <TableCell className="font-medium">{agent.name}</TableCell>
+                        <TableCell>{agent.profiles?.email || 'Unknown'}</TableCell>
+                        <TableCell>{agent.language}</TableCell>
+                        <TableCell>{new Date(agent.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="max-w-xs truncate">{agent.description || 'N/A'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Activity className="w-5 h-5 mr-2" />
+                  Activity Logs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Agent</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Details</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {activityLogs.map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell>{log.profiles?.email || 'Unknown'}</TableCell>
+                        <TableCell className="font-medium">{log.action}</TableCell>
+                        <TableCell>{log.agents?.name || 'N/A'}</TableCell>
+                        <TableCell>{new Date(log.created_at).toLocaleString()}</TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {log.details ? JSON.stringify(log.details) : 'N/A'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="create-user" className="space-y-6">
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center">
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Create New User
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  Add a new user to the system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleCreateUser} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-email" className="text-foreground">Email</Label>
+                    <Input id="new-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user email" required className="bg-input border-border text-foreground" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password" className="text-foreground">Password</Label>
+                    <Input id="new-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter user password" required className="bg-input border-border text-foreground" />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading} variant="default">
+                    {loading ? "Creating user..." : "Create User"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>;
 };

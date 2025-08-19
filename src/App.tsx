@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Pricing from "./pages/Pricing";
 import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
+import Agents from "./pages/Agents";
 import TestAgent from "./pages/TestAgent";
 import DemoTesting from "./pages/DemoTesting";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -31,6 +32,11 @@ const App = () => (
           <Route path="/sign-in/pricing" element={<Pricing />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/agents" element={
+            <ProtectedRoute>
+              <Agents />
+            </ProtectedRoute>
+          } />
           <Route path="/create-agent" element={
             <ProtectedRoute>
               <CreateAgent />
