@@ -48,7 +48,7 @@ const CustomerHeroSection = ({
       {/* Header with user info and sign out */}
       <div className="absolute top-0 left-0 right-0 z-20 p-6">
         <div className="flex justify-between items-center max-w-6xl mx-auto">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
             <div className="p-2 rounded-lg bg-voice-accent/20">
               <Mic className="w-6 h-6 text-voice-accent" />
             </div>
