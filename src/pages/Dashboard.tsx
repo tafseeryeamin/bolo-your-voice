@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import Header from "@/components/Header";
 import CustomerHeroSection from "@/components/CustomerHeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import CTASection from "@/components/CTASection";
@@ -32,7 +33,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main>
+      <Header />
+      <main className="pt-20">
         <CustomerHeroSection user={user} />
         <FeaturesSection />
         <CTASection />
