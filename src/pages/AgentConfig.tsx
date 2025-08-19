@@ -290,8 +290,8 @@ const AgentConfig = () => {
       backchannel_words: backchannelWords.split(',').map(word => word.trim()),
       reminder_trigger_ms: reminderTriggerMs,
       reminder_max_count: reminderMaxCount,
-      ambient_sound: ambientSound,
-      ambient_sound_volume: ambientSoundVolume[0],
+      background_sound: ambientSound, // Sends values like "static-noise", "coffee-shop", etc.
+      background_sound_volume: ambientSoundVolume[0],
       begin_message_delay_ms: beginMessageDelayMs,
       ring_duration_ms: ringDurationMs,
       stt_mode: sttMode,
