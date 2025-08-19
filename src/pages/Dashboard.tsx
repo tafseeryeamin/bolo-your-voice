@@ -33,7 +33,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <CustomerHeroSection user={user} />
+      <Header />
+      <main className="pt-20">
+        <FeaturesSection />
+        <CTASection />
+      </main>
     </div>
   );
 };
