@@ -116,31 +116,7 @@ const DeploymentSection = () => {
           {[3, 4].map(index => <div key={index} className="col-span-6 row-span-2 group relative animate-fade-in" style={{
           animationDelay: features[index].delay
         }}>
-              <div className="relative h-full p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-500 hover:bg-white/10 hover:scale-[1.02]">
-                <div className="flex items-start gap-4 h-full">
-                  <div className="p-3 rounded-xl bg-primary/20 backdrop-blur-sm">
-                    {(() => {
-                  const IconComponent = features[index].icon;
-                  return <IconComponent className="w-6 h-6 text-white" />;
-                })()}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-white mb-3">
-                      {features[index].title}
-                    </h3>
-                    <p className="text-white/70 leading-relaxed">
-                      {features[index].description}
-                    </p>
-                  </div>
-                  <div className="w-24 h-16 bg-gradient-to-r from-primary/20 to-primary/40 rounded-lg flex items-center justify-center">
-                    <span className="text-white/60 text-xs">
-                      {features[index].mockup}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              </div>
+              
             </div>)}
 
           {/* Small feature - 3x2 */}
