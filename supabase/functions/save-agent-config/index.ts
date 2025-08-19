@@ -19,14 +19,15 @@ serve(async (req) => {
       throw new Error('RETELL_API_KEY not found in environment variables');
     }
 
-    const agentConfig = await req.json();
+    const { agentId, ...agentConfig } = await req.json();
     console.log('Received agent config:', agentConfig);
+    console.log('Agent ID:', agentId);
 
     // Map the configuration to Retell AI format
     const retellPayload = {
       agent_name: agentConfig.agent_name,
       voice_id: agentConfig.voice_id,
-      voice_model: agentConfig.voice_model,
+      voice_model: agentConfig.voice_model || "eleven_turbo_v2",
       voice_temperature: agentConfig.voice_temperature,
       voice_speed: agentConfig.voice_speed,
       volume: agentConfig.volume,
@@ -37,8 +38,8 @@ serve(async (req) => {
       backchannel_words: agentConfig.backchannel_words,
       reminder_trigger_ms: agentConfig.reminder_trigger_ms,
       reminder_max_count: agentConfig.reminder_max_count,
-      background_sound: agentConfig.background_sound,
-      background_sound_volume: agentConfig.background_sound_volume,
+      ambient_sound: agentConfig.background_sound,
+      ambient_sound_volume: agentConfig.background_sound_volume,
       language: "en-US", // Set to multilingual as requested
       webhook_url: agentConfig.webhook_url,
       begin_message_delay_ms: agentConfig.begin_message_delay_ms,
@@ -48,6 +49,8 @@ serve(async (req) => {
       allow_user_dtmf: agentConfig.allow_user_dtmf,
       user_dtmf_options: agentConfig.user_dtmf_options,
       denoising_mode: agentConfig.denoising_mode,
+      fallback_voice_ids: agentConfig.fallback_voice_ids || [],
+      boosted_keywords: agentConfig.boosted_keywords || [],
       version: 0,
       // Add default response_engine if not provided
       response_engine: agentConfig.response_engine || {
@@ -59,8 +62,17 @@ serve(async (req) => {
 
     console.log('Sending to Retell AI:', retellPayload);
 
-    const response = await fetch('https://api.retellai.com/create-agent', {
-      method: 'POST',
+    // Determine if this is an update or create operation
+    const isUpdate = !!agentId;
+    const apiUrl = isUpdate 
+      ? `https://api.retellai.com/update-agent/${agentId}`
+      : 'https://api.retellai.com/create-agent';
+    const method = isUpdate ? 'PATCH' : 'POST';
+
+    console.log(`Making ${method} request to:`, apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: method,
       headers: {
         'Authorization': `Bearer ${retellApiKey}`,
         'Content-Type': 'application/json',
@@ -81,7 +93,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({ 
       success: true, 
       agent: result,
-      message: 'Agent configuration saved successfully'
+      isUpdate: isUpdate,
+      message: isUpdate ? 'Agent configuration updated successfully' : 'Agent created successfully'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
