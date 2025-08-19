@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
+import Pricing from "./pages/Pricing";
 import FloatingElements from "./components/FloatingElements";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />

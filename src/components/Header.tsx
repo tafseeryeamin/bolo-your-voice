@@ -13,7 +13,11 @@ const Header = () => {
           <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO</span>
         </div>
         
-        
+        <nav className="hidden md:flex items-center space-x-8">
+          <Button variant="ghost" onClick={() => navigate("/pricing")}>
+            Pricing
+          </Button>
+        </nav>
         
         <div className="flex items-center space-x-4">
           <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/signin")}>
