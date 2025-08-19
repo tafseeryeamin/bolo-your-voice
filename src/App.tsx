@@ -9,6 +9,7 @@ import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 import Pricing from "./pages/Pricing";
+import AgentConfig from "./pages/AgentConfig";
 import FloatingElements from "./components/FloatingElements";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/sign-in/pricing" element={<Pricing />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/agent-config" element={<AgentConfig />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
