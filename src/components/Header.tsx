@@ -62,20 +62,45 @@ const Header = () => {
             Pricing
           </Button>
           {user && (
-            <Button variant="ghost" onClick={() => navigate("/create-agent")}>
-              <Settings className="w-4 h-4 mr-2" />
-              My Agents
-            </Button>
+            <>
+              <Button variant="ghost" onClick={() => navigate("/create-agent")}>
+                My Agents
+              </Button>
+              {isAdmin && (
+                <Button variant="ghost" onClick={() => navigate("/admin")}>
+                  Admin
+                </Button>
+              )}
+            </>
           )}
         </nav>
         
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/sign-in")}>
-            Sign In
-          </Button>
-          <Button variant="voice" data-cal-link="tafser-yeamin-8jqc8u/bolo" data-cal-namespace="bolo" data-cal-config='{"layout":"month_view"}'>
-            Get Started
-          </Button>
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-muted-foreground">
+                Welcome, {user.email}
+              </span>
+              <Button 
+                variant="ghost" 
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate("/");
+                }}
+              >
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/sign-in")}>
+                Sign In
+              </Button>
+              <Button variant="voice" data-cal-link="tafser-yeamin-8jqc8u/bolo" data-cal-namespace="bolo" data-cal-config='{"layout":"month_view"}'>
+                Get Started
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -35,7 +35,6 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="pt-20">
-        <CustomerHeroSection user={user} />
         <FeaturesSection />
         <CTASection />
       </main>
