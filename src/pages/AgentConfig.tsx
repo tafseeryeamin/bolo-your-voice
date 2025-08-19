@@ -10,8 +10,6 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Settings, Webhook, Wrench, Mic, Plus, Trash2, Play, User, Volume2, Gauge, Zap, MessageSquare, Clock, Music, Globe, TrendingUp, BarChart3 } from "lucide-react";
 import Header from "@/components/Header";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 // Voice data with all the voices you specified
 const voices = [
@@ -104,7 +102,6 @@ interface PostCallAnalysisData {
 }
 
 const AgentConfig = () => {
-  const { toast } = useToast();
   // Basic settings
   const [agentName, setAgentName] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("");
@@ -243,69 +240,101 @@ const AgentConfig = () => {
   };
 
   const handleSave = async () => {
+    console.log("Starting handleSave function");
+    console.log("All state variables:", {
+      agentName,
+      agentPrompt,
+      selectedVoice,
+      fallbackVoiceIds,
+      voiceTemperature,
+      voiceSpeed,
+      volume,
+      responsiveness,
+      interruptionSensitivity,
+      enableBackchannel,
+      backchannelFrequency,
+      backchannelWords,
+      reminderTriggerMs,
+      reminderMaxCount,
+      ambientSound,
+      ambientSoundVolume,
+      beginMessageDelayMs,
+      ringDurationMs,
+      sttMode,
+      vocabSpecialization,
+      allowUserDtmf,
+      dtmfDigitLimit,
+      dtmfTerminationKey,
+      dtmfTimeoutMs,
+      denoisingMode,
+      boostedKeywords,
+      postCallAnalysisData,
+      speaksFirst,
+      aiFirstMessage,
+      tools,
+      webhookUrl
+    });
+    
+    const config = {
+      agent_name: agentName,
+      agent_prompt: agentPrompt,
+      voice_id: selectedVoice,
+      fallback_voice_ids: fallbackVoiceIds,
+      voice_temperature: voiceTemperature[0],
+      voice_speed: voiceSpeed[0],
+      volume: volume[0],
+      responsiveness: responsiveness[0],
+      interruption_sensitivity: interruptionSensitivity[0],
+      enable_backchannel: enableBackchannel,
+      backchannel_frequency: backchannelFrequency[0],
+      backchannel_words: backchannelWords.split(',').map(word => word.trim()),
+      reminder_trigger_ms: reminderTriggerMs,
+      reminder_max_count: reminderMaxCount,
+      background_sound: ambientSound, // Sends values like "static-noise", "coffee-shop", etc.
+      background_sound_volume: ambientSoundVolume[0],
+      begin_message_delay_ms: beginMessageDelayMs,
+      ring_duration_ms: ringDurationMs,
+      stt_mode: sttMode,
+      vocab_specialization: vocabSpecialization,
+      allow_user_dtmf: allowUserDtmf,
+      user_dtmf_options: {
+        digit_limit: dtmfDigitLimit,
+        termination_key: dtmfTerminationKey,
+        timeout_ms: dtmfTimeoutMs
+      },
+      denoising_mode: denoisingMode,
+      language: "multilingual",
+      webhook_url: webhookUrl,
+      boosted_keywords: boostedKeywords.split(',').map(keyword => keyword.trim()),
+      post_call_analysis_data: postCallAnalysisData.map(data => ({
+        type: data.type,
+        name: data.name,
+        description: data.description,
+      })),
+      speaks_first: speaksFirst,
+      ai_first_message: aiFirstMessage,
+      tools,
+    };
+    
     try {
-      console.log("Saving agent configuration...");
-      
-      const configData = {
-        agent_name: agentName,
-        voice_id: selectedVoice,
-        voice_model: "eleven_turbo_v2", // Default voice model
-        voice_temperature: voiceTemperature[0],
-        voice_speed: voiceSpeed[0],
-        volume: volume[0],
-        responsiveness: responsiveness[0],
-        interruption_sensitivity: interruptionSensitivity[0],
-        enable_backchannel: enableBackchannel,
-        backchannel_frequency: backchannelFrequency[0],
-        backchannel_words: backchannelWords.split(',').map(word => word.trim()),
-        reminder_trigger_ms: reminderTriggerMs,
-        reminder_max_count: reminderMaxCount,
-        background_sound: ambientSound, // Sends values like "static-noise", "coffee-shop", etc.
-        background_sound_volume: ambientSoundVolume[0],
-        webhook_url: webhookUrl,
-        begin_message_delay_ms: beginMessageDelayMs,
-        ring_duration_ms: ringDurationMs,
-        stt_mode: sttMode,
-        vocab_specialization: vocabSpecialization,
-        allow_user_dtmf: allowUserDtmf,
-        user_dtmf_options: {
-          digit_limit: dtmfDigitLimit,
-          termination_key: dtmfTerminationKey,
-          timeout_ms: dtmfTimeoutMs
+      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/955d68ca-7f0e-46d8-9835-b0bbf8a8b0eb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        denoising_mode: denoisingMode,
-        fallback_voice_ids: fallbackVoiceIds,
-        boosted_keywords: boostedKeywords.split(',').map(keyword => keyword.trim()).filter(k => k),
-      };
-
-      console.log("Config data to send:", configData);
-
-      const { data, error } = await supabase.functions.invoke('save-agent-config', {
-        body: configData
+        body: JSON.stringify(config),
       });
-
-      if (error) {
-        console.error("Supabase function error:", error);
-        throw error;
-      }
-
-      console.log("Save response:", data);
-
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: "Agent configuration saved successfully to Retell AI!",
-        });
+      
+      if (response.ok) {
+        console.log("Agent Configuration sent successfully:", config);
+        // You could add a toast notification here for success
       } else {
-        throw new Error(data.error || "Failed to save configuration");
+        console.error("Failed to send configuration:", response.statusText);
+        // You could add a toast notification here for error
       }
     } catch (error) {
-      console.error("Error saving agent configuration:", error);
-      toast({
-        title: "Error",
-        description: `Failed to save configuration: ${error.message}`,
-        variant: "destructive",
-      });
+      console.error("Error sending configuration:", error);
+      // You could add a toast notification here for error
     }
   };
 
