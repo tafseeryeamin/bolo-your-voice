@@ -162,27 +162,7 @@ const Pricing = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 px-4 text-center">
-          <div className="container mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Ready to Get Started?
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Join thousands of developers building the future of voice AI
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Start Building Free
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                Contact Sales
-              </Button>
-            </div>
-            <p className="text-white/60 text-sm mt-4">
-              No credit card required • 1,000 free minutes included
-            </p>
-          </div>
-        </section>
+        
       </main>
     </div>;
 };
