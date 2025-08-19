@@ -55,7 +55,7 @@ serve(async (req) => {
       // Add required response_engine for create operations
       response_engine: agentConfig.response_engine || {
         type: "retell-llm",
-        llm_id: "llm_b89dc1ed4b3ad1b6b0dd99b5a5e24e", // Use a default LLM ID
+        llm_id: "public_key_7ce8fc237e97788ef867f", // Use the provided LLM key
         version: 0
       },
       // Add other required fields for create
