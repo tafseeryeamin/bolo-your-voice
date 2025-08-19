@@ -91,7 +91,7 @@ const AgentConfig = () => {
     ));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const config = {
       agentPrompt,
       selectedVoice,
@@ -100,8 +100,27 @@ const AgentConfig = () => {
       webhookUrl,
       tools,
     };
-    console.log("Agent Configuration:", config);
-    // Here you would typically save to your backend
+    
+    try {
+      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/955d68ca-7f0e-46d8-9835-b0bbf8a8b0eb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      });
+      
+      if (response.ok) {
+        console.log("Agent Configuration sent successfully:", config);
+        // You could add a toast notification here for success
+      } else {
+        console.error("Failed to send configuration:", response.statusText);
+        // You could add a toast notification here for error
+      }
+    } catch (error) {
+      console.error("Error sending configuration:", error);
+      // You could add a toast notification here for error
+    }
   };
 
   return (
