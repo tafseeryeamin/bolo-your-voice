@@ -203,7 +203,7 @@ const DemoTesting = () => {
             <TestTube className="w-8 h-8 mr-3 text-primary" />
             Demo and Testing
           </h1>
-          <p className="text-muted-foreground">Test Retell AI voice calls with custom API credentials.</p>
+          <p className="text-muted-foreground">Test voice calls with custom API credentials.</p>
         </div>
 
         <Card>
@@ -216,11 +216,11 @@ const DemoTesting = () => {
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="api-key">Retell API Key</Label>
+                <Label htmlFor="api-key">API Key</Label>
                 <Input
                   id="api-key"
                   type="password"
-                  placeholder="Enter your Retell API key"
+                  placeholder="Enter your API key"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   className="mt-2"
@@ -239,7 +239,21 @@ const DemoTesting = () => {
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-4">
+            <div className="flex flex-col items-center space-y-6">
+              {/* Large Microphone Icon */}
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Mic className="w-12 h-12 text-primary" />
+                </div>
+                {isConnected && (
+                  <div className="absolute -top-2 -right-2">
+                    <div className="w-6 h-6 bg-green-500 rounded-full animate-pulse flex items-center justify-center">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {!isConnected && !isConnecting && (
                 <Button
                   onClick={handleTest}
@@ -280,7 +294,7 @@ const DemoTesting = () => {
             <div className="bg-muted/50 p-4 rounded-lg">
               <h4 className="font-medium text-sm mb-2">Instructions:</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>1. Enter your Retell API key and Agent ID</li>
+                <li>1. Enter your API key and Agent ID</li>
                 <li>2. Click "Start Test Call" to initiate the voice call</li>
                 <li>3. Allow microphone access when prompted</li>
                 <li>4. Speak with the AI agent to test functionality</li>
