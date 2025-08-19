@@ -23,58 +23,58 @@ serve(async (req) => {
     console.log('Received agent config:', agentConfig);
     console.log('Agent ID:', agentId);
 
-    // Map the configuration to Retell AI format
+    // Validate required fields and provide defaults
+    const agentName = agentConfig.agent_name || "My Agent";
+    const voiceId = agentConfig.voice_id || "9BWtsMINqrJLrRacOk9x"; // Default to Aria voice
+    const voiceModel = agentConfig.voice_model || "eleven_turbo_v2";
+    
+    // Map the configuration to Retell AI format with proper validation
     const retellPayload = {
-      agent_name: agentConfig.agent_name,
-      voice_id: agentConfig.voice_id,
-      voice_model: agentConfig.voice_model || "eleven_turbo_v2",
-      voice_temperature: agentConfig.voice_temperature,
-      voice_speed: agentConfig.voice_speed,
-      volume: agentConfig.volume,
-      responsiveness: agentConfig.responsiveness,
-      interruption_sensitivity: agentConfig.interruption_sensitivity,
-      enable_backchannel: agentConfig.enable_backchannel,
-      backchannel_frequency: agentConfig.backchannel_frequency,
-      backchannel_words: agentConfig.backchannel_words,
-      reminder_trigger_ms: agentConfig.reminder_trigger_ms,
-      reminder_max_count: agentConfig.reminder_max_count,
-      ambient_sound: agentConfig.background_sound,
-      ambient_sound_volume: agentConfig.background_sound_volume,
-      language: "en-US", // Set as requested
-      webhook_url: agentConfig.webhook_url || "https://your-webhook-url.com", // Add default webhook
-      begin_message_delay_ms: agentConfig.begin_message_delay_ms,
-      ring_duration_ms: agentConfig.ring_duration_ms,
-      stt_mode: agentConfig.stt_mode,
-      vocab_specialization: agentConfig.vocab_specialization,
-      allow_user_dtmf: agentConfig.allow_user_dtmf,
-      user_dtmf_options: agentConfig.user_dtmf_options,
-      denoising_mode: agentConfig.denoising_mode,
-      fallback_voice_ids: agentConfig.fallback_voice_ids || [],
-      boosted_keywords: agentConfig.boosted_keywords || [],
-      version: 0,
-      // Add required response_engine for create operations
-      response_engine: agentConfig.response_engine || {
-        type: "retell-llm",
-        llm_id: "public_key_7ce8fc237e97788ef867f", // Use the provided LLM key
-        version: 0
+      agent_name: agentName,
+      voice_id: voiceId,
+      voice_model: voiceModel,
+      voice_temperature: agentConfig.voice_temperature || 1,
+      voice_speed: agentConfig.voice_speed || 1,
+      volume: agentConfig.volume || 1,
+      responsiveness: agentConfig.responsiveness || 1,
+      interruption_sensitivity: agentConfig.interruption_sensitivity || 1,
+      enable_backchannel: agentConfig.enable_backchannel || false,
+      backchannel_frequency: agentConfig.backchannel_frequency || 0.9,
+      backchannel_words: agentConfig.backchannel_words || ["yeah", "uh-huh"],
+      reminder_trigger_ms: agentConfig.reminder_trigger_ms || 10000,
+      reminder_max_count: agentConfig.reminder_max_count || 2,
+      ambient_sound: agentConfig.background_sound || "off",
+      ambient_sound_volume: agentConfig.background_sound_volume || 1,
+      language: "en-US",
+      webhook_url: agentConfig.webhook_url || "https://your-webhook-url.com",
+      begin_message_delay_ms: agentConfig.begin_message_delay_ms || 1000,
+      ring_duration_ms: agentConfig.ring_duration_ms || 30000,
+      stt_mode: agentConfig.stt_mode || "fast",
+      vocab_specialization: agentConfig.vocab_specialization || "general",
+      allow_user_dtmf: agentConfig.allow_user_dtmf || true,
+      user_dtmf_options: agentConfig.user_dtmf_options || {
+        digit_limit: 25,
+        termination_key: "#",
+        timeout_ms: 8000
       },
-      // Add other required fields for create
-      opt_out_sensitive_data_storage: false,
-      opt_in_signed_url: false,
-      normalize_for_speech: true,
-      end_call_after_silence_ms: 600000,
-      max_call_duration_ms: 3600000
+      denoising_mode: agentConfig.denoising_mode || "noise-cancellation",
+      fallback_voice_ids: Array.isArray(agentConfig.fallback_voice_ids) ? agentConfig.fallback_voice_ids : [],
+      boosted_keywords: Array.isArray(agentConfig.boosted_keywords) ? agentConfig.boosted_keywords : []
     };
 
-    // Remove fields that are not allowed in UPDATE operations
-    if (agentId) {
-      delete retellPayload.response_engine;
-      delete retellPayload.version;
-      delete retellPayload.opt_out_sensitive_data_storage;
-      delete retellPayload.opt_in_signed_url;
-      delete retellPayload.normalize_for_speech;
-      delete retellPayload.end_call_after_silence_ms;
-      delete retellPayload.max_call_duration_ms;
+    // Add create-only fields
+    if (!agentId) {
+      retellPayload.version = 0;
+      retellPayload.response_engine = {
+        type: "retell-llm",
+        llm_id: "public_key_7ce8fc237e97788ef867f",
+        version: 0
+      };
+      retellPayload.opt_out_sensitive_data_storage = false;
+      retellPayload.opt_in_signed_url = false;
+      retellPayload.normalize_for_speech = true;
+      retellPayload.end_call_after_silence_ms = 600000;
+      retellPayload.max_call_duration_ms = 3600000;
     }
 
     console.log('Sending to Retell AI:', retellPayload);
@@ -104,7 +104,20 @@ serve(async (req) => {
     if (!response.ok) {
       console.error(`Retell AI API error: ${response.status} - ${responseText}`);
       console.error('Request payload was:', JSON.stringify(retellPayload, null, 2));
-      throw new Error(`Retell AI API error: ${response.status} - ${responseText}`);
+      console.error('Request headers:', {
+        'Authorization': `Bearer ${retellApiKey.substring(0, 10)}...`,
+        'Content-Type': 'application/json'
+      });
+      
+      // Return a more detailed error response
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: `Retell AI API error: ${response.status} - ${responseText}`,
+        details: responseText
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const result = JSON.parse(responseText);
