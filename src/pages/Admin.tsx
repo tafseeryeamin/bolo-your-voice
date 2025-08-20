@@ -18,7 +18,7 @@ const Admin = () => {
   const [agents, setAgents] = useState<any[]>([]);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [agentIds, setAgentIds] = useState<{[key: string]: string}>({});
+  
   const [roleUpdateLoading, setRoleUpdateLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -191,116 +191,6 @@ const Admin = () => {
     }
   };
 
-  const handleAssignAgentId = async (notification: any) => {
-    const agentId = agentIds[notification.id];
-    if (!agentId || !agentId.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter an Agent ID",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    console.log("Assigning agent ID:", agentId, "to notification:", notification.id);
-    console.log("Notification data:", notification.data);
-
-    try {
-      const notificationData = notification.data;
-      if (!notificationData?.internal_agent_id) {
-        console.error("No internal agent ID found in notification:", notificationData);
-        toast({
-          title: "Error",
-          description: "No internal agent ID found in notification",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      console.log("Updating agent with internal ID:", notificationData.internal_agent_id);
-
-      // Update the existing agent record with the assigned Retell agent ID
-      const { error: updateError } = await supabase
-        .from('agents')
-        .update({ 
-          llm_websocket_url: agentId // Store the Retell agent ID here
-        })
-        .eq('id', notificationData.internal_agent_id);
-
-      if (updateError) {
-        console.error("Error updating agent:", updateError);
-        toast({
-          title: "Error",
-          description: "Failed to update agent with Retell ID",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      console.log("Agent updated successfully with Retell ID:", agentId);
-
-      // Mark notification as read
-      const { error: notificationError } = await supabase
-        .from('notifications')
-        .update({ 
-          read: true,
-          data: { 
-            ...notificationData,
-            assigned_agent_id: agentId 
-          }
-        })
-        .eq('id', notification.id);
-
-      if (notificationError) {
-        console.error("Error updating notification:", notificationError);
-      }
-
-      // Create activity log with proper user ID
-      const { data: agentData } = await supabase
-        .from('agents')
-        .select('user_id')
-        .eq('id', notificationData.internal_agent_id)
-        .single();
-
-      if (agentData) {
-        await supabase
-          .from('activity_logs')
-          .insert({
-            user_id: agentData.user_id,
-            agent_id: notificationData.internal_agent_id,
-            action: 'agent_retell_id_assigned',
-            details: { 
-              assigned_retell_id: agentId,
-              agent_name: notificationData.agent_name 
-            }
-          });
-      }
-
-      toast({
-        title: "Success",
-        description: "Agent ID assigned successfully! Agent is now ready for testing.",
-      });
-
-      // Clear the input
-      setAgentIds(prev => ({
-        ...prev,
-        [notification.id]: ''
-      }));
-
-      // Refresh data
-      fetchNotifications();
-      fetchAgents();
-      fetchActivityLogs();
-
-    } catch (error) {
-      console.error("Error assigning agent ID:", error);
-      toast({
-        title: "Error",
-        description: `Failed to assign agent ID: ${error.message}`,
-        variant: "destructive"
-      });
-    }
-  };
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -484,28 +374,8 @@ const Admin = () => {
                                 Mark Read
                               </Button>
                             ) : (
-                              <div className="flex flex-col gap-2 min-w-[200px]">
-                                <div className="flex gap-2">
-                                  <Input
-                                    placeholder="Enter Agent ID"
-                                    value={agentIds[notification.id] || ''}
-                                    onChange={(e) => setAgentIds(prev => ({
-                                      ...prev,
-                                      [notification.id]: e.target.value
-                                    }))}
-                                    className="w-full"
-                                  />
-                                   <Button
-                                     size="sm"
-                                     onClick={() => handleAssignAgentId(notification)}
-                                     disabled={!agentIds[notification.id] || !agentIds[notification.id].trim()}
-                                   >
-                                     Assign
-                                   </Button>
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                  Enter the Agent ID from your system to assign to this user's agent configuration.
-                                </p>
+                              <div className="text-sm text-muted-foreground">
+                                Agent configuration approved. User can now test and deploy their agent.
                               </div>
                             )}
                           </div>

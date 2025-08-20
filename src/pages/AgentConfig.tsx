@@ -82,7 +82,7 @@ const AgentConfig = () => {
   const [websiteLink, setWebsiteLink] = useState("");
   const [retellAgentId, setRetellAgentId] = useState<string | null>(null);
   const [isCreatingAgent, setIsCreatingAgent] = useState(false);
-  const [showVoiceTester, setShowVoiceTester] = useState<boolean>(false);
+  
 
   useEffect(() => {
     console.log("AgentConfig component mounted");
@@ -155,11 +155,6 @@ const AgentConfig = () => {
           }
         }
 
-        // Check if agent has been assigned a Retell ID
-        if (agent.llm_websocket_url) {
-          setRetellAgentId(agent.llm_websocket_url);
-          setShowVoiceTester(true);
-        }
       }
     } catch (error) {
       console.error("Error in loadAgentData:", error);
@@ -323,8 +318,6 @@ const AgentConfig = () => {
         }
       }
 
-      // Show voice tester
-      setShowVoiceTester(true);
 
       // Log activity
       await supabase
@@ -534,20 +527,26 @@ const AgentConfig = () => {
             </CardContent>
           </Card>
 
-          {/* Test Agent Component */}
-          {showVoiceTester && (
-            <VoiceTester 
-              agentId={retellAgentId} 
-              agentName={agentName}
-            />
-          )}
-          
-          {retellAgentId && (
-            <AgentTester 
-              agentId={retellAgentId} 
-              agentName={agentName}
-            />
-          )}
+          {/* Test and Deploy */}
+          <div className="space-y-8">
+            <div className="bg-card rounded-lg border p-6">
+              <h2 className="text-2xl font-bold mb-4">Test Your Agent</h2>
+              <div className="space-y-6">
+                <VoiceTester agentId={existingAgentId} agentName={agentName || 'Your Agent'} />
+                <AgentTester agentId={existingAgentId || ''} agentName={agentName || 'Your Agent'} />
+              </div>
+            </div>
+            
+            <div className="bg-card rounded-lg border p-6">
+              <h2 className="text-2xl font-bold mb-4">Deploy Agent</h2>
+              <p className="text-muted-foreground mb-4">
+                Your agent is ready to be deployed. You can integrate it into your applications using the provided API endpoints.
+              </p>
+              <Button onClick={() => navigate('/demo-testing')} className="w-full">
+                Go to Demo & Testing
+              </Button>
+            </div>
+          </div>
 
           {/* Save Button */}
           <div className="flex justify-end space-x-4">
