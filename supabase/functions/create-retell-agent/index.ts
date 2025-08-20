@@ -21,6 +21,7 @@ serve(async (req) => {
     console.log('Create Retell Agent function called');
     
     const {
+      internal_agent_id,
       agent_name,
       system_prompt,
       first_message,
@@ -75,6 +76,7 @@ serve(async (req) => {
         title: 'New Agent Configuration Submitted',
         message: `New agent "${agent_name}" configuration submitted and ready for review.`,
         data: {
+          internal_agent_id,
           agent_name,
           voice_id,
           first_message,

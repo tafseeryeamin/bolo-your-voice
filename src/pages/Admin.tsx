@@ -203,81 +203,55 @@ const Admin = () => {
     }
 
     try {
-      // Find the user who submitted this request from the notification data
       const notificationData = notification.data;
-      
-      // Get user from profiles based on email or find user who created similar agents
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('*');
-      
-      if (profileError) {
-        console.error("Error fetching profiles:", profileError);
+      if (!notificationData?.internal_agent_id) {
         toast({
           title: "Error",
-          description: "Could not find user profile",
+          description: "No internal agent ID found in notification",
           variant: "destructive"
         });
         return;
       }
 
-      // Find the user - we'll need to match by agent name or other criteria
-      // For now, let's assume we can find it by matching recent agents
-      const { data: existingAgents } = await supabase
+      // Update the existing agent record with the assigned Retell agent ID
+      const { error: updateError } = await supabase
         .from('agents')
-        .select('user_id')
-        .eq('name', notificationData.agent_name)
-        .order('created_at', { ascending: false })
-        .limit(1);
+        .update({ 
+          llm_websocket_url: agentId // Store the Retell agent ID here
+        })
+        .eq('id', notificationData.internal_agent_id);
 
-      let userId = null;
-      if (existingAgents && existingAgents.length > 0) {
-        userId = existingAgents[0].user_id;
-      } else {
-        // If no existing agent found, we'll need to find another way to identify the user
-        // For now, let's use the first profile (this should be improved)
-        if (profiles && profiles.length > 0) {
-          userId = profiles[0].id;
-        }
-      }
-
-      if (!userId) {
+      if (updateError) {
+        console.error("Error updating agent:", updateError);
         toast({
           title: "Error",
-          description: "Could not identify the user for this request",
+          description: "Failed to update agent with Retell ID",
           variant: "destructive"
         });
         return;
       }
 
-      // Create or update the agent record with the provided agent ID
-      const { error: agentError } = await supabase
-        .from('agents')
-        .insert({
-          name: notificationData.agent_name,
-          user_id: userId,
-          voice_id: notificationData.voice_id,
-          prompt: `Agent created from admin assignment. Voice: ${notificationData.voice_id}, Responsiveness: ${notificationData.responsiveness}`,
-          begin_message: notificationData.first_message,
-          response_engine: agentId, // Store the external agent ID here
-          description: `Knowledge Base: ${notificationData.knowledge_base || 'None'}, Website: ${notificationData.website_link || 'None'}`
-        });
+      // Mark notification as read
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .update({ 
+          read: true,
+          data: { 
+            ...notificationData,
+            assigned_agent_id: agentId 
+          }
+        })
+        .eq('id', notification.id);
 
-      if (agentError) {
-        console.error("Error creating agent:", agentError);
-        toast({
-          title: "Error",
-          description: "Failed to create agent record",
-          variant: "destructive"
-        });
-        return;
+      if (notificationError) {
+        console.error("Error updating notification:", notificationError);
       }
 
       // Create activity log
       await supabase
         .from('activity_logs')
         .insert({
-          user_id: userId,
+          user_id: 'admin',
           action: 'agent_assigned',
           details: {
             agent_name: notificationData.agent_name,

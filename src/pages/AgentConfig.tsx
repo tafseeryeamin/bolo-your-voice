@@ -177,16 +177,10 @@ const AgentConfig = () => {
         return;
       }
 
-      // Show voice tester immediately
-      setShowVoiceTester(true);
-      
-      // First create the Retell agent
-      await createRetellAgent();
-
       const agentData = {
         name: agentName,
         user_id: user.id,
-          voice_id: selectedVoice,
+        voice_id: selectedVoice,
         language: 'en-US', 
         description: agentPrompt,
         prompt: agentPrompt,
@@ -197,12 +191,14 @@ const AgentConfig = () => {
           voice_model: "eleven_turbo_v2",
           responsiveness: responsiveness[0],
           enable_backchannel: enableBackchannel,
-          backchannel_frequency: backchannelFrequency[0]
+          backchannel_frequency: backchannelFrequency[0],
+          knowledge_base: knowledgeBase,
+          website_link: websiteLink
         }),
         llm_websocket_url: null
       };
 
-      // Save to Supabase database
+      // Save to Supabase database first
       let result;
       if (existingAgentId) {
         // Update existing agent
@@ -224,22 +220,46 @@ const AgentConfig = () => {
         throw new Error(result.error.message);
       }
 
+      const savedAgent = result.data[0];
+      setExistingAgentId(savedAgent.id);
+
+      // Now create the Retell agent request with the saved agent ID
+      const { data, error } = await supabase.functions.invoke('create-retell-agent', {
+        body: {
+          internal_agent_id: savedAgent.id,
+          agent_name: agentName,
+          system_prompt: agentPrompt,
+          first_message: firstMessage,
+          voice_id: selectedVoice,
+          responsiveness: responsiveness[0],
+          enable_backchannel: enableBackchannel,
+          backchannel_frequency: backchannelFrequency[0],
+          knowledge_base: knowledgeBase,
+          website_link: websiteLink
+        }
+      });
+
+      if (error) {
+        console.error("Error creating Retell agent request:", error);
+      }
+
+      // Show voice tester
+      setShowVoiceTester(true);
+
       // Log activity
       await supabase
         .from('activity_logs')
         .insert([{
           user_id: user.id,
-          agent_id: result.data[0].id,
+          agent_id: savedAgent.id,
           action: existingAgentId ? 'agent_updated' : 'agent_created',
           details: { agent_name: agentName }
         }]);
 
       toast({
         title: "Success",
-        description: existingAgentId ? "Agent updated successfully!" : "Agent created successfully!",
+        description: `Agent ${existingAgentId ? 'updated' : 'created'} successfully! Admin will review and assign Retell agent ID.`,
       });
-
-      // Don't redirect immediately, let user test the agent
       
     } catch (error) {
       console.error("Error saving agent configuration:", error);
