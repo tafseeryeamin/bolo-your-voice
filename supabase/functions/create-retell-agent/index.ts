@@ -37,6 +37,7 @@ serve(async (req) => {
     // Create simplified payload matching your form
     const webhookPayload = {
       agent_name,
+      system_prompt,
       version: 0,
       response_engine: {
         type: "retell-llm",
