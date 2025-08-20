@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Play, User, Mic } from "lucide-react";
+import { User, Mic } from "lucide-react";
 import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import AgentTester from "@/components/AgentTester";
 
 const AgentConfig = () => {
   const { toast } = useToast();
@@ -48,42 +49,40 @@ const AgentConfig = () => {
   const createRetellAgent = async () => {
     setIsCreatingAgent(true);
     try {
-      // Call webhook to create Retell agent
-      const webhookPayload = {
-        agent_name: agentName,
-        version: 0,
-        response_engine: {
-          type: "retell-llm",
-          llm_id: "your_llm_id" // This would come from your webhook configuration
-        },
-        voice_id: "11labs-Amritanshu",
-        voice_model: "eleven_turbo_v2", 
-        language: "en-US",
-        responsiveness: responsiveness[0],
-        enable_backchannel: enableBackchannel,
-        backchannel_frequency: backchannelFrequency[0],
-        system_prompt: agentPrompt
-      };
-
-      const response = await fetch('YOUR_WEBHOOK_URL', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(webhookPayload),
+      console.log('Creating Retell agent...');
+      
+      // Call Supabase edge function to create Retell agent
+      const { data, error } = await supabase.functions.invoke('create-retell-agent', {
+        body: {
+          agent_name: agentName,
+          version: 0,
+          response_engine: {
+            type: "retell-llm",
+            llm_id: "your_llm_id" // This would come from your LLM configuration
+          },
+          voice_id: "11labs-Amritanshu",
+          voice_model: "eleven_turbo_v2", 
+          language: "en-US",
+          responsiveness: responsiveness[0],
+          enable_backchannel: enableBackchannel,
+          backchannel_frequency: backchannelFrequency[0],
+          system_prompt: agentPrompt
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create Retell agent');
+      if (error) {
+        throw new Error(error.message);
       }
 
-      const result = await response.json();
-      setRetellAgentId(result.agent_id);
-
-      toast({
-        title: "Success",
-        description: "Retell agent created successfully!",
-      });
+      if (data.success) {
+        setRetellAgentId(data.agent_id);
+        toast({
+          title: "Success",
+          description: "Retell agent created successfully!",
+        });
+      } else {
+        throw new Error(data.error || 'Failed to create Retell agent');
+      }
 
     } catch (error) {
       console.error("Error creating Retell agent:", error);
@@ -308,32 +307,10 @@ const AgentConfig = () => {
 
           {/* Test Agent Component */}
           {retellAgentId && (
-            <Card>
-              <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-                <Mic className="w-5 h-5 text-voice-accent mr-2" />
-                <CardTitle>Test Your Agent</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-muted rounded-lg">
-                    <Label className="text-sm font-medium">Agent ID</Label>
-                    <p className="text-sm text-muted-foreground font-mono">{retellAgentId}</p>
-                  </div>
-                  <Button 
-                    onClick={() => {
-                      // Add test functionality here
-                      toast({
-                        title: "Test Agent",
-                        description: "Testing functionality will be implemented with Retell API integration",
-                      });
-                    }}
-                    className="w-full"
-                  >
-                    Test Agent Performance
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <AgentTester 
+              agentId={retellAgentId} 
+              agentName={agentName}
+            />
           )}
 
           {/* Save Button */}
