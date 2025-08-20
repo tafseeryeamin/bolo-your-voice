@@ -64,7 +64,7 @@ serve(async (req) => {
     
     try {
       // Send to your webhook URL
-      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/955d68ca-7f0e-46d8-9835-b0bbf8a8b0eb', {
+      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/6bf0e28b-34b0-4848-b7d2-3b6a568e6ce4', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
