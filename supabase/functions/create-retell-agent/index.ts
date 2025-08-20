@@ -62,64 +62,19 @@ serve(async (req) => {
     console.log('Payload JSON:', JSON.stringify(webhookPayload, null, 2));
     console.log('Payload size:', JSON.stringify(webhookPayload).length, 'bytes');
     
-    try {
-      // Send to your webhook URL
-      const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/6bf0e28b-34b0-4848-b7d2-3b6a568e6ce4', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
-        },
-        body: JSON.stringify(webhookPayload),
-      });
+    // No longer sending to webhook - admin will handle agent creation
+    console.log('Agent configuration saved, admin will be notified via email');
 
-      console.log('Webhook response status:', response.status);
-      console.log('Webhook response headers:', Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Webhook error response:', errorText);
-        
-        // Return a success response even if webhook fails, for testing
-        return new Response(JSON.stringify({
-          success: true,
-          agent_id: `webhook-error-${Date.now()}`, // Temporary ID for testing
-          data: { 
-            message: "Webhook failed but returning success for testing",
-            webhook_error: `${response.status} - ${errorText}`,
-            webhook_status: response.status
-          }
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+    return new Response(JSON.stringify({
+      success: true,
+      message: "Configuration saved successfully. Admin will review and provide agent ID.",
+      data: { 
+        status: "pending_admin_review",
+        submitted_at: new Date().toISOString()
       }
-
-      const result = await response.json();
-      console.log('Webhook response JSON:', result);
-
-      return new Response(JSON.stringify({
-        success: true,
-        agent_id: result.agent_id || result.id || `temp-${Date.now()}`, // Handle different response formats
-        data: result
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-
-    } catch (fetchError) {
-      console.error('Fetch error when calling webhook:', fetchError);
-      
-      // Return success even if webhook is unreachable, for testing
-      return new Response(JSON.stringify({
-        success: true,
-        agent_id: `fetch-error-${Date.now()}`, // Temporary ID for testing
-        data: { 
-          message: "Webhook unreachable but returning success for testing",
-          fetch_error: fetchError.message
-        }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
     console.error('Error in create-retell-agent function:', error);
