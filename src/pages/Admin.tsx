@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity } from "lucide-react";
+import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity, Bell, Check } from "lucide-react";
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +17,7 @@ const Admin = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [roleUpdateLoading, setRoleUpdateLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -25,6 +26,7 @@ const Admin = () => {
     fetchUsers();
     fetchAgents();
     fetchActivityLogs();
+    fetchNotifications();
   }, []);
   const checkAuth = async () => {
     const {
@@ -150,6 +152,43 @@ const Admin = () => {
       console.error("Error fetching activity logs:", error);
     }
   };
+
+  const fetchNotifications = async () => {
+    try {
+      const { data: notifications, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching notifications:", error);
+        return;
+      }
+
+      setNotifications(notifications || []);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const markNotificationAsRead = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+      
+      if (error) {
+        console.error("Error marking notification as read:", error);
+        return;
+      }
+
+      // Refresh notifications
+      fetchNotifications();
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -246,13 +285,102 @@ const Admin = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="notifications" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="notifications" className="relative">
+              Notifications
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="agents">Agents</TabsTrigger>
             <TabsTrigger value="activity">Activity Logs</TabsTrigger>
             <TabsTrigger value="create-user">Create User</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="notifications" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Bell className="w-5 h-5 mr-2" />
+                  Agent Configuration Requests
+                </CardTitle>
+                <CardDescription>
+                  New agent configurations submitted by users awaiting your review
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {notifications.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No notifications at this time
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-4 border rounded-lg ${
+                          notification.read ? 'bg-muted/30' : 'bg-card border-primary/20'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-semibold">{notification.title}</h4>
+                              {!notification.read && (
+                                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                  NEW
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {notification.message}
+                            </p>
+                            
+                            {notification.data && (
+                              <div className="bg-muted/50 p-3 rounded border text-sm space-y-2">
+                                <div><strong>Agent Name:</strong> {notification.data.agent_name}</div>
+                                <div><strong>Voice:</strong> {notification.data.voice_id}</div>
+                                <div><strong>First Message:</strong> {notification.data.first_message}</div>
+                                <div><strong>Responsiveness:</strong> {notification.data.responsiveness}</div>
+                                <div><strong>Backchannel:</strong> {notification.data.enable_backchannel ? 'Enabled' : 'Disabled'}</div>
+                                {notification.data.knowledge_base && (
+                                  <div><strong>Knowledge Base:</strong> {notification.data.knowledge_base}</div>
+                                )}
+                                {notification.data.website_link && (
+                                  <div><strong>Website:</strong> {notification.data.website_link}</div>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="text-xs text-muted-foreground mt-2">
+                              Submitted: {new Date(notification.created_at).toLocaleString()}
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col gap-2 ml-4">
+                            {!notification.read && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => markNotificationAsRead(notification.id)}
+                              >
+                                <Check className="w-4 h-4 mr-1" />
+                                Mark Read
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
             <Card>

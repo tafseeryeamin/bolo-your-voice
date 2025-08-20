@@ -1,5 +1,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -62,8 +67,31 @@ serve(async (req) => {
     console.log('Payload JSON:', JSON.stringify(webhookPayload, null, 2));
     console.log('Payload size:', JSON.stringify(webhookPayload).length, 'bytes');
     
-    // No longer sending to webhook - admin will handle agent creation
-    console.log('Agent configuration saved, admin will be notified via email');
+    // Create notification for admin
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert({
+        type: 'new_agent_request',
+        title: 'New Agent Configuration Submitted',
+        message: `New agent "${agent_name}" configuration submitted and ready for review.`,
+        data: {
+          agent_name,
+          voice_id,
+          first_message,
+          responsiveness,
+          enable_backchannel,
+          backchannel_frequency,
+          knowledge_base,
+          website_link,
+          submitted_at: new Date().toISOString()
+        }
+      });
+
+    if (notificationError) {
+      console.error('Error creating notification:', notificationError);
+    } else {
+      console.log('Admin notification created successfully');
+    }
 
     return new Response(JSON.stringify({
       success: true,
