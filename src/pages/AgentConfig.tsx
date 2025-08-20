@@ -13,6 +13,7 @@ import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AgentTester from "@/components/AgentTester";
+import VoiceTester from "@/components/VoiceTester";
 
 // Voice data with all available voices
 const voices = [
@@ -386,10 +387,16 @@ const AgentConfig = () => {
 
           {/* Test Agent Component */}
           {retellAgentId && (
-            <AgentTester 
-              agentId={retellAgentId} 
-              agentName={agentName}
-            />
+            <>
+              <AgentTester 
+                agentId={retellAgentId} 
+                agentName={agentName}
+              />
+              <VoiceTester 
+                agentId={retellAgentId} 
+                agentName={agentName}
+              />
+            </>
           )}
 
           {/* Save Button */}
