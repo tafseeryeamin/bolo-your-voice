@@ -247,22 +247,30 @@ const Admin = () => {
         console.error("Error updating notification:", notificationError);
       }
 
-      // Create activity log
-      await supabase
-        .from('activity_logs')
-        .insert({
-          user_id: 'admin',
-          action: 'agent_assigned',
-          details: {
-            agent_name: notificationData.agent_name,
-            agent_id: agentId,
-            assigned_by_admin: true
-          }
-        });
+      // Create activity log with proper user ID
+      const { data: agentData } = await supabase
+        .from('agents')
+        .select('user_id')
+        .eq('id', notificationData.internal_agent_id)
+        .single();
+
+      if (agentData) {
+        await supabase
+          .from('activity_logs')
+          .insert({
+            user_id: agentData.user_id,
+            agent_id: notificationData.internal_agent_id,
+            action: 'agent_retell_id_assigned',
+            details: { 
+              assigned_retell_id: agentId,
+              agent_name: notificationData.agent_name 
+            }
+          });
+      }
 
       toast({
         title: "Success",
-        description: `Agent ID ${agentId} has been assigned and the user can now test their agent.`
+        description: "Agent ID assigned successfully! Agent is now ready for testing.",
       });
 
       // Clear the input
@@ -272,6 +280,7 @@ const Admin = () => {
       }));
 
       // Refresh data
+      fetchNotifications();
       fetchAgents();
       fetchActivityLogs();
 
@@ -279,7 +288,7 @@ const Admin = () => {
       console.error("Error assigning agent ID:", error);
       toast({
         title: "Error",
-        description: "Failed to assign agent ID",
+        description: `Failed to assign agent ID: ${error.message}`,
         variant: "destructive"
       });
     }

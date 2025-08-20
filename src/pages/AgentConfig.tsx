@@ -198,49 +198,59 @@ const AgentConfig = () => {
         llm_websocket_url: null
       };
 
-      // Save to Supabase database first
       let result;
+      let savedAgent;
+
       if (existingAgentId) {
         // Update existing agent
+        console.log("Updating existing agent:", existingAgentId);
         result = await supabase
           .from('agents')
           .update(agentData)
           .eq('id', existingAgentId)
           .eq('user_id', user.id)
           .select();
+        
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+        savedAgent = result.data[0];
       } else {
         // Create new agent
+        console.log("Creating new agent");
         result = await supabase
           .from('agents')
           .insert(agentData)
           .select();
-      }
-
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-
-      const savedAgent = result.data[0];
-      setExistingAgentId(savedAgent.id);
-
-      // Now create the Retell agent request with the saved agent ID
-      const { data, error } = await supabase.functions.invoke('create-retell-agent', {
-        body: {
-          internal_agent_id: savedAgent.id,
-          agent_name: agentName,
-          system_prompt: agentPrompt,
-          first_message: firstMessage,
-          voice_id: selectedVoice,
-          responsiveness: responsiveness[0],
-          enable_backchannel: enableBackchannel,
-          backchannel_frequency: backchannelFrequency[0],
-          knowledge_base: knowledgeBase,
-          website_link: websiteLink
+        
+        if (result.error) {
+          throw new Error(result.error.message);
         }
-      });
+        savedAgent = result.data[0];
+        setExistingAgentId(savedAgent.id);
+      }
 
-      if (error) {
-        console.error("Error creating Retell agent request:", error);
+      // Only create notification if it's a new agent (not an update)
+      if (!existingAgentId) {
+        // Create notification for admin review
+        const { data, error } = await supabase.functions.invoke('create-retell-agent', {
+          body: {
+            internal_agent_id: savedAgent.id,
+            agent_name: agentName,
+            system_prompt: agentPrompt,
+            first_message: firstMessage,
+            voice_id: selectedVoice,
+            responsiveness: responsiveness[0],
+            enable_backchannel: enableBackchannel,
+            backchannel_frequency: backchannelFrequency[0],
+            knowledge_base: knowledgeBase,
+            website_link: websiteLink
+          }
+        });
+
+        if (error) {
+          console.error("Error creating Retell agent request:", error);
+        }
       }
 
       // Show voice tester
@@ -258,7 +268,7 @@ const AgentConfig = () => {
 
       toast({
         title: "Success",
-        description: `Agent ${existingAgentId ? 'updated' : 'created'} successfully! Admin will review and assign Retell agent ID.`,
+        description: existingAgentId ? "Agent updated successfully!" : "Agent created successfully! Admin will review and assign Retell agent ID.",
       });
       
     } catch (error) {
