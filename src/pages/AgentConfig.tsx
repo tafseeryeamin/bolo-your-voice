@@ -80,6 +80,7 @@ const AgentConfig = () => {
   const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
   const [retellAgentId, setRetellAgentId] = useState<string | null>(null);
   const [isCreatingAgent, setIsCreatingAgent] = useState(false);
+  const [showVoiceTester, setShowVoiceTester] = useState<boolean>(false);
 
   useEffect(() => {
     console.log("AgentConfig component mounted");
@@ -158,6 +159,9 @@ const AgentConfig = () => {
         return;
       }
 
+      // Show voice tester immediately
+      setShowVoiceTester(true);
+      
       // First create the Retell agent
       await createRetellAgent();
 
@@ -386,17 +390,18 @@ const AgentConfig = () => {
           </Card>
 
           {/* Test Agent Component */}
+          {showVoiceTester && (
+            <VoiceTester 
+              agentId={retellAgentId} 
+              agentName={agentName}
+            />
+          )}
+          
           {retellAgentId && (
-            <>
-              <AgentTester 
-                agentId={retellAgentId} 
-                agentName={agentName}
-              />
-              <VoiceTester 
-                agentId={retellAgentId} 
-                agentName={agentName}
-              />
-            </>
+            <AgentTester 
+              agentId={retellAgentId} 
+              agentName={agentName}
+            />
           )}
 
           {/* Save Button */}

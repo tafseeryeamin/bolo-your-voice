@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface VoiceTesterProps {
-  agentId: string;
+  agentId: string | null;
   agentName: string;
 }
 
@@ -21,6 +21,15 @@ const VoiceTester: React.FC<VoiceTesterProps> = ({ agentId, agentName }) => {
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const startVoiceTest = async () => {
+    if (!agentId) {
+      toast({
+        title: "Waiting for Agent",
+        description: "Agent is being created, please wait...",
+        variant: "default",
+      });
+      return;
+    }
+
     try {
       // Create a web call using Retell API
       const { data, error } = await supabase.functions.invoke('create-retell-web-call', {
@@ -244,11 +253,12 @@ const VoiceTester: React.FC<VoiceTesterProps> = ({ agentId, agentName }) => {
           {!isConnected ? (
             <Button 
               onClick={startVoiceTest}
-              className="flex items-center space-x-2 bg-voice-accent hover:bg-voice-muted"
+              disabled={!agentId}
+              className="flex items-center space-x-2 bg-voice-accent hover:bg-voice-muted disabled:bg-gray-400"
               size="lg"
             >
               <Mic className="w-5 h-5" />
-              <span>Start Voice Test</span>
+              <span>{!agentId ? "Waiting for Agent..." : "Start Voice Test"}</span>
             </Button>
           ) : (
             <div className="flex items-center space-x-4">
