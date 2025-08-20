@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { User, Mic } from "lucide-react";
@@ -12,6 +13,55 @@ import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AgentTester from "@/components/AgentTester";
+
+// Voice data with all available voices
+const voices = [
+  { name: "Adrian", trait: "American, Young, Retell", id: "11labs-Adrian" },
+  { name: "Amritanshu (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Amritanshu" },
+  { name: "Amy (UK)", trait: "British, Young, Provider", id: "11labs-Amy" },
+  { name: "Andrew", trait: "American, Young, Retell", id: "11labs-Andrew" },
+  { name: "Anna", trait: "American, Young, Retell", id: "11labs-Anna" },
+  { name: "Anthony", trait: "British, Middle Aged, Retell", id: "11labs-Anthony" },
+  { name: "Billy", trait: "American, Young, Retell", id: "11labs-Billy" },
+  { name: "Bing", trait: "American, Young, Retell", id: "11labs-Bing" },
+  { name: "Brian", trait: "American, Young, Retell", id: "11labs-Brian" },
+  { name: "Carola (de-DE)", trait: "German, Middle Aged, Provider", id: "11labs-Carola" },
+  { name: "Charlie (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-charlie" },
+  { name: "Chloe", trait: "American, Young, Retell", id: "11labs-Chloe" },
+  { name: "Cimo", trait: "American, Middle Aged, Retell", id: "11labs-Cimo" },
+  { name: "Dorothy", trait: "British, Young, Provider", id: "11labs-Dorothy" },
+  { name: "Emily", trait: "American, Middle Aged, Retell", id: "11labs-Emily" },
+  { name: "Ethan", trait: "American, Young, Retell", id: "11labs-Ethan" },
+  { name: "Evie", trait: "American, Young, Retell", id: "11labs-Evie" },
+  { name: "Gilfoy", trait: "American, Middle Aged, Retell", id: "11labs-Gilfoy" },
+  { name: "Grace", trait: "American, Middle Aged, Retell", id: "11labs-Grace" },
+  { name: "James", trait: "American, Old, Retell", id: "11labs-James" },
+  { name: "Jason", trait: "American, Young, Retell", id: "11labs-Jason" },
+  { name: "Jenny", trait: "American, Young, Retell", id: "11labs-Jenny" },
+  { name: "Joe", trait: "American, Middle Aged, Provider", id: "11labs-Joe" },
+  { name: "John", trait: "American, Middle Aged, Retell", id: "11labs-John" },
+  { name: "Julia", trait: "American, Middle Aged, Retell", id: "11labs-Julia" },
+  { name: "Kate", trait: "American, Middle Aged, Retell", id: "11labs-Kate" },
+  { name: "Kathrine", trait: "American, Middle Aged, Retell", id: "11labs-Kathrine" },
+  { name: "Lily", trait: "American, Young, Retell", id: "11labs-Lily" },
+  { name: "Lucas", trait: "American, Middle Aged, Retell", id: "11labs-Lucas" },
+  { name: "Marissa", trait: "American, Young, Retell", id: "11labs-Marissa" },
+  { name: "Max", trait: "American, Middle Aged, Retell", id: "11labs-Max" },
+  { name: "Mia", trait: "American, Middle Aged, Retell", id: "11labs-Mia" },
+  { name: "Monika (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Monika" },
+  { name: "Myra", trait: "American, Young, Retell", id: "11labs-Myra" },
+  { name: "Nina", trait: "American, Middle Aged, Retell", id: "11labs-Nina" },
+  { name: "Noah (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-Noah" },
+  { name: "Paola", trait: "American, Young, Provider", id: "11labs-Paola" },
+  { name: "Paul", trait: "American, Old, Retell", id: "11labs-Paul" },
+  { name: "Ryan", trait: "American, Young, Retell", id: "11labs-Ryan" },
+  { name: "Samad (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Samad" },
+  { name: "Santiago (es-ES)", trait: "Spanish, Middle Aged, Provider", id: "11labs-Santiago" },
+  { name: "Steve", trait: "American, Old, Retell", id: "11labs-Steve" },
+  { name: "Susan", trait: "American, Middle Aged, Retell", id: "11labs-Susan" },
+  { name: "Victoria", trait: "American, Young, Retell", id: "11labs-victoria" },
+  { name: "Zuri", trait: "American, Old, Retell", id: "11labs-Zuri" },
+];
 
 const AgentConfig = () => {
   const { toast } = useToast();
@@ -21,6 +71,7 @@ const AgentConfig = () => {
   
   // Essential fields only
   const [agentName, setAgentName] = useState("");
+  const [selectedVoice, setSelectedVoice] = useState("11labs-Amritanshu");
   const [agentPrompt, setAgentPrompt] = useState("");
   const [responsiveness, setResponsiveness] = useState([1]);
   const [enableBackchannel, setEnableBackchannel] = useState(true);
@@ -60,7 +111,7 @@ const AgentConfig = () => {
             type: "retell-llm",
             llm_id: "your_llm_id" // This would come from your LLM configuration
           },
-          voice_id: "11labs-Amritanshu",
+          voice_id: selectedVoice,
           voice_model: "eleven_turbo_v2", 
           language: "en-US",
           responsiveness: responsiveness[0],
@@ -117,7 +168,7 @@ const AgentConfig = () => {
       const agentData = {
         name: agentName,
         user_id: user.id,
-        voice_id: "11labs-Amritanshu",
+          voice_id: selectedVoice,
         language: 'en-US', 
         description: agentPrompt,
         prompt: agentPrompt,
@@ -224,19 +275,35 @@ const AgentConfig = () => {
             </CardContent>
           </Card>
 
-          {/* Agent Settings */}
+          {/* Voice & Settings */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0 pb-4">
               <Mic className="w-5 h-5 text-voice-accent mr-2" />
-              <CardTitle>Agent Settings</CardTitle>
+              <CardTitle>Voice & Settings</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
+                <div>
+                  <Label>Voice Selection</Label>
+                  <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Choose a voice for your agent" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 bg-card border-border z-50">
+                      {voices.map((voice) => (
+                        <SelectItem key={voice.id} value={voice.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{voice.name}</span>
+                            <span className="text-xs text-muted-foreground">{voice.trait}</span>
+                            <span className="text-xs text-muted-foreground font-mono">{voice.id}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-                  <div>
-                    <Label className="text-sm font-medium">Voice</Label>
-                    <p className="text-sm text-muted-foreground">11labs-Amritanshu</p>
-                  </div>
                   <div>
                     <Label className="text-sm font-medium">Voice Model</Label>
                     <p className="text-sm text-muted-foreground">eleven_turbo_v2</p>
@@ -248,6 +315,10 @@ const AgentConfig = () => {
                   <div>
                     <Label className="text-sm font-medium">Version</Label>
                     <p className="text-sm text-muted-foreground">0</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Selected Voice ID</Label>
+                    <p className="text-sm text-muted-foreground font-mono">{selectedVoice}</p>
                   </div>
                 </div>
 
