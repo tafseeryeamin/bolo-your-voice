@@ -22,10 +22,10 @@ const DemoTesting = () => {
   const [retellWebClient, setRetellWebClient] = useState<RetellWebClient | null>(null);
 
   useEffect(() => {
-    checkAdminAccess();
+    checkUserAccess();
   }, []);
 
-  const checkAdminAccess = async () => {
+  const checkUserAccess = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -34,25 +34,10 @@ const DemoTesting = () => {
         return;
       }
 
-      const { data: hasAdminRole } = await supabase.rpc('has_role', {
-        _user_id: user.id,
-        _role: 'admin'
-      });
-
-      if (!hasAdminRole) {
-        toast({
-          title: "Access Denied",
-          description: "You need admin privileges to access this page.",
-          variant: "destructive",
-        });
-        navigate("/dashboard");
-        return;
-      }
-
-      setIsAdmin(true);
+      setIsAdmin(true); // Allow all authenticated users
     } catch (error) {
-      console.error('Error checking admin access:', error);
-      navigate("/dashboard");
+      console.error('Error checking user access:', error);
+      navigate("/signin");
     } finally {
       setLoading(false);
     }
@@ -177,22 +162,6 @@ const DemoTesting = () => {
     );
   }
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <Shield className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-foreground mb-2">Access Denied</h2>
-              <p className="text-muted-foreground">You don't have permission to access this page.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">

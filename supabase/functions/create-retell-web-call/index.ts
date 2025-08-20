@@ -13,11 +13,10 @@ serve(async (req) => {
   }
 
   try {
-    const { agent_id } = await req.json();
+    const { api_key, agent_id } = await req.json();
     
-    const api_key = Deno.env.get('RETELL_API_KEY');
     if (!api_key) {
-      throw new Error('RETELL_API_KEY environment variable is not set');
+      throw new Error('api_key is required');
     }
     
     if (!agent_id) {
