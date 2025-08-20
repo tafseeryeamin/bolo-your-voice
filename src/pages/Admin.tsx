@@ -193,7 +193,7 @@ const Admin = () => {
 
   const handleAssignAgentId = async (notification: any) => {
     const agentId = agentIds[notification.id];
-    if (!agentId) {
+    if (!agentId || !agentId.trim()) {
       toast({
         title: "Error",
         description: "Please enter an Agent ID",
@@ -202,9 +202,13 @@ const Admin = () => {
       return;
     }
 
+    console.log("Assigning agent ID:", agentId, "to notification:", notification.id);
+    console.log("Notification data:", notification.data);
+
     try {
       const notificationData = notification.data;
       if (!notificationData?.internal_agent_id) {
+        console.error("No internal agent ID found in notification:", notificationData);
         toast({
           title: "Error",
           description: "No internal agent ID found in notification",
@@ -212,6 +216,8 @@ const Admin = () => {
         });
         return;
       }
+
+      console.log("Updating agent with internal ID:", notificationData.internal_agent_id);
 
       // Update the existing agent record with the assigned Retell agent ID
       const { error: updateError } = await supabase
@@ -230,6 +236,8 @@ const Admin = () => {
         });
         return;
       }
+
+      console.log("Agent updated successfully with Retell ID:", agentId);
 
       // Mark notification as read
       const { error: notificationError } = await supabase
@@ -487,13 +495,13 @@ const Admin = () => {
                                     }))}
                                     className="w-full"
                                   />
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleAssignAgentId(notification)}
-                                    disabled={!agentIds[notification.id]}
-                                  >
-                                    Assign
-                                  </Button>
+                                   <Button
+                                     size="sm"
+                                     onClick={() => handleAssignAgentId(notification)}
+                                     disabled={!agentIds[notification.id] || !agentIds[notification.id].trim()}
+                                   >
+                                     Assign
+                                   </Button>
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                   Enter the Agent ID from your system to assign to this user's agent configuration.
