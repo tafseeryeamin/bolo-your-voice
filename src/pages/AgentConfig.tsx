@@ -78,6 +78,8 @@ const AgentConfig = () => {
   const [responsiveness, setResponsiveness] = useState([1]);
   const [enableBackchannel, setEnableBackchannel] = useState(true);
   const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
+  const [knowledgeBase, setKnowledgeBase] = useState("");
+  const [websiteLink, setWebsiteLink] = useState("");
   const [retellAgentId, setRetellAgentId] = useState<string | null>(null);
   const [isCreatingAgent, setIsCreatingAgent] = useState(false);
   const [showVoiceTester, setShowVoiceTester] = useState<boolean>(false);
@@ -114,7 +116,9 @@ const AgentConfig = () => {
           voice_id: selectedVoice,
           responsiveness: responsiveness[0],
           enable_backchannel: enableBackchannel,
-          backchannel_frequency: backchannelFrequency[0]
+          backchannel_frequency: backchannelFrequency[0],
+          knowledge_base: knowledgeBase,
+          website_link: websiteLink
         }
       });
 
@@ -296,6 +300,33 @@ const AgentConfig = () => {
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     This message will be spoken first when the agent starts a conversation
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="knowledge-base">Knowledge Base</Label>
+                  <Textarea
+                    id="knowledge-base"
+                    placeholder="Enter knowledge base content or instructions for the agent"
+                    value={knowledgeBase}
+                    onChange={(e) => setKnowledgeBase(e.target.value)}
+                    className="min-h-20 mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Additional knowledge or context the agent should be aware of
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="website-link">Website Link</Label>
+                  <Input
+                    id="website-link"
+                    type="url"
+                    placeholder="https://example.com"
+                    value={websiteLink}
+                    onChange={(e) => setWebsiteLink(e.target.value)}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Website URL that the agent should reference or scrape
                   </p>
                 </div>
               </div>

@@ -22,7 +22,9 @@ serve(async (req) => {
       voice_id,
       responsiveness,
       enable_backchannel,
-      backchannel_frequency
+      backchannel_frequency,
+      knowledge_base,
+      website_link
     } = await req.json();
 
     console.log('Creating Retell agent with simplified payload:', {
@@ -31,7 +33,9 @@ serve(async (req) => {
       voice_id,
       responsiveness,
       enable_backchannel,
-      backchannel_frequency
+      backchannel_frequency,
+      knowledge_base,
+      website_link
     });
 
     // Create simplified payload matching your form
@@ -49,7 +53,9 @@ serve(async (req) => {
       responsiveness,
       enable_backchannel,
       backchannel_frequency,
-      first_message: first_message || "Hello! How can I help you today?"
+      first_message: first_message || "Hello! How can I help you today?",
+      knowledge_base,
+      website_link
     };
 
     console.log('Sending request to webhook:', webhookPayload);
