@@ -58,7 +58,9 @@ serve(async (req) => {
       website_link
     };
 
-    console.log('Sending request to webhook:', webhookPayload);
+    console.log('Sending request to webhook with payload:');
+    console.log('Payload JSON:', JSON.stringify(webhookPayload, null, 2));
+    console.log('Payload size:', JSON.stringify(webhookPayload).length, 'bytes');
     
     try {
       // Send to your webhook URL
@@ -66,6 +68,7 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning
         },
         body: JSON.stringify(webhookPayload),
       });
