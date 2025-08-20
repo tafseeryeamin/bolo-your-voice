@@ -88,18 +88,88 @@ const AgentConfig = () => {
     console.log("AgentConfig component mounted");
     
     // Check if we have an existing agent ID from URL params
-    const agentId = searchParams.get('agent_id');
+    const agentId = searchParams.get('id') || searchParams.get('agent_id');
     const agentName = searchParams.get('agent_name');
     
     if (agentId) {
       setExistingAgentId(agentId);
       console.log("Found existing agent ID:", agentId);
       
+      // Load existing agent data
+      loadAgentData(agentId);
+      
       if (agentName) {
         setAgentName(decodeURIComponent(agentName));
       }
     }
   }, [searchParams]);
+
+  const loadAgentData = async (agentId: string) => {
+    try {
+      console.log("Loading agent data for ID:", agentId);
+      
+      const { data: agent, error } = await supabase
+        .from('agents')
+        .select('*')
+        .eq('id', agentId)
+        .single();
+
+      if (error) {
+        console.error("Error loading agent data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load agent data",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (agent) {
+        console.log("Loaded agent data:", agent);
+        setAgentName(agent.name || "");
+        setSelectedVoice(agent.voice_id || "11labs-Amritanshu");
+        setAgentPrompt(agent.prompt || "");
+        setFirstMessage(agent.begin_message || "");
+        
+        // Parse response_engine if it exists and contains settings
+        if (agent.response_engine) {
+          try {
+            const responseEngine = JSON.parse(agent.response_engine);
+            if (responseEngine.responsiveness !== undefined) {
+              setResponsiveness([responseEngine.responsiveness]);
+            }
+            if (responseEngine.enable_backchannel !== undefined) {
+              setEnableBackchannel(responseEngine.enable_backchannel);
+            }
+            if (responseEngine.backchannel_frequency !== undefined) {
+              setBackchannelFrequency([responseEngine.backchannel_frequency]);
+            }
+            if (responseEngine.knowledge_base) {
+              setKnowledgeBase(responseEngine.knowledge_base);
+            }
+            if (responseEngine.website_link) {
+              setWebsiteLink(responseEngine.website_link);
+            }
+          } catch (parseError) {
+            console.log("Could not parse response_engine:", parseError);
+          }
+        }
+
+        // Check if agent has been assigned a Retell ID
+        if (agent.llm_websocket_url) {
+          setRetellAgentId(agent.llm_websocket_url);
+          setShowVoiceTester(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error in loadAgentData:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load agent configuration",
+        variant: "destructive",
+      });
+    }
+  };
 
 
   const createRetellAgent = async () => {
