@@ -83,6 +83,7 @@ const AgentConfig = () => {
   const [retellAgentId, setRetellAgentId] = useState<string | null>(null);
   const [isCreatingAgent, setIsCreatingAgent] = useState(false);
   const [showVoiceTester, setShowVoiceTester] = useState<boolean>(false);
+  const [showCurl, setShowCurl] = useState(false);
 
   useEffect(() => {
     console.log("AgentConfig component mounted");
@@ -162,6 +163,26 @@ const AgentConfig = () => {
     }
   };
 
+  const generateCurlCommand = () => {
+    const payload = {
+      agent_name: agentName,
+      system_prompt: agentPrompt,
+      first_message: firstMessage,
+      voice_id: selectedVoice,
+      responsiveness: responsiveness[0],
+      enable_backchannel: enableBackchannel,
+      backchannel_frequency: backchannelFrequency[0],
+      knowledge_base: knowledgeBase,
+      website_link: websiteLink
+    };
+
+    const curlCommand = `curl -X POST "YOUR_N8N_WEBHOOK_URL" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(payload, null, 2)}'`;
+
+    return curlCommand;
+  };
+
   const handleSave = async () => {
     try {
       console.log("Saving agent configuration...");
@@ -233,6 +254,9 @@ const AgentConfig = () => {
           action: existingAgentId ? 'agent_updated' : 'agent_created',
           details: { agent_name: agentName }
         }]);
+
+      // Show curl command
+      setShowCurl(true);
 
       toast({
         title: "Success",
@@ -433,6 +457,35 @@ const AgentConfig = () => {
               </div>
             </CardContent>
           </Card>
+
+          
+          {/* Curl Command Display */}
+          {showCurl && (
+            <Card>
+              <CardHeader>
+                <CardTitle>n8n Webhook Command</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Use this curl command to send the agent data to your n8n workflow. Replace "YOUR_N8N_WEBHOOK_URL" with your actual n8n webhook URL.
+                  </p>
+                  <div className="bg-muted p-4 rounded-lg">
+                    <pre className="text-sm whitespace-pre-wrap break-all">
+                      {generateCurlCommand()}
+                    </pre>
+                  </div>
+                  <Button 
+                    onClick={() => navigator.clipboard.writeText(generateCurlCommand())}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Copy Command
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Test Agent Component */}
           {showVoiceTester && (
