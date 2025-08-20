@@ -182,148 +182,247 @@ const DemoTesting = () => {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <Header />
-      <div className="container mx-auto p-6 max-w-2xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center">
-            <TestTube className="w-8 h-8 mr-3 text-primary" />
-            Demo and Testing
-          </h1>
-          <p className="text-muted-foreground">Test voice calls with custom API credentials.</p>
+      <div className="container mx-auto p-6 max-w-4xl">
+        {/* Header Section */}
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 rounded-full bg-primary/10 mr-4">
+              <TestTube className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="text-4xl font-bold text-foreground">Demo & Testing</h1>
+          </div>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Test your voice AI agents with real-time conversations. Enter your credentials and start talking to your agent instantly.
+          </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Mic className="w-5 h-5 mr-2 text-voice-accent" />
-              Voice Call Testing
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="api-key">API Key</Label>
-                <Input
-                  id="api-key"
-                  type="password"
-                  placeholder="Enter your API key"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="mt-2"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="agent-id">Agent ID</Label>
-                <Input
-                  id="agent-id"
-                  placeholder="Enter the agent ID to test"
-                  value={agentId}
-                  onChange={(e) => setAgentId(e.target.value)}
-                  className="mt-2"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center space-y-6">
-              {/* Large Interactive Microphone */}
-              <div className="relative">
-                <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  isConnected 
-                    ? 'bg-green-500/20 border-4 border-green-500 shadow-lg shadow-green-500/30' 
-                    : isConnecting 
-                      ? 'bg-yellow-500/20 border-4 border-yellow-500 animate-pulse'
-                      : 'bg-primary/10 border-4 border-primary/30 hover:bg-primary/20 hover:border-primary/50'
-                }`}>
-                  {isConnected ? (
-                    <Mic className="w-16 h-16 text-green-600 animate-pulse" />
-                  ) : isConnecting ? (
-                    <Mic className="w-16 h-16 text-yellow-600" />
-                  ) : (
-                    <Mic className="w-16 h-16 text-primary" />
-                  )}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Configuration Panel */}
+          <Card className="border-2 hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center text-xl">
+                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 mr-3">
+                  <Mic className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-5">
+                <div className="space-y-3">
+                  <Label htmlFor="api-key" className="text-sm font-medium flex items-center">
+                    🔑 Retell API Key
+                  </Label>
+                  <Input
+                    id="api-key"
+                    type="password"
+                    placeholder="key_xxxxxxxxxxxxxxxx"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    disabled={isConnecting || isConnected}
+                  />
                 </div>
                 
-                {/* Status Indicator */}
-                {isConnected && (
-                  <div className="absolute -top-3 -right-3">
-                    <div className="w-8 h-8 bg-green-500 rounded-full animate-pulse flex items-center justify-center shadow-lg">
-                      <div className="w-4 h-4 bg-white rounded-full"></div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Audio Level Rings */}
-                {isConnected && (
-                  <>
-                    <div className="absolute inset-0 border-2 border-green-500/40 rounded-full animate-ping"></div>
-                    <div className="absolute inset-2 border-2 border-green-500/30 rounded-full animate-ping animation-delay-200"></div>
-                  </>
-                )}
+                <div className="space-y-3">
+                  <Label htmlFor="agent-id" className="text-sm font-medium flex items-center">
+                    🤖 Agent ID
+                  </Label>
+                  <Input
+                    id="agent-id"
+                    placeholder="agent_xxxxxxxxxxxxxxxx"
+                    value={agentId}
+                    onChange={(e) => setAgentId(e.target.value)}
+                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    disabled={isConnecting || isConnected}
+                  />
+                </div>
               </div>
 
-              {/* Status Text */}
-              <div className="text-center">
-                <p className={`text-lg font-medium ${
-                  isConnected ? 'text-green-600' : isConnecting ? 'text-yellow-600' : 'text-muted-foreground'
-                }`}>
-                  {isConnected ? 'Call Active - Speaking...' : isConnecting ? 'Connecting to Agent...' : 'Ready to Start Call'}
-                </p>
+              <div className="bg-muted/30 p-4 rounded-lg border-l-4 border-primary/30">
+                <h4 className="font-medium text-sm mb-2 text-foreground">📋 Quick Guide</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Enter your Retell API key and Agent ID</li>
+                  <li>• Click the microphone to start the call</li>
+                  <li>• Allow microphone access when prompted</li>
+                  <li>• Speak naturally with your AI agent</li>
+                  <li>• Click to end the call when finished</li>
+                </ul>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Control Buttons */}
-              <div className="flex flex-col items-center space-y-4">
-                {!isConnected && !isConnecting && (
-                  <Button
-                    onClick={handleTest}
-                    className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 text-lg font-medium rounded-xl shadow-lg"
-                    disabled={!apiKey.trim() || !agentId.trim()}
+          {/* Voice Interface Panel */}
+          <Card className="border-2 hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center text-xl">
+                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 mr-3">
+                  <Mic className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
+                Voice Interface
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center space-y-8 py-8">
+                {/* Enhanced Microphone Design */}
+                <div className="relative">
+                  {/* Outer Glow Ring */}
+                  <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                    isConnected 
+                      ? 'bg-green-500/10 scale-150 animate-pulse' 
+                      : isConnecting 
+                        ? 'bg-yellow-500/10 scale-125 animate-pulse'
+                        : 'bg-primary/5 scale-100'
+                  }`}></div>
+                  
+                  {/* Middle Ring */}
+                  <div className={`absolute inset-4 rounded-full border-2 transition-all duration-300 ${
+                    isConnected 
+                      ? 'border-green-400/40 animate-ping' 
+                      : isConnecting 
+                        ? 'border-yellow-400/40 animate-ping'
+                        : 'border-primary/20'
+                  }`}></div>
+                  
+                  {/* Main Microphone Button */}
+                  <div className={`relative w-40 h-40 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                    isConnected 
+                      ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/30 scale-110' 
+                      : isConnecting 
+                        ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30 animate-pulse'
+                        : 'bg-gradient-to-br from-primary to-primary/80 shadow-lg hover:shadow-primary/30 hover:from-primary/90 hover:to-primary'
+                  }`}
+                    onClick={!isConnected && !isConnecting ? handleTest : undefined}
                   >
-                    <Mic className="w-6 h-6 mr-3" />
-                    Start Voice Call
-                  </Button>
-                )}
+                    {/* Inner Glow */}
+                    <div className="absolute inset-2 rounded-full bg-white/10"></div>
+                    
+                    {/* Microphone Icon */}
+                    {isConnected ? (
+                      <Mic className="w-16 h-16 text-white animate-pulse relative z-10" />
+                    ) : isConnecting ? (
+                      <Mic className="w-16 h-16 text-white relative z-10" />
+                    ) : (
+                      <Mic className="w-16 h-16 text-white relative z-10" />
+                    )}
+                    
+                    {/* Connection Indicator */}
+                    {isConnected && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-2 border-white animate-pulse flex items-center justify-center">
+                        <div className="w-3 h-3 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Audio Level Visualization */}
+                  {isConnected && (
+                    <>
+                      <div className="absolute inset-0 border-2 border-green-400/30 rounded-full animate-ping animation-delay-300"></div>
+                      <div className="absolute -inset-4 border-2 border-green-400/20 rounded-full animate-ping animation-delay-500"></div>
+                      <div className="absolute -inset-8 border-2 border-green-400/10 rounded-full animate-ping animation-delay-700"></div>
+                    </>
+                  )}
+                </div>
 
-                {isConnecting && (
-                  <div className="text-center space-y-4">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-3"></div>
-                    <p className="text-yellow-600 font-medium">Establishing Connection...</p>
+                {/* Status Display */}
+                <div className="text-center space-y-4">
+                  <div className={`text-xl font-semibold transition-colors duration-300 ${
+                    isConnected ? 'text-green-600 dark:text-green-400' 
+                    : isConnecting ? 'text-yellow-600 dark:text-yellow-400' 
+                    : 'text-muted-foreground'
+                  }`}>
+                    {isConnected ? '🎙️ Live Conversation' 
+                     : isConnecting ? '⏳ Connecting...' 
+                     : '🎯 Ready to Connect'}
+                  </div>
+                  
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isConnected ? 'text-green-600/80 dark:text-green-400/80' 
+                    : isConnecting ? 'text-yellow-600/80 dark:text-yellow-400/80' 
+                    : 'text-muted-foreground'
+                  }`}>
+                    {isConnected ? 'Speak naturally - your agent is listening' 
+                     : isConnecting ? 'Establishing connection to your agent...' 
+                     : 'Click the microphone to start your conversation'}
+                  </p>
+                </div>
+
+                {/* Control Buttons */}
+                <div className="flex flex-col items-center space-y-4 w-full">
+                  {!isConnected && !isConnecting && (
+                    <Button
+                      onClick={handleTest}
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 text-lg font-medium rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      disabled={!apiKey.trim() || !agentId.trim()}
+                      size="lg"
+                    >
+                      <Mic className="w-5 h-5 mr-3" />
+                      Start Conversation
+                    </Button>
+                  )}
+
+                  {isConnecting && (
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-500"></div>
+                        <span className="text-yellow-600 dark:text-yellow-400 font-medium">Connecting to agent...</span>
+                      </div>
+                      <Button
+                        onClick={handleStopCall}
+                        variant="outline"
+                        className="border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-6 py-2 transition-all duration-200"
+                        size="sm"
+                      >
+                        <MicOff className="w-4 h-4 mr-2" />
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+
+                  {isConnected && (
                     <Button
                       onClick={handleStopCall}
-                      variant="outline"
-                      className="border-red-500 text-red-600 hover:bg-red-50 px-8 py-2"
+                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 text-lg font-medium rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
+                      size="lg"
                     >
-                      <MicOff className="w-4 h-4 mr-2" />
-                      Cancel
+                      <MicOff className="w-5 h-5 mr-3" />
+                      End Conversation
                     </Button>
-                  </div>
-                )}
-
-                {isConnected && (
-                  <Button
-                    onClick={handleStopCall}
-                    className="bg-red-600 hover:bg-red-700 text-white px-12 py-4 text-lg font-medium rounded-xl shadow-lg"
-                  >
-                    <MicOff className="w-6 h-6 mr-3" />
-                    End Call
-                  </Button>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium text-sm mb-2">Instructions:</h4>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>1. Enter your API key and Agent ID</li>
-                <li>2. Click "Start Test Call" to initiate the voice call</li>
-                <li>3. Allow microphone access when prompted</li>
-                <li>4. Speak with the AI agent to test functionality</li>
-                <li>5. Click "End Call" when finished testing</li>
-              </ul>
+        {/* Features Section */}
+        <div className="mt-12 grid md:grid-cols-3 gap-6 animate-fade-in">
+          <div className="text-center p-6 rounded-lg bg-card border border-border/50 hover:shadow-md transition-shadow duration-300">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
             </div>
-          </CardContent>
-        </Card>
+            <h3 className="font-semibold mb-2">Real-time Testing</h3>
+            <p className="text-sm text-muted-foreground">Test your agents with instant voice conversations and immediate feedback.</p>
+          </div>
+          
+          <div className="text-center p-6 rounded-lg bg-card border border-border/50 hover:shadow-md transition-shadow duration-300">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Mic className="w-6 h-6 text-green-500" />
+            </div>
+            <h3 className="font-semibold mb-2">High Quality Audio</h3>
+            <p className="text-sm text-muted-foreground">Crystal clear audio processing with noise reduction and echo cancellation.</p>
+          </div>
+          
+          <div className="text-center p-6 rounded-lg bg-card border border-border/50 hover:shadow-md transition-shadow duration-300">
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-6 h-6 text-purple-500" />
+            </div>
+            <h3 className="font-semibold mb-2">Secure & Private</h3>
+            <p className="text-sm text-muted-foreground">Your API keys and conversations are secure with enterprise-grade encryption.</p>
+          </div>
+        </div>
       </div>
     </div>
   );
