@@ -39,7 +39,7 @@ const TestAgent = () => {
       setIsCallActive(true);
       setCallStatus("Initiating call...");
 
-      const { data, error } = await supabase.functions.invoke('create-retell-call', {
+      const { data, error } = await supabase.functions.invoke('create-retell-web-call', {
         body: { agent_id: agentId }
       });
 

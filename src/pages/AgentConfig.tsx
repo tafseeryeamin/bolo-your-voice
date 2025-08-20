@@ -12,8 +12,6 @@ import { User, Mic } from "lucide-react";
 import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import AgentTester from "@/components/AgentTester";
-import VoiceTester from "@/components/VoiceTester";
 
 // Voice data with all available voices
 const voices = [
@@ -80,8 +78,6 @@ const AgentConfig = () => {
   const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
   const [knowledgeBase, setKnowledgeBase] = useState("");
   const [websiteLink, setWebsiteLink] = useState("");
-  const [retellAgentId, setRetellAgentId] = useState<string | null>(null);
-  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
   
 
   useEffect(() => {
@@ -167,65 +163,6 @@ const AgentConfig = () => {
   };
 
 
-  const createRetellAgent = async () => {
-    setIsCreatingAgent(true);
-    try {
-      console.log('Creating Retell agent...');
-      
-      // Call Supabase edge function to create Retell agent
-      const { data, error } = await supabase.functions.invoke('create-retell-agent', {
-        body: {
-          agent_name: agentName,
-          system_prompt: agentPrompt,
-          first_message: firstMessage,
-          voice_id: selectedVoice,
-          responsiveness: responsiveness[0],
-          enable_backchannel: enableBackchannel,
-          backchannel_frequency: backchannelFrequency[0],
-          knowledge_base: knowledgeBase,
-          website_link: websiteLink
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      console.log('Full webhook response:', data);
-      
-      // Extract agent_id from various possible response formats
-      const agentId = data?.agent_id || data?.data?.agent_id || data?.data?.id;
-      
-      if (agentId) {
-        setRetellAgentId(agentId);
-        console.log('Retell Agent ID set:', agentId);
-        toast({
-          title: "Success",
-          description: "Retell agent created successfully!",
-        });
-      } else {
-        console.warn('No agent_id in response. Full data:', data);
-        // Set a temporary ID for testing since webhook doesn't return agent_id yet
-        const tempId = `temp-${Date.now()}`;
-        setRetellAgentId(tempId);
-        console.log('Using temporary agent ID for testing:', tempId);
-        toast({
-          title: "Agent Creation Started",
-          description: "Webhook called successfully. Agent is being created...",
-        });
-      }
-
-    } catch (error) {
-      console.error("Error creating Retell agent:", error);
-      toast({
-        title: "Error",
-        description: `Failed to create Retell agent: ${error.message}`,
-        variant: "destructive",
-      });
-    } finally {
-      setIsCreatingAgent(false);
-    }
-  };
 
   const handleSave = async () => {
     try {
@@ -527,44 +464,43 @@ const AgentConfig = () => {
             </CardContent>
           </Card>
 
-          {/* Test and Deploy */}
-          <div className="space-y-8">
-            <div className="bg-card rounded-lg border p-6">
-              <h2 className="text-2xl font-bold mb-4">Test Your Agent</h2>
-              <div className="space-y-6">
-                <VoiceTester agentId={existingAgentId} agentName={agentName || 'Your Agent'} />
-                <AgentTester agentId={existingAgentId || ''} agentName={agentName || 'Your Agent'} />
-              </div>
-            </div>
-            
-            <div className="bg-card rounded-lg border p-6">
-              <h2 className="text-2xl font-bold mb-4">Deploy Agent</h2>
-              <p className="text-muted-foreground mb-4">
-                Your agent is ready to be deployed. You can integrate it into your applications using the provided API endpoints.
+          {/* Testing Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Test & Deploy</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Ready to test your agent? Save your configuration first, then test or deploy.
               </p>
-              <Button onClick={() => navigate('/demo-testing')} className="w-full">
-                Go to Demo & Testing
-              </Button>
-            </div>
-          </div>
+              <div className="flex space-x-4">
+                <Button 
+                  onClick={() => navigate(`/test-agent?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)}
+                  className="flex-1"
+                  disabled={!agentName}
+                >
+                  Test Agent
+                </Button>
+                <Button 
+                  onClick={() => navigate(`/demo-testing?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)}
+                  variant="outline" 
+                  className="flex-1"
+                  disabled={!agentName}
+                >
+                  Deploy Agent
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Save Button */}
           <div className="flex justify-end space-x-4">
             <Button 
-              onClick={handleSave} 
-              disabled={isCreatingAgent}
+              onClick={handleSave}
               className="bg-voice-accent hover:bg-voice-muted text-primary-foreground"
             >
-              {isCreatingAgent ? "Creating Agent..." : existingAgentId ? "Update Configuration" : "Save Configuration"}
+              {existingAgentId ? "Update Configuration" : "Save Configuration"}
             </Button>
-            {retellAgentId && (
-              <Button 
-                onClick={() => navigate("/agents")}
-                variant="outline"
-              >
-                Go to My Agents
-              </Button>
-            )}
           </div>
         </div>
       </div>
