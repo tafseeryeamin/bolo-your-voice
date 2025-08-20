@@ -44,7 +44,10 @@ const DemoTesting = () => {
   };
 
   const handleTest = async () => {
+    console.log("Starting handleTest function");
+    
     if (!apiKey.trim() || !agentId.trim()) {
+      console.log("Missing API key or agent ID");
       toast({
         title: "Missing Information",
         description: "Please provide both API key and Agent ID.",
@@ -54,9 +57,10 @@ const DemoTesting = () => {
     }
 
     setIsConnecting(true);
+    console.log("Set connecting state to true");
     
     try {
-      console.log("Creating Retell web call...");
+      console.log("Creating Retell web call with:", { agentId: agentId.trim() });
       
       const { data, error } = await supabase.functions.invoke('create-retell-web-call', {
         body: {
@@ -65,18 +69,27 @@ const DemoTesting = () => {
         }
       });
 
+      console.log("Supabase function response:", { data, error });
+
       if (error) {
         console.error("Supabase function error:", error);
-        throw error;
+        throw new Error(`Supabase function error: ${error.message || 'Unknown error'}`);
       }
 
-      if (data.error) {
+      if (data?.error) {
+        console.error("API returned error:", data.error);
         throw new Error(data.error);
       }
 
       console.log("Retell web call response:", data);
 
+      if (!data?.access_token) {
+        console.error("No access token in response:", data);
+        throw new Error("No access token received from Retell API");
+      }
+
       // Initialize Retell Web Client
+      console.log("Initializing Retell Web Client");
       const webClient = new RetellWebClient();
       
       // Set up event listeners
@@ -115,15 +128,20 @@ const DemoTesting = () => {
       });
 
       // Start the call
+      console.log("Starting call with access token:", data.access_token ? "present" : "missing");
+      console.log("Sample rate:", data.sample_rate);
+      
       await webClient.startCall({
         accessToken: data.access_token,
-        sampleRate: data.sample_rate,
+        sampleRate: data.sample_rate || 24000,
       });
 
+      console.log("Call started successfully");
       setRetellWebClient(webClient);
 
     } catch (error) {
       console.error("Error testing Retell call:", error);
+      console.error("Error stack:", error.stack);
       setIsConnecting(false);
       toast({
         title: "Test Failed",
