@@ -18,6 +18,7 @@ const Admin = () => {
   const [agents, setAgents] = useState<any[]>([]);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [agentIds, setAgentIds] = useState<{[key: string]: string}>({});
   const [roleUpdateLoading, setRoleUpdateLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -187,6 +188,126 @@ const Admin = () => {
       fetchNotifications();
     } catch (error) {
       console.error("Error marking notification as read:", error);
+    }
+  };
+
+  const handleAssignAgentId = async (notification: any) => {
+    const agentId = agentIds[notification.id];
+    if (!agentId) {
+      toast({
+        title: "Error",
+        description: "Please enter an Agent ID",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Find the user who submitted this request from the notification data
+      const notificationData = notification.data;
+      
+      // Get user from profiles based on email or find user who created similar agents
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('*');
+      
+      if (profileError) {
+        console.error("Error fetching profiles:", profileError);
+        toast({
+          title: "Error",
+          description: "Could not find user profile",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Find the user - we'll need to match by agent name or other criteria
+      // For now, let's assume we can find it by matching recent agents
+      const { data: existingAgents } = await supabase
+        .from('agents')
+        .select('user_id')
+        .eq('name', notificationData.agent_name)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      let userId = null;
+      if (existingAgents && existingAgents.length > 0) {
+        userId = existingAgents[0].user_id;
+      } else {
+        // If no existing agent found, we'll need to find another way to identify the user
+        // For now, let's use the first profile (this should be improved)
+        if (profiles && profiles.length > 0) {
+          userId = profiles[0].id;
+        }
+      }
+
+      if (!userId) {
+        toast({
+          title: "Error",
+          description: "Could not identify the user for this request",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create or update the agent record with the provided agent ID
+      const { error: agentError } = await supabase
+        .from('agents')
+        .insert({
+          name: notificationData.agent_name,
+          user_id: userId,
+          voice_id: notificationData.voice_id,
+          prompt: `Agent created from admin assignment. Voice: ${notificationData.voice_id}, Responsiveness: ${notificationData.responsiveness}`,
+          begin_message: notificationData.first_message,
+          response_engine: agentId, // Store the external agent ID here
+          description: `Knowledge Base: ${notificationData.knowledge_base || 'None'}, Website: ${notificationData.website_link || 'None'}`
+        });
+
+      if (agentError) {
+        console.error("Error creating agent:", agentError);
+        toast({
+          title: "Error",
+          description: "Failed to create agent record",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create activity log
+      await supabase
+        .from('activity_logs')
+        .insert({
+          user_id: userId,
+          action: 'agent_assigned',
+          details: {
+            agent_name: notificationData.agent_name,
+            agent_id: agentId,
+            assigned_by_admin: true
+          }
+        });
+
+      toast({
+        title: "Success",
+        description: `Agent ID ${agentId} has been assigned and the user can now test their agent.`
+      });
+
+      // Clear the input
+      setAgentIds(prev => ({
+        ...prev,
+        [notification.id]: ''
+      }));
+
+      // Refresh data
+      fetchAgents();
+      fetchActivityLogs();
+
+    } catch (error) {
+      console.error("Error assigning agent ID:", error);
+      toast({
+        title: "Error",
+        description: "Failed to assign agent ID",
+        variant: "destructive"
+      });
     }
   };
   const handleCreateUser = async (e: React.FormEvent) => {
@@ -362,7 +483,7 @@ const Admin = () => {
                           </div>
                           
                           <div className="flex flex-col gap-2 ml-4">
-                            {!notification.read && (
+                            {!notification.read ? (
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -371,6 +492,30 @@ const Admin = () => {
                                 <Check className="w-4 h-4 mr-1" />
                                 Mark Read
                               </Button>
+                            ) : (
+                              <div className="flex flex-col gap-2 min-w-[200px]">
+                                <div className="flex gap-2">
+                                  <Input
+                                    placeholder="Enter Agent ID"
+                                    value={agentIds[notification.id] || ''}
+                                    onChange={(e) => setAgentIds(prev => ({
+                                      ...prev,
+                                      [notification.id]: e.target.value
+                                    }))}
+                                    className="w-full"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleAssignAgentId(notification)}
+                                    disabled={!agentIds[notification.id]}
+                                  >
+                                    Assign
+                                  </Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  Enter the Agent ID from your system to assign to this user's agent configuration.
+                                </p>
+                              </div>
                             )}
                           </div>
                         </div>
