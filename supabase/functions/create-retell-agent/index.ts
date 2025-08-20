@@ -63,14 +63,17 @@ serve(async (req) => {
       body: JSON.stringify(webhookPayload),
     });
 
+    console.log('Webhook response status:', response.status);
+    console.log('Webhook response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Webhook error:', response.status, errorText);
+      console.error('Webhook error response:', errorText);
       throw new Error(`Webhook error: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
-    console.log('Webhook response:', result);
+    console.log('Webhook response JSON:', result);
 
     return new Response(JSON.stringify({
       success: true,
