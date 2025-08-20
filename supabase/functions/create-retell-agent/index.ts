@@ -18,6 +18,7 @@ serve(async (req) => {
     const {
       agent_name,
       system_prompt,
+      first_message,
       voice_id,
       responsiveness,
       enable_backchannel,
@@ -26,6 +27,7 @@ serve(async (req) => {
 
     console.log('Creating Retell agent with simplified payload:', {
       agent_name,
+      first_message,
       voice_id,
       responsiveness,
       enable_backchannel,
@@ -45,7 +47,8 @@ serve(async (req) => {
       language: "en-US",
       responsiveness,
       enable_backchannel,
-      backchannel_frequency
+      backchannel_frequency,
+      first_message: first_message || "Hello! How can I help you today?"
     };
 
     console.log('Sending request to webhook:', webhookPayload);

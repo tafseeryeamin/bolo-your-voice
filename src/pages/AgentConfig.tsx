@@ -73,6 +73,7 @@ const AgentConfig = () => {
   const [agentName, setAgentName] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("11labs-Amritanshu");
   const [agentPrompt, setAgentPrompt] = useState("");
+  const [firstMessage, setFirstMessage] = useState("");
   const [responsiveness, setResponsiveness] = useState([1]);
   const [enableBackchannel, setEnableBackchannel] = useState(true);
   const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
@@ -107,6 +108,7 @@ const AgentConfig = () => {
         body: {
           agent_name: agentName,
           system_prompt: agentPrompt,
+          first_message: firstMessage,
           voice_id: selectedVoice,
           responsiveness: responsiveness[0],
           enable_backchannel: enableBackchannel,
@@ -165,7 +167,7 @@ const AgentConfig = () => {
         language: 'en-US', 
         description: agentPrompt,
         prompt: agentPrompt,
-        begin_message: null,
+        begin_message: firstMessage || null,
         response_engine: JSON.stringify({
           type: "retell-llm",
           version: 0,
@@ -263,6 +265,19 @@ const AgentConfig = () => {
                     onChange={(e) => setAgentPrompt(e.target.value)}
                     className="min-h-32 mt-2"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="first-message">First Message</Label>
+                  <Textarea
+                    id="first-message"
+                    placeholder="Enter the first message the AI will say when the conversation starts (optional)"
+                    value={firstMessage}
+                    onChange={(e) => setFirstMessage(e.target.value)}
+                    className="min-h-20 mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This message will be spoken first when the agent starts a conversation
+                  </p>
                 </div>
               </div>
             </CardContent>
