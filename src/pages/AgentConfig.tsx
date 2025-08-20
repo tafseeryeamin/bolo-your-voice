@@ -106,18 +106,11 @@ const AgentConfig = () => {
       const { data, error } = await supabase.functions.invoke('create-retell-agent', {
         body: {
           agent_name: agentName,
-          version: 0,
-          response_engine: {
-            type: "retell-llm",
-            llm_id: "your_llm_id" // This would come from your LLM configuration
-          },
+          system_prompt: agentPrompt,
           voice_id: selectedVoice,
-          voice_model: "eleven_turbo_v2", 
-          language: "en-US",
           responsiveness: responsiveness[0],
           enable_backchannel: enableBackchannel,
-          backchannel_frequency: backchannelFrequency[0],
-          system_prompt: agentPrompt
+          backchannel_frequency: backchannelFrequency[0]
         }
       });
 

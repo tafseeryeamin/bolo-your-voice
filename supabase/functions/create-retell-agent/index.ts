@@ -15,74 +15,62 @@ serve(async (req) => {
   try {
     console.log('Create Retell Agent function called');
     
-    const retellApiKey = Deno.env.get('RETELL_API_KEY');
-    if (!retellApiKey) {
-      console.error('RETELL_API_KEY not found');
-      throw new Error('Retell API key not configured');
-    }
-
     const {
       agent_name,
-      version,
-      response_engine,
+      system_prompt,
       voice_id,
-      voice_model,
-      language,
       responsiveness,
       enable_backchannel,
-      backchannel_frequency,
-      system_prompt
+      backchannel_frequency
     } = await req.json();
 
-    console.log('Creating Retell agent with payload:', {
+    console.log('Creating Retell agent with simplified payload:', {
       agent_name,
       voice_id,
-      language,
       responsiveness,
       enable_backchannel,
       backchannel_frequency
     });
 
-    // Create agent with Retell API
-    const retellPayload = {
+    // Create simplified payload matching your form
+    const webhookPayload = {
       agent_name,
-      version,
-      response_engine,
+      version: 0,
+      response_engine: {
+        type: "retell-llm",
+        llm_id: "your_llm_id"
+      },
       voice_id,
-      voice_model,
-      language,
+      voice_model: "eleven_turbo_v2",
+      language: "en-US",
       responsiveness,
       enable_backchannel,
-      backchannel_frequency,
-      // Add system prompt to LLM configuration
-      llm_websocket_url: null,
-      begin_message: "Hello! I'm your AI assistant. How can I help you today?",
-      general_prompt: system_prompt
+      backchannel_frequency
     };
 
-    console.log('Sending request to Retell API...');
+    console.log('Sending request to webhook:', webhookPayload);
     
-    const response = await fetch('https://api.retellai.com/create-agent', {
+    // Send to your webhook URL
+    const response = await fetch('https://awake-cockatoo-naturally.ngrok-free.app/webhook/955d68ca-7f0e-46d8-9835-b0bbf8a8b0eb', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${retellApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(retellPayload),
+      body: JSON.stringify(webhookPayload),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Retell API error:', response.status, errorText);
-      throw new Error(`Retell API error: ${response.status} - ${errorText}`);
+      console.error('Webhook error:', response.status, errorText);
+      throw new Error(`Webhook error: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
-    console.log('Retell agent created successfully:', result);
+    console.log('Webhook response:', result);
 
     return new Response(JSON.stringify({
       success: true,
-      agent_id: result.agent_id,
+      agent_id: result.agent_id || result.id, // Handle different response formats
       data: result
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
