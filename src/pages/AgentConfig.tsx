@@ -20,13 +20,12 @@ const AgentConfig = () => {
   
   // Essential fields only
   const [agentName, setAgentName] = useState("");
-  const [selectedVoice, setSelectedVoice] = useState("11labs-Amritanshu");
   const [agentPrompt, setAgentPrompt] = useState("");
-  const [aiFirstMessage, setAiFirstMessage] = useState("");
   const [responsiveness, setResponsiveness] = useState([1]);
   const [enableBackchannel, setEnableBackchannel] = useState(true);
   const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
-  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+  const [retellAgentId, setRetellAgentId] = useState<string | null>(null);
+  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
 
   useEffect(() => {
     console.log("AgentConfig component mounted");
@@ -45,32 +44,56 @@ const AgentConfig = () => {
     }
   }, [searchParams]);
 
-  const playVoicePreview = async (voiceId: string) => {
+
+  const createRetellAgent = async () => {
+    setIsCreatingAgent(true);
     try {
-      setPlayingVoice(voiceId);
-      
-      // Create a simple voice preview using Speech Synthesis API
-      const utterance = new SpeechSynthesisUtterance("Hello, this is a preview of my voice. How can I help you today?");
-      
-      // Try to find Indian voice for Amritanshu
-      const availableVoices = speechSynthesis.getVoices();
-      let selectedVoice = availableVoices[0]; // Default
-      
-      if (voiceId === "11labs-Amritanshu") {
-        selectedVoice = availableVoices.find(v => v.lang.includes('en-IN')) || selectedVoice;
-        utterance.pitch = 1.0;
+      // Call webhook to create Retell agent
+      const webhookPayload = {
+        agent_name: agentName,
+        version: 0,
+        response_engine: {
+          type: "retell-llm",
+          llm_id: "your_llm_id" // This would come from your webhook configuration
+        },
+        voice_id: "11labs-Amritanshu",
+        voice_model: "eleven_turbo_v2", 
+        language: "en-US",
+        responsiveness: responsiveness[0],
+        enable_backchannel: enableBackchannel,
+        backchannel_frequency: backchannelFrequency[0],
+        system_prompt: agentPrompt
+      };
+
+      const response = await fetch('YOUR_WEBHOOK_URL', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create Retell agent');
       }
-      
-      utterance.voice = selectedVoice;
-      utterance.rate = 0.9;
-      
-      utterance.onend = () => setPlayingVoice(null);
-      utterance.onerror = () => setPlayingVoice(null);
-      
-      speechSynthesis.speak(utterance);
+
+      const result = await response.json();
+      setRetellAgentId(result.agent_id);
+
+      toast({
+        title: "Success",
+        description: "Retell agent created successfully!",
+      });
+
     } catch (error) {
-      console.error('Error playing voice preview:', error);
-      setPlayingVoice(null);
+      console.error("Error creating Retell agent:", error);
+      toast({
+        title: "Error",
+        description: `Failed to create Retell agent: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingAgent(false);
     }
   };
 
@@ -89,14 +112,17 @@ const AgentConfig = () => {
         return;
       }
 
+      // First create the Retell agent
+      await createRetellAgent();
+
       const agentData = {
         name: agentName,
         user_id: user.id,
-        voice_id: selectedVoice,
+        voice_id: "11labs-Amritanshu",
         language: 'en-US', 
         description: agentPrompt,
         prompt: agentPrompt,
-        begin_message: aiFirstMessage, // AI always speaks first
+        begin_message: null,
         response_engine: JSON.stringify({
           type: "retell-llm",
           version: 0,
@@ -145,9 +171,8 @@ const AgentConfig = () => {
         description: existingAgentId ? "Agent updated successfully!" : "Agent created successfully!",
       });
 
-      // Redirect to agents page
-      navigate("/agents");
-
+      // Don't redirect immediately, let user test the agent
+      
     } catch (error) {
       console.error("Error saving agent configuration:", error);
       toast({
@@ -196,44 +221,34 @@ const AgentConfig = () => {
                     className="min-h-32 mt-2"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="first-message">First Message (AI speaks first)</Label>
-                  <Textarea
-                    id="first-message"
-                    placeholder="Enter the first message the AI will say when the call starts"
-                    value={aiFirstMessage}
-                    onChange={(e) => setAiFirstMessage(e.target.value)}
-                    className="min-h-20 mt-2"
-                  />
-                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Voice & Settings */}
+          {/* Agent Settings */}
           <Card>
             <CardHeader className="flex flex-row items-center space-y-0 pb-4">
               <Mic className="w-5 h-5 text-voice-accent mr-2" />
-              <CardTitle>Voice & Settings</CardTitle>
+              <CardTitle>Agent Settings</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                <div>
-                  <Label>Voice (Fixed: Amritanshu)</Label>
-                  <div className="mt-2 p-3 bg-muted rounded-md flex items-center justify-between">
-                    <div>
-                      <span className="font-medium">Amritanshu</span>
-                      <span className="text-sm text-muted-foreground ml-2">Indian, Middle Aged</span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => playVoicePreview(selectedVoice)}
-                      disabled={playingVoice === selectedVoice}
-                    >
-                      <Play className="w-4 h-4 mr-1" />
-                      {playingVoice === selectedVoice ? "Playing..." : "Preview"}
-                    </Button>
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                  <div>
+                    <Label className="text-sm font-medium">Voice</Label>
+                    <p className="text-sm text-muted-foreground">11labs-Amritanshu</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Voice Model</Label>
+                    <p className="text-sm text-muted-foreground">eleven_turbo_v2</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Language</Label>
+                    <p className="text-sm text-muted-foreground">en-US</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Version</Label>
+                    <p className="text-sm text-muted-foreground">0</p>
                   </div>
                 </div>
 
@@ -291,11 +306,53 @@ const AgentConfig = () => {
             </CardContent>
           </Card>
 
+          {/* Test Agent Component */}
+          {retellAgentId && (
+            <Card>
+              <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+                <Mic className="w-5 h-5 text-voice-accent mr-2" />
+                <CardTitle>Test Your Agent</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <Label className="text-sm font-medium">Agent ID</Label>
+                    <p className="text-sm text-muted-foreground font-mono">{retellAgentId}</p>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      // Add test functionality here
+                      toast({
+                        title: "Test Agent",
+                        description: "Testing functionality will be implemented with Retell API integration",
+                      });
+                    }}
+                    className="w-full"
+                  >
+                    Test Agent Performance
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Save Button */}
-          <div className="flex justify-end">
-            <Button onClick={handleSave} className="bg-voice-accent hover:bg-voice-muted text-primary-foreground">
-              Save Configuration
+          <div className="flex justify-end space-x-4">
+            <Button 
+              onClick={handleSave} 
+              disabled={isCreatingAgent}
+              className="bg-voice-accent hover:bg-voice-muted text-primary-foreground"
+            >
+              {isCreatingAgent ? "Creating Agent..." : existingAgentId ? "Update Configuration" : "Save Configuration"}
             </Button>
+            {retellAgentId && (
+              <Button 
+                onClick={() => navigate("/agents")}
+                variant="outline"
+              >
+                Go to My Agents
+              </Button>
+            )}
           </div>
         </div>
       </div>
