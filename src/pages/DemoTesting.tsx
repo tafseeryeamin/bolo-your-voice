@@ -4,11 +4,50 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mic, MicOff, TestTube, Shield } from "lucide-react";
 import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { RetellWebClient } from "retell-client-js-sdk";
+
+// Voice options organized by gender and age
+const voiceOptions = {
+  male: {
+    young: [
+      { id: "TX3LPaxmHKxFdv7VOQHJ", name: "Liam", traits: "Young, energetic, friendly" },
+      { id: "onwK4e9ZLuTAKqWW03F9", name: "Daniel", traits: "Young, professional, clear" },
+      { id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum", traits: "Young, warm, conversational" }
+    ],
+    middle: [
+      { id: "CwhRBWXzGAHq8TQ4Fs17", name: "Roger", traits: "Mature, authoritative, confident" },
+      { id: "IKne3meq5aSn9XLyUdCD", name: "Charlie", traits: "Professional, reliable, trustworthy" },
+      { id: "JBFqnCBsd6RMkjVDRZzb", name: "George", traits: "Experienced, wise, calming" }
+    ],
+    senior: [
+      { id: "pqHfZKP75CvOlQylNhV4", name: "Bill", traits: "Distinguished, experienced, authoritative" },
+      { id: "nPczCjzI2devNBz1zQrb", name: "Brian", traits: "Mature, professional, knowledgeable" },
+      { id: "cjVigY5qzO86Huf0OWal", name: "Eric", traits: "Senior, experienced, wise" }
+    ]
+  },
+  female: {
+    young: [
+      { id: "9BWtsMINqrJLrRacOk9x", name: "Aria", traits: "Young, vibrant, enthusiastic" },
+      { id: "pFZP5JQG7iQjIQuC4Bku", name: "Lily", traits: "Young, sweet, friendly" },
+      { id: "Xb7hH8MSUJpSbSDYk0k2", name: "Alice", traits: "Young, professional, clear" }
+    ],
+    middle: [
+      { id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah", traits: "Professional, confident, warm" },
+      { id: "FGY2WhTYpPnrIDTdsKH5", name: "Laura", traits: "Mature, trustworthy, engaging" },
+      { id: "cgSgspJ2msm6clMCkdW9", name: "Jessica", traits: "Professional, articulate, friendly" }
+    ],
+    senior: [
+      { id: "XB0fDUnXU5powFXDhCwa", name: "Charlotte", traits: "Distinguished, experienced, wise" },
+      { id: "XrExE9yKIg1WjnnlVkGX", name: "Matilda", traits: "Mature, authoritative, knowledgeable" },
+      { id: "SAz9YHcvj6GT2YYXdXww", name: "River", traits: "Experienced, calming, professional" }
+    ]
+  }
+};
 
 const DemoTesting = () => {
   const { toast } = useToast();
@@ -17,6 +56,9 @@ const DemoTesting = () => {
   const [loading, setLoading] = useState(true);
   const [apiKey, setApiKey] = useState("");
   const [agentId, setAgentId] = useState("");
+  const [selectedGender, setSelectedGender] = useState<"male" | "female">("female");
+  const [selectedAge, setSelectedAge] = useState<"young" | "middle" | "senior">("middle");
+  const [selectedVoice, setSelectedVoice] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [retellWebClient, setRetellWebClient] = useState<RetellWebClient | null>(null);
@@ -65,7 +107,13 @@ const DemoTesting = () => {
       const { data, error } = await supabase.functions.invoke('create-retell-web-call', {
         body: {
           api_key: apiKey.trim(),
-          agent_id: agentId.trim()
+          agent_id: agentId.trim(),
+          voice_preferences: {
+            gender: selectedGender,
+            age: selectedAge,
+            voice_id: selectedVoice,
+            voice_name: selectedVoice ? voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name : undefined
+          }
         }
       });
 
@@ -238,6 +286,71 @@ const DemoTesting = () => {
                     className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     disabled={isConnecting || isConnected}
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium flex items-center">
+                      👤 Gender
+                    </Label>
+                    <Select value={selectedGender} onValueChange={(value: "male" | "female") => {
+                      setSelectedGender(value);
+                      setSelectedVoice("");
+                    }} disabled={isConnecting || isConnected}>
+                      <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium flex items-center">
+                      🎂 Age Group
+                    </Label>
+                    <Select value={selectedAge} onValueChange={(value: "young" | "middle" | "senior") => {
+                      setSelectedAge(value);
+                      setSelectedVoice("");
+                    }} disabled={isConnecting || isConnected}>
+                      <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                        <SelectValue placeholder="Select age" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="young">Young (18-30)</SelectItem>
+                        <SelectItem value="middle">Middle (30-50)</SelectItem>
+                        <SelectItem value="senior">Senior (50+)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium flex items-center">
+                    🎤 Voice Selection
+                  </Label>
+                  <Select value={selectedVoice} onValueChange={setSelectedVoice} disabled={isConnecting || isConnected}>
+                    <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                      <SelectValue placeholder="Select a voice" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {voiceOptions[selectedGender][selectedAge].map((voice) => (
+                        <SelectItem key={voice.id} value={voice.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{voice.name}</span>
+                            <span className="text-xs text-muted-foreground">{voice.traits}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedVoice && (
+                    <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/30 rounded">
+                      Selected: {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name} - {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.traits}
+                    </div>
+                  )}
                 </div>
               </div>
 

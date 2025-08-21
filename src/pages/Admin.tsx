@@ -346,6 +346,18 @@ const Admin = () => {
                               <div className="bg-muted/50 p-3 rounded border text-sm space-y-2">
                                 <div><strong>Agent Name:</strong> {notification.data.agent_name}</div>
                                 <div><strong>Voice:</strong> {notification.data.voice_id}</div>
+                                {notification.data.voice_preferences && (
+                                  <div className="bg-muted/30 p-2 rounded mt-2">
+                                    <div className="text-xs font-semibold mb-1">Voice Preferences:</div>
+                                    <div className="text-xs space-y-1">
+                                      <div><strong>Gender:</strong> {notification.data.voice_preferences.gender}</div>
+                                      <div><strong>Age Group:</strong> {notification.data.voice_preferences.age}</div>
+                                      {notification.data.voice_preferences.voice_name && (
+                                        <div><strong>Selected Voice:</strong> {notification.data.voice_preferences.voice_name}</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                                 <div><strong>First Message:</strong> {notification.data.first_message}</div>
                                 <div><strong>Responsiveness:</strong> {notification.data.responsiveness}</div>
                                 <div><strong>Backchannel:</strong> {notification.data.enable_backchannel ? 'Enabled' : 'Disabled'}</div>

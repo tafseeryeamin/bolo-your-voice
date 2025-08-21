@@ -30,7 +30,8 @@ serve(async (req) => {
       enable_backchannel,
       backchannel_frequency,
       knowledge_base,
-      website_link
+      website_link,
+      voice_preferences
     } = await req.json();
 
     console.log('Creating Retell agent with simplified payload:', {
@@ -85,6 +86,7 @@ serve(async (req) => {
           backchannel_frequency,
           knowledge_base,
           website_link,
+          voice_preferences,
           submitted_at: new Date().toISOString()
         }
       });
