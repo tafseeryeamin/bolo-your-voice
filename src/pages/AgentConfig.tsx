@@ -13,54 +13,75 @@ import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// Voice data with all available voices
-const voices = [
-  { name: "Adrian", trait: "American, Young, Retell", id: "11labs-Adrian" },
-  { name: "Amritanshu (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Amritanshu" },
-  { name: "Amy (UK)", trait: "British, Young, Provider", id: "11labs-Amy" },
-  { name: "Andrew", trait: "American, Young, Retell", id: "11labs-Andrew" },
-  { name: "Anna", trait: "American, Young, Retell", id: "11labs-Anna" },
-  { name: "Anthony", trait: "British, Middle Aged, Retell", id: "11labs-Anthony" },
-  { name: "Billy", trait: "American, Young, Retell", id: "11labs-Billy" },
-  { name: "Bing", trait: "American, Young, Retell", id: "11labs-Bing" },
-  { name: "Brian", trait: "American, Young, Retell", id: "11labs-Brian" },
-  { name: "Carola (de-DE)", trait: "German, Middle Aged, Provider", id: "11labs-Carola" },
-  { name: "Charlie (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-charlie" },
-  { name: "Chloe", trait: "American, Young, Retell", id: "11labs-Chloe" },
-  { name: "Cimo", trait: "American, Middle Aged, Retell", id: "11labs-Cimo" },
-  { name: "Dorothy", trait: "British, Young, Provider", id: "11labs-Dorothy" },
-  { name: "Emily", trait: "American, Middle Aged, Retell", id: "11labs-Emily" },
-  { name: "Ethan", trait: "American, Young, Retell", id: "11labs-Ethan" },
-  { name: "Evie", trait: "American, Young, Retell", id: "11labs-Evie" },
-  { name: "Gilfoy", trait: "American, Middle Aged, Retell", id: "11labs-Gilfoy" },
-  { name: "Grace", trait: "American, Middle Aged, Retell", id: "11labs-Grace" },
-  { name: "James", trait: "American, Old, Retell", id: "11labs-James" },
-  { name: "Jason", trait: "American, Young, Retell", id: "11labs-Jason" },
-  { name: "Jenny", trait: "American, Young, Retell", id: "11labs-Jenny" },
-  { name: "Joe", trait: "American, Middle Aged, Provider", id: "11labs-Joe" },
-  { name: "John", trait: "American, Middle Aged, Retell", id: "11labs-John" },
-  { name: "Julia", trait: "American, Middle Aged, Retell", id: "11labs-Julia" },
-  { name: "Kate", trait: "American, Middle Aged, Retell", id: "11labs-Kate" },
-  { name: "Kathrine", trait: "American, Middle Aged, Retell", id: "11labs-Kathrine" },
-  { name: "Lily", trait: "American, Young, Retell", id: "11labs-Lily" },
-  { name: "Lucas", trait: "American, Middle Aged, Retell", id: "11labs-Lucas" },
-  { name: "Marissa", trait: "American, Young, Retell", id: "11labs-Marissa" },
-  { name: "Max", trait: "American, Middle Aged, Retell", id: "11labs-Max" },
-  { name: "Mia", trait: "American, Middle Aged, Retell", id: "11labs-Mia" },
-  { name: "Monika (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Monika" },
-  { name: "Myra", trait: "American, Young, Retell", id: "11labs-Myra" },
-  { name: "Nina", trait: "American, Middle Aged, Retell", id: "11labs-Nina" },
-  { name: "Noah (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-Noah" },
-  { name: "Paola", trait: "American, Young, Provider", id: "11labs-Paola" },
-  { name: "Paul", trait: "American, Old, Retell", id: "11labs-Paul" },
-  { name: "Ryan", trait: "American, Young, Retell", id: "11labs-Ryan" },
-  { name: "Samad (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Samad" },
-  { name: "Santiago (es-ES)", trait: "Spanish, Middle Aged, Provider", id: "11labs-Santiago" },
-  { name: "Steve", trait: "American, Old, Retell", id: "11labs-Steve" },
-  { name: "Susan", trait: "American, Middle Aged, Retell", id: "11labs-Susan" },
-  { name: "Victoria", trait: "American, Young, Retell", id: "11labs-victoria" },
-  { name: "Zuri", trait: "American, Old, Retell", id: "11labs-Zuri" },
-];
+// Voice options organized by gender and age
+const voiceOptions = {
+  male: {
+    young: [
+      { name: "Adrian", trait: "American, Young, Retell", id: "11labs-Adrian" },
+      { name: "Andrew", trait: "American, Young, Retell", id: "11labs-Andrew" },
+      { name: "Billy", trait: "American, Young, Retell", id: "11labs-Billy" },
+      { name: "Bing", trait: "American, Young, Retell", id: "11labs-Bing" },
+      { name: "Brian", trait: "American, Young, Retell", id: "11labs-Brian" },
+      { name: "Ethan", trait: "American, Young, Retell", id: "11labs-Ethan" },
+      { name: "Jason", trait: "American, Young, Retell", id: "11labs-Jason" },
+      { name: "Ryan", trait: "American, Young, Retell", id: "11labs-Ryan" }
+    ],
+    middle: [
+      { name: "Anthony", trait: "British, Middle Aged, Retell", id: "11labs-Anthony" },
+      { name: "Amritanshu (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Amritanshu" },
+      { name: "Charlie (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-charlie" },
+      { name: "Cimo", trait: "American, Middle Aged, Retell", id: "11labs-Cimo" },
+      { name: "Gilfoy", trait: "American, Middle Aged, Retell", id: "11labs-Gilfoy" },
+      { name: "Joe", trait: "American, Middle Aged, Provider", id: "11labs-Joe" },
+      { name: "John", trait: "American, Middle Aged, Retell", id: "11labs-John" },
+      { name: "Lucas", trait: "American, Middle Aged, Retell", id: "11labs-Lucas" },
+      { name: "Max", trait: "American, Middle Aged, Retell", id: "11labs-Max" },
+      { name: "Noah (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-Noah" },
+      { name: "Samad (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Samad" },
+      { name: "Santiago (es-ES)", trait: "Spanish, Middle Aged, Provider", id: "11labs-Santiago" }
+    ],
+    senior: [
+      { name: "James", trait: "American, Old, Retell", id: "11labs-James" },
+      { name: "Paul", trait: "American, Old, Retell", id: "11labs-Paul" },
+      { name: "Steve", trait: "American, Old, Retell", id: "11labs-Steve" }
+    ]
+  },
+  female: {
+    young: [
+      { name: "Amy (UK)", trait: "British, Young, Provider", id: "11labs-Amy" },
+      { name: "Anna", trait: "American, Young, Retell", id: "11labs-Anna" },
+      { name: "Chloe", trait: "American, Young, Retell", id: "11labs-Chloe" },
+      { name: "Evie", trait: "American, Young, Retell", id: "11labs-Evie" },
+      { name: "Jenny", trait: "American, Young, Retell", id: "11labs-Jenny" },
+      { name: "Lily", trait: "American, Young, Retell", id: "11labs-Lily" },
+      { name: "Marissa", trait: "American, Young, Retell", id: "11labs-Marissa" },
+      { name: "Myra", trait: "American, Young, Retell", id: "11labs-Myra" },
+      { name: "Paola", trait: "American, Young, Provider", id: "11labs-Paola" },
+      { name: "Victoria", trait: "American, Young, Retell", id: "11labs-victoria" }
+    ],
+    middle: [
+      { name: "Carola (de-DE)", trait: "German, Middle Aged, Provider", id: "11labs-Carola" },
+      { name: "Dorothy", trait: "British, Young, Provider", id: "11labs-Dorothy" },
+      { name: "Emily", trait: "American, Middle Aged, Retell", id: "11labs-Emily" },
+      { name: "Grace", trait: "American, Middle Aged, Retell", id: "11labs-Grace" },
+      { name: "Julia", trait: "American, Middle Aged, Retell", id: "11labs-Julia" },
+      { name: "Kate", trait: "American, Middle Aged, Retell", id: "11labs-Kate" },
+      { name: "Kathrine", trait: "American, Middle Aged, Retell", id: "11labs-Kathrine" },
+      { name: "Mia", trait: "American, Middle Aged, Retell", id: "11labs-Mia" },
+      { name: "Monika (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Monika" },
+      { name: "Nina", trait: "American, Middle Aged, Retell", id: "11labs-Nina" },
+      { name: "Susan", trait: "American, Middle Aged, Retell", id: "11labs-Susan" }
+    ],
+    senior: [
+      { name: "Zuri", trait: "American, Old, Retell", id: "11labs-Zuri" }
+    ]
+  }
+};
+
+// Flatten all voices for backward compatibility
+const voices = Object.values(voiceOptions).flatMap(gender => 
+  Object.values(gender).flatMap(age => age)
+);
 
 const AgentConfig = () => {
   const { toast } = useToast();
@@ -71,6 +92,8 @@ const AgentConfig = () => {
   // Essential fields only
   const [agentName, setAgentName] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("11labs-Amritanshu");
+  const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
+  const [selectedAge, setSelectedAge] = useState<"young" | "middle" | "senior">("middle");
   const [agentPrompt, setAgentPrompt] = useState("");
   const [firstMessage, setFirstMessage] = useState("");
   const [responsiveness, setResponsiveness] = useState([1]);
@@ -123,7 +146,25 @@ const AgentConfig = () => {
       if (agent) {
         console.log("Loaded agent data:", agent);
         setAgentName(agent.name || "");
-        setSelectedVoice(agent.voice_id || "11labs-Amritanshu");
+        
+        // Find voice in categorized structure and set gender/age accordingly
+        const voiceId = agent.voice_id || "11labs-Amritanshu";
+        setSelectedVoice(voiceId);
+        
+        // Find the voice in our categorized structure
+        let foundVoice = false;
+        for (const [gender, ageGroups] of Object.entries(voiceOptions)) {
+          for (const [age, voiceList] of Object.entries(ageGroups)) {
+            if (voiceList.find(v => v.id === voiceId)) {
+              setSelectedGender(gender as "male" | "female");
+              setSelectedAge(age as "young" | "middle" | "senior");
+              foundVoice = true;
+              break;
+            }
+          }
+          if (foundVoice) break;
+        }
+        
         setAgentPrompt(agent.prompt || "");
         setFirstMessage(agent.begin_message || "");
         
@@ -246,7 +287,12 @@ const AgentConfig = () => {
             enable_backchannel: enableBackchannel,
             backchannel_frequency: backchannelFrequency[0],
             knowledge_base: knowledgeBase,
-            website_link: websiteLink
+            website_link: websiteLink,
+            voice_preferences: {
+              gender: selectedGender,
+              age: selectedAge,
+              voice_name: voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name
+            }
           }
         });
 
@@ -371,6 +417,41 @@ const AgentConfig = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Gender</Label>
+                    <Select value={selectedGender} onValueChange={(value: "male" | "female") => {
+                      setSelectedGender(value);
+                      setSelectedVoice("");
+                    }}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border z-50">
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Age Group</Label>
+                    <Select value={selectedAge} onValueChange={(value: "young" | "middle" | "senior") => {
+                      setSelectedAge(value);
+                      setSelectedVoice("");
+                    }}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select age" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border z-50">
+                        <SelectItem value="young">Young (18-30)</SelectItem>
+                        <SelectItem value="middle">Middle (30-50)</SelectItem>
+                        <SelectItem value="senior">Senior (50+)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <div>
                   <Label>Voice Selection</Label>
                   <Select value={selectedVoice} onValueChange={setSelectedVoice}>
@@ -378,7 +459,7 @@ const AgentConfig = () => {
                       <SelectValue placeholder="Choose a voice for your agent" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60 bg-card border-border z-50">
-                      {voices.map((voice) => (
+                      {voiceOptions[selectedGender][selectedAge].map((voice) => (
                         <SelectItem key={voice.id} value={voice.id}>
                           <div className="flex flex-col">
                             <span className="font-medium">{voice.name}</span>
@@ -389,6 +470,11 @@ const AgentConfig = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {selectedVoice && (
+                    <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/30 rounded">
+                      Selected: {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name} - {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.trait}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
