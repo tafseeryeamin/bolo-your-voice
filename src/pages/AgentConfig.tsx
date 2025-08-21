@@ -16,79 +16,207 @@ import { useToast } from "@/hooks/use-toast";
 // Voice options organized by gender and age
 const voiceOptions = {
   male: {
-    young: [
-      { name: "Adrian", trait: "American, Young, Retell", id: "11labs-Adrian" },
-      { name: "Andrew", trait: "American, Young, Retell", id: "11labs-Andrew" },
-      { name: "Billy", trait: "American, Young, Retell", id: "11labs-Billy" },
-      { name: "Bing", trait: "American, Young, Retell", id: "11labs-Bing" },
-      { name: "Brian", trait: "American, Young, Retell", id: "11labs-Brian" },
-      { name: "Ethan", trait: "American, Young, Retell", id: "11labs-Ethan" },
-      { name: "Jason", trait: "American, Young, Retell", id: "11labs-Jason" },
-      { name: "Ryan", trait: "American, Young, Retell", id: "11labs-Ryan" }
-    ],
-    middle: [
-      { name: "Anthony", trait: "British, Middle Aged, Retell", id: "11labs-Anthony" },
-      { name: "Amritanshu (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Amritanshu" },
-      { name: "Charlie (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-charlie" },
-      { name: "Cimo", trait: "American, Middle Aged, Retell", id: "11labs-Cimo" },
-      { name: "Gilfoy", trait: "American, Middle Aged, Retell", id: "11labs-Gilfoy" },
-      { name: "Joe", trait: "American, Middle Aged, Provider", id: "11labs-Joe" },
-      { name: "John", trait: "American, Middle Aged, Retell", id: "11labs-John" },
-      { name: "Lucas", trait: "American, Middle Aged, Retell", id: "11labs-Lucas" },
-      { name: "Max", trait: "American, Middle Aged, Retell", id: "11labs-Max" },
-      { name: "Noah (en-AU)", trait: "Australian, Middle Aged, Provider", id: "11labs-Noah" },
-      { name: "Samad (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Samad" },
-      { name: "Santiago (es-ES)", trait: "Spanish, Middle Aged, Provider", id: "11labs-Santiago" }
-    ],
-    senior: [
-      { name: "James", trait: "American, Old, Retell", id: "11labs-James" },
-      { name: "Paul", trait: "American, Old, Retell", id: "11labs-Paul" },
-      { name: "Steve", trait: "American, Old, Retell", id: "11labs-Steve" }
-    ]
+    young: [{
+      name: "Adrian",
+      trait: "American, Young, Retell",
+      id: "11labs-Adrian"
+    }, {
+      name: "Andrew",
+      trait: "American, Young, Retell",
+      id: "11labs-Andrew"
+    }, {
+      name: "Billy",
+      trait: "American, Young, Retell",
+      id: "11labs-Billy"
+    }, {
+      name: "Bing",
+      trait: "American, Young, Retell",
+      id: "11labs-Bing"
+    }, {
+      name: "Brian",
+      trait: "American, Young, Retell",
+      id: "11labs-Brian"
+    }, {
+      name: "Ethan",
+      trait: "American, Young, Retell",
+      id: "11labs-Ethan"
+    }, {
+      name: "Jason",
+      trait: "American, Young, Retell",
+      id: "11labs-Jason"
+    }, {
+      name: "Ryan",
+      trait: "American, Young, Retell",
+      id: "11labs-Ryan"
+    }],
+    middle: [{
+      name: "Anthony",
+      trait: "British, Middle Aged, Retell",
+      id: "11labs-Anthony"
+    }, {
+      name: "Amritanshu (en-IN)",
+      trait: "Indian, Middle Aged, Provider",
+      id: "11labs-Amritanshu"
+    }, {
+      name: "Charlie (en-AU)",
+      trait: "Australian, Middle Aged, Provider",
+      id: "11labs-charlie"
+    }, {
+      name: "Cimo",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Cimo"
+    }, {
+      name: "Gilfoy",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Gilfoy"
+    }, {
+      name: "Joe",
+      trait: "American, Middle Aged, Provider",
+      id: "11labs-Joe"
+    }, {
+      name: "John",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-John"
+    }, {
+      name: "Lucas",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Lucas"
+    }, {
+      name: "Max",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Max"
+    }, {
+      name: "Noah (en-AU)",
+      trait: "Australian, Middle Aged, Provider",
+      id: "11labs-Noah"
+    }, {
+      name: "Samad (en-IN)",
+      trait: "Indian, Middle Aged, Provider",
+      id: "11labs-Samad"
+    }, {
+      name: "Santiago (es-ES)",
+      trait: "Spanish, Middle Aged, Provider",
+      id: "11labs-Santiago"
+    }],
+    senior: [{
+      name: "James",
+      trait: "American, Old, Retell",
+      id: "11labs-James"
+    }, {
+      name: "Paul",
+      trait: "American, Old, Retell",
+      id: "11labs-Paul"
+    }, {
+      name: "Steve",
+      trait: "American, Old, Retell",
+      id: "11labs-Steve"
+    }]
   },
   female: {
-    young: [
-      { name: "Amy (UK)", trait: "British, Young, Provider", id: "11labs-Amy" },
-      { name: "Anna", trait: "American, Young, Retell", id: "11labs-Anna" },
-      { name: "Chloe", trait: "American, Young, Retell", id: "11labs-Chloe" },
-      { name: "Evie", trait: "American, Young, Retell", id: "11labs-Evie" },
-      { name: "Jenny", trait: "American, Young, Retell", id: "11labs-Jenny" },
-      { name: "Lily", trait: "American, Young, Retell", id: "11labs-Lily" },
-      { name: "Marissa", trait: "American, Young, Retell", id: "11labs-Marissa" },
-      { name: "Myra", trait: "American, Young, Retell", id: "11labs-Myra" },
-      { name: "Paola", trait: "American, Young, Provider", id: "11labs-Paola" },
-      { name: "Victoria", trait: "American, Young, Retell", id: "11labs-victoria" }
-    ],
-    middle: [
-      { name: "Carola (de-DE)", trait: "German, Middle Aged, Provider", id: "11labs-Carola" },
-      { name: "Dorothy", trait: "British, Young, Provider", id: "11labs-Dorothy" },
-      { name: "Emily", trait: "American, Middle Aged, Retell", id: "11labs-Emily" },
-      { name: "Grace", trait: "American, Middle Aged, Retell", id: "11labs-Grace" },
-      { name: "Julia", trait: "American, Middle Aged, Retell", id: "11labs-Julia" },
-      { name: "Kate", trait: "American, Middle Aged, Retell", id: "11labs-Kate" },
-      { name: "Kathrine", trait: "American, Middle Aged, Retell", id: "11labs-Kathrine" },
-      { name: "Mia", trait: "American, Middle Aged, Retell", id: "11labs-Mia" },
-      { name: "Monika (en-IN)", trait: "Indian, Middle Aged, Provider", id: "11labs-Monika" },
-      { name: "Nina", trait: "American, Middle Aged, Retell", id: "11labs-Nina" },
-      { name: "Susan", trait: "American, Middle Aged, Retell", id: "11labs-Susan" }
-    ],
-    senior: [
-      { name: "Zuri", trait: "American, Old, Retell", id: "11labs-Zuri" }
-    ]
+    young: [{
+      name: "Amy (UK)",
+      trait: "British, Young, Provider",
+      id: "11labs-Amy"
+    }, {
+      name: "Anna",
+      trait: "American, Young, Retell",
+      id: "11labs-Anna"
+    }, {
+      name: "Chloe",
+      trait: "American, Young, Retell",
+      id: "11labs-Chloe"
+    }, {
+      name: "Evie",
+      trait: "American, Young, Retell",
+      id: "11labs-Evie"
+    }, {
+      name: "Jenny",
+      trait: "American, Young, Retell",
+      id: "11labs-Jenny"
+    }, {
+      name: "Lily",
+      trait: "American, Young, Retell",
+      id: "11labs-Lily"
+    }, {
+      name: "Marissa",
+      trait: "American, Young, Retell",
+      id: "11labs-Marissa"
+    }, {
+      name: "Myra",
+      trait: "American, Young, Retell",
+      id: "11labs-Myra"
+    }, {
+      name: "Paola",
+      trait: "American, Young, Provider",
+      id: "11labs-Paola"
+    }, {
+      name: "Victoria",
+      trait: "American, Young, Retell",
+      id: "11labs-victoria"
+    }],
+    middle: [{
+      name: "Carola (de-DE)",
+      trait: "German, Middle Aged, Provider",
+      id: "11labs-Carola"
+    }, {
+      name: "Dorothy",
+      trait: "British, Young, Provider",
+      id: "11labs-Dorothy"
+    }, {
+      name: "Emily",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Emily"
+    }, {
+      name: "Grace",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Grace"
+    }, {
+      name: "Julia",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Julia"
+    }, {
+      name: "Kate",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Kate"
+    }, {
+      name: "Kathrine",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Kathrine"
+    }, {
+      name: "Mia",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Mia"
+    }, {
+      name: "Monika (en-IN)",
+      trait: "Indian, Middle Aged, Provider",
+      id: "11labs-Monika"
+    }, {
+      name: "Nina",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Nina"
+    }, {
+      name: "Susan",
+      trait: "American, Middle Aged, Retell",
+      id: "11labs-Susan"
+    }],
+    senior: [{
+      name: "Zuri",
+      trait: "American, Old, Retell",
+      id: "11labs-Zuri"
+    }]
   }
 };
 
 // Flatten all voices for backward compatibility
-const voices = Object.values(voiceOptions).flatMap(gender => 
-  Object.values(gender).flatMap(age => age)
-);
-
+const voices = Object.values(voiceOptions).flatMap(gender => Object.values(gender).flatMap(age => age));
 const AgentConfig = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [existingAgentId, setExistingAgentId] = useState<string | null>(null);
-  
+
   // Essential fields only
   const [agentName, setAgentName] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("11labs-Amritanshu");
@@ -101,56 +229,47 @@ const AgentConfig = () => {
   const [backchannelFrequency, setBackchannelFrequency] = useState([0.9]);
   const [knowledgeBase, setKnowledgeBase] = useState("");
   const [websiteLink, setWebsiteLink] = useState("");
-  
-
   useEffect(() => {
     console.log("AgentConfig component mounted");
-    
+
     // Check if we have an existing agent ID from URL params
     const agentId = searchParams.get('id') || searchParams.get('agent_id');
     const agentName = searchParams.get('agent_name');
-    
     if (agentId) {
       setExistingAgentId(agentId);
       console.log("Found existing agent ID:", agentId);
-      
+
       // Load existing agent data
       loadAgentData(agentId);
-      
       if (agentName) {
         setAgentName(decodeURIComponent(agentName));
       }
     }
   }, [searchParams]);
-
   const loadAgentData = async (agentId: string) => {
     try {
       console.log("Loading agent data for ID:", agentId);
-      
-      const { data: agent, error } = await supabase
-        .from('agents')
-        .select('*')
-        .eq('id', agentId)
-        .single();
-
+      const {
+        data: agent,
+        error
+      } = await supabase.from('agents').select('*').eq('id', agentId).single();
       if (error) {
         console.error("Error loading agent data:", error);
         toast({
           title: "Error",
           description: "Failed to load agent data",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
-
       if (agent) {
         console.log("Loaded agent data:", agent);
         setAgentName(agent.name || "");
-        
+
         // Find voice in categorized structure and set gender/age accordingly
         const voiceId = agent.voice_id || "11labs-Amritanshu";
         setSelectedVoice(voiceId);
-        
+
         // Find the voice in our categorized structure
         let foundVoice = false;
         for (const [gender, ageGroups] of Object.entries(voiceOptions)) {
@@ -164,10 +283,9 @@ const AgentConfig = () => {
           }
           if (foundVoice) break;
         }
-        
         setAgentPrompt(agent.prompt || "");
         setFirstMessage(agent.begin_message || "");
-        
+
         // Parse response_engine if it exists and contains settings
         if (agent.response_engine) {
           try {
@@ -191,40 +309,40 @@ const AgentConfig = () => {
             console.log("Could not parse response_engine:", parseError);
           }
         }
-
       }
     } catch (error) {
       console.error("Error in loadAgentData:", error);
       toast({
         title: "Error",
         description: "Failed to load agent configuration",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
-
-
   const handleSave = async () => {
     try {
       console.log("Saving agent configuration...");
-      
+
       // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        },
+        error: userError
+      } = await supabase.auth.getUser();
       if (userError || !user) {
         toast({
           title: "Error",
           description: "You must be logged in to save agents",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
-
       const agentData = {
         name: agentName,
         user_id: user.id,
         voice_id: selectedVoice,
-        language: 'en-US', 
+        language: 'en-US',
         description: agentPrompt,
         prompt: agentPrompt,
         begin_message: firstMessage || null,
@@ -240,20 +358,12 @@ const AgentConfig = () => {
         }),
         llm_websocket_url: null
       };
-
       let result;
       let savedAgent;
-
       if (existingAgentId) {
         // Update existing agent
         console.log("Updating existing agent:", existingAgentId);
-        result = await supabase
-          .from('agents')
-          .update(agentData)
-          .eq('id', existingAgentId)
-          .eq('user_id', user.id)
-          .select();
-        
+        result = await supabase.from('agents').update(agentData).eq('id', existingAgentId).eq('user_id', user.id).select();
         if (result.error) {
           throw new Error(result.error.message);
         }
@@ -261,11 +371,7 @@ const AgentConfig = () => {
       } else {
         // Create new agent
         console.log("Creating new agent");
-        result = await supabase
-          .from('agents')
-          .insert(agentData)
-          .select();
-        
+        result = await supabase.from('agents').insert(agentData).select();
         if (result.error) {
           throw new Error(result.error.message);
         }
@@ -276,7 +382,10 @@ const AgentConfig = () => {
       // Only create notification if it's a new agent (not an update)
       if (!existingAgentId) {
         // Create notification for admin review
-        const { data, error } = await supabase.functions.invoke('create-retell-agent', {
+        const {
+          data,
+          error
+        } = await supabase.functions.invoke('create-retell-agent', {
           body: {
             internal_agent_id: savedAgent.id,
             agent_name: agentName,
@@ -295,40 +404,34 @@ const AgentConfig = () => {
             }
           }
         });
-
         if (error) {
           console.error("Error creating Retell agent request:", error);
         }
       }
 
-
       // Log activity
-      await supabase
-        .from('activity_logs')
-        .insert([{
-          user_id: user.id,
-          agent_id: savedAgent.id,
-          action: existingAgentId ? 'agent_updated' : 'agent_created',
-          details: { agent_name: agentName }
-        }]);
-
+      await supabase.from('activity_logs').insert([{
+        user_id: user.id,
+        agent_id: savedAgent.id,
+        action: existingAgentId ? 'agent_updated' : 'agent_created',
+        details: {
+          agent_name: agentName
+        }
+      }]);
       toast({
         title: "Success",
-        description: existingAgentId ? "Agent updated successfully!" : "Agent created successfully! Admin will review and assign Retell agent ID.",
+        description: existingAgentId ? "Agent updated successfully!" : "Agent created successfully! Admin will review and assign Retell agent ID."
       });
-      
     } catch (error) {
       console.error("Error saving agent configuration:", error);
       toast({
         title: "Error",
         description: `Failed to save configuration: ${error.message}`,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto p-6 max-w-4xl">
         <div className="mb-8">
@@ -347,60 +450,29 @@ const AgentConfig = () => {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="agent-name">Agent Name</Label>
-                  <Input
-                    id="agent-name"
-                    placeholder="Enter a name for your agent"
-                    value={agentName}
-                    onChange={(e) => setAgentName(e.target.value)}
-                    className="mt-2"
-                  />
+                  <Input id="agent-name" placeholder="Enter a name for your agent" value={agentName} onChange={e => setAgentName(e.target.value)} className="mt-2" />
                 </div>
                 <div>
                   <Label htmlFor="prompt">System Prompt</Label>
-                  <Textarea
-                    id="prompt"
-                    placeholder="Type in a universal prompt for your agent, such as its role, conversational style, objective, etc."
-                    value={agentPrompt}
-                    onChange={(e) => setAgentPrompt(e.target.value)}
-                    className="min-h-32 mt-2"
-                  />
+                  <Textarea id="prompt" placeholder="Type in a universal prompt for your agent, such as its role, conversational style, objective, etc." value={agentPrompt} onChange={e => setAgentPrompt(e.target.value)} className="min-h-32 mt-2" />
                 </div>
                 <div>
                   <Label htmlFor="first-message">First Message</Label>
-                  <Textarea
-                    id="first-message"
-                    placeholder="Enter the first message the AI will say when the conversation starts (optional)"
-                    value={firstMessage}
-                    onChange={(e) => setFirstMessage(e.target.value)}
-                    className="min-h-20 mt-2"
-                  />
+                  <Textarea id="first-message" placeholder="Enter the first message the AI will say when the conversation starts (optional)" value={firstMessage} onChange={e => setFirstMessage(e.target.value)} className="min-h-20 mt-2" />
                   <p className="text-xs text-muted-foreground mt-1">
                     This message will be spoken first when the agent starts a conversation
                   </p>
                 </div>
                 <div>
                   <Label htmlFor="knowledge-base">Knowledge Base</Label>
-                  <Textarea
-                    id="knowledge-base"
-                    placeholder="Enter knowledge base content or instructions for the agent"
-                    value={knowledgeBase}
-                    onChange={(e) => setKnowledgeBase(e.target.value)}
-                    className="min-h-20 mt-2"
-                  />
+                  <Textarea id="knowledge-base" placeholder="Enter knowledge base content or instructions for the agent" value={knowledgeBase} onChange={e => setKnowledgeBase(e.target.value)} className="min-h-20 mt-2" />
                   <p className="text-xs text-muted-foreground mt-1">
                     Additional knowledge or context the agent should be aware of
                   </p>
                 </div>
                 <div>
                   <Label htmlFor="website-link">Website Link</Label>
-                  <Input
-                    id="website-link"
-                    type="url"
-                    placeholder="https://example.com"
-                    value={websiteLink}
-                    onChange={(e) => setWebsiteLink(e.target.value)}
-                    className="mt-2"
-                  />
+                  <Input id="website-link" type="url" placeholder="https://example.com" value={websiteLink} onChange={e => setWebsiteLink(e.target.value)} className="mt-2" />
                   <p className="text-xs text-muted-foreground mt-1">
                     Website URL that the agent should reference or scrape
                   </p>
@@ -421,9 +493,9 @@ const AgentConfig = () => {
                   <div>
                     <Label>Gender</Label>
                     <Select value={selectedGender} onValueChange={(value: "male" | "female") => {
-                      setSelectedGender(value);
-                      setSelectedVoice("");
-                    }}>
+                    setSelectedGender(value);
+                    setSelectedVoice("");
+                  }}>
                       <SelectTrigger className="mt-2">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
@@ -437,9 +509,9 @@ const AgentConfig = () => {
                   <div>
                     <Label>Age Group</Label>
                     <Select value={selectedAge} onValueChange={(value: "young" | "middle" | "senior") => {
-                      setSelectedAge(value);
-                      setSelectedVoice("");
-                    }}>
+                    setSelectedAge(value);
+                    setSelectedVoice("");
+                  }}>
                       <SelectTrigger className="mt-2">
                         <SelectValue placeholder="Select age" />
                       </SelectTrigger>
@@ -452,30 +524,7 @@ const AgentConfig = () => {
                   </div>
                 </div>
 
-                <div>
-                  <Label>Voice Selection</Label>
-                  <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Choose a voice for your agent" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60 bg-card border-border z-50">
-                      {voiceOptions[selectedGender][selectedAge].map((voice) => (
-                        <SelectItem key={voice.id} value={voice.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{voice.name}</span>
-                            <span className="text-xs text-muted-foreground">{voice.trait}</span>
-                            <span className="text-xs text-muted-foreground font-mono">{voice.id}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedVoice && (
-                    <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/30 rounded">
-                      Selected: {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name} - {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.trait}
-                    </div>
-                  )}
-                </div>
+                
 
                 <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                   <div>
@@ -499,14 +548,7 @@ const AgentConfig = () => {
                 <div>
                   <Label>Responsiveness</Label>
                   <div className="mt-2">
-                    <Slider
-                      value={responsiveness}
-                      onValueChange={setResponsiveness}
-                      min={0}
-                      max={2}
-                      step={0.1}
-                      className="w-full"
-                    />
+                    <Slider value={responsiveness} onValueChange={setResponsiveness} min={0} max={2} step={0.1} className="w-full" />
                     <div className="flex justify-between text-sm text-muted-foreground mt-1">
                       <span>Slow (0)</span>
                       <span className="font-medium">{responsiveness[0]}</span>
@@ -518,33 +560,20 @@ const AgentConfig = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="backchannel">Enable Backchannel</Label>
-                    <Switch
-                      id="backchannel"
-                      checked={enableBackchannel}
-                      onCheckedChange={setEnableBackchannel}
-                    />
+                    <Switch id="backchannel" checked={enableBackchannel} onCheckedChange={setEnableBackchannel} />
                   </div>
                   
-                  {enableBackchannel && (
-                    <div>
+                  {enableBackchannel && <div>
                       <Label>Backchannel Frequency</Label>
                       <div className="mt-2">
-                        <Slider
-                          value={backchannelFrequency}
-                          onValueChange={setBackchannelFrequency}
-                          min={0}
-                          max={2}
-                          step={0.1}
-                          className="w-full"
-                        />
+                        <Slider value={backchannelFrequency} onValueChange={setBackchannelFrequency} min={0} max={2} step={0.1} className="w-full" />
                         <div className="flex justify-between text-sm text-muted-foreground mt-1">
                           <span>Low (0)</span>
                           <span className="font-medium">{backchannelFrequency[0]}</span>
                           <span>High (2)</span>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </div>
             </CardContent>
@@ -560,19 +589,10 @@ const AgentConfig = () => {
                 Ready to test your agent? Save your configuration first, then test or deploy.
               </p>
               <div className="flex space-x-4">
-                <Button 
-                  onClick={() => navigate(`/test-agent?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)}
-                  className="flex-1"
-                  disabled={!agentName}
-                >
+                <Button onClick={() => navigate(`/test-agent?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)} className="flex-1" disabled={!agentName}>
                   Test Agent
                 </Button>
-                <Button 
-                  onClick={() => navigate(`/demo-testing?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)}
-                  variant="outline" 
-                  className="flex-1"
-                  disabled={!agentName}
-                >
+                <Button onClick={() => navigate(`/demo-testing?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)} variant="outline" className="flex-1" disabled={!agentName}>
                   Deploy Agent
                 </Button>
               </div>
@@ -581,17 +601,12 @@ const AgentConfig = () => {
 
           {/* Save Button */}
           <div className="flex justify-end space-x-4">
-            <Button 
-              onClick={handleSave}
-              className="bg-voice-accent hover:bg-voice-muted text-primary-foreground"
-            >
+            <Button onClick={handleSave} className="bg-voice-accent hover:bg-voice-muted text-primary-foreground">
               {existingAgentId ? "Update Configuration" : "Save Configuration"}
             </Button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AgentConfig;
