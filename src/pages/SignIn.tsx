@@ -14,6 +14,7 @@ import { User, Session } from '@supabase/supabase-js';
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -105,7 +106,10 @@ const SignIn = () => {
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: name
+          }
         }
       });
 
@@ -187,6 +191,20 @@ const SignIn = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-foreground">Full Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your full name"
+                    required
+                    className="bg-background/50 border-border/50 text-foreground placeholder:text-muted-foreground focus:bg-background"
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">Email</Label>
                 <Input
