@@ -14,43 +14,92 @@ import { RetellWebClient } from "retell-client-js-sdk";
 // Voice options organized by gender and age
 const voiceOptions = {
   male: {
-    young: [
-      { id: "TX3LPaxmHKxFdv7VOQHJ", name: "Liam", traits: "Young, energetic, friendly" },
-      { id: "onwK4e9ZLuTAKqWW03F9", name: "Daniel", traits: "Young, professional, clear" },
-      { id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum", traits: "Young, warm, conversational" }
-    ],
-    middle: [
-      { id: "CwhRBWXzGAHq8TQ4Fs17", name: "Roger", traits: "Mature, authoritative, confident" },
-      { id: "IKne3meq5aSn9XLyUdCD", name: "Charlie", traits: "Professional, reliable, trustworthy" },
-      { id: "JBFqnCBsd6RMkjVDRZzb", name: "George", traits: "Experienced, wise, calming" }
-    ],
-    senior: [
-      { id: "pqHfZKP75CvOlQylNhV4", name: "Bill", traits: "Distinguished, experienced, authoritative" },
-      { id: "nPczCjzI2devNBz1zQrb", name: "Brian", traits: "Mature, professional, knowledgeable" },
-      { id: "cjVigY5qzO86Huf0OWal", name: "Eric", traits: "Senior, experienced, wise" }
-    ]
+    young: [{
+      id: "TX3LPaxmHKxFdv7VOQHJ",
+      name: "Liam",
+      traits: "Young, energetic, friendly"
+    }, {
+      id: "onwK4e9ZLuTAKqWW03F9",
+      name: "Daniel",
+      traits: "Young, professional, clear"
+    }, {
+      id: "N2lVS1w4EtoT3dr4eOWO",
+      name: "Callum",
+      traits: "Young, warm, conversational"
+    }],
+    middle: [{
+      id: "CwhRBWXzGAHq8TQ4Fs17",
+      name: "Roger",
+      traits: "Mature, authoritative, confident"
+    }, {
+      id: "IKne3meq5aSn9XLyUdCD",
+      name: "Charlie",
+      traits: "Professional, reliable, trustworthy"
+    }, {
+      id: "JBFqnCBsd6RMkjVDRZzb",
+      name: "George",
+      traits: "Experienced, wise, calming"
+    }],
+    senior: [{
+      id: "pqHfZKP75CvOlQylNhV4",
+      name: "Bill",
+      traits: "Distinguished, experienced, authoritative"
+    }, {
+      id: "nPczCjzI2devNBz1zQrb",
+      name: "Brian",
+      traits: "Mature, professional, knowledgeable"
+    }, {
+      id: "cjVigY5qzO86Huf0OWal",
+      name: "Eric",
+      traits: "Senior, experienced, wise"
+    }]
   },
   female: {
-    young: [
-      { id: "9BWtsMINqrJLrRacOk9x", name: "Aria", traits: "Young, vibrant, enthusiastic" },
-      { id: "pFZP5JQG7iQjIQuC4Bku", name: "Lily", traits: "Young, sweet, friendly" },
-      { id: "Xb7hH8MSUJpSbSDYk0k2", name: "Alice", traits: "Young, professional, clear" }
-    ],
-    middle: [
-      { id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah", traits: "Professional, confident, warm" },
-      { id: "FGY2WhTYpPnrIDTdsKH5", name: "Laura", traits: "Mature, trustworthy, engaging" },
-      { id: "cgSgspJ2msm6clMCkdW9", name: "Jessica", traits: "Professional, articulate, friendly" }
-    ],
-    senior: [
-      { id: "XB0fDUnXU5powFXDhCwa", name: "Charlotte", traits: "Distinguished, experienced, wise" },
-      { id: "XrExE9yKIg1WjnnlVkGX", name: "Matilda", traits: "Mature, authoritative, knowledgeable" },
-      { id: "SAz9YHcvj6GT2YYXdXww", name: "River", traits: "Experienced, calming, professional" }
-    ]
+    young: [{
+      id: "9BWtsMINqrJLrRacOk9x",
+      name: "Aria",
+      traits: "Young, vibrant, enthusiastic"
+    }, {
+      id: "pFZP5JQG7iQjIQuC4Bku",
+      name: "Lily",
+      traits: "Young, sweet, friendly"
+    }, {
+      id: "Xb7hH8MSUJpSbSDYk0k2",
+      name: "Alice",
+      traits: "Young, professional, clear"
+    }],
+    middle: [{
+      id: "EXAVITQu4vr4xnSDxMaL",
+      name: "Sarah",
+      traits: "Professional, confident, warm"
+    }, {
+      id: "FGY2WhTYpPnrIDTdsKH5",
+      name: "Laura",
+      traits: "Mature, trustworthy, engaging"
+    }, {
+      id: "cgSgspJ2msm6clMCkdW9",
+      name: "Jessica",
+      traits: "Professional, articulate, friendly"
+    }],
+    senior: [{
+      id: "XB0fDUnXU5powFXDhCwa",
+      name: "Charlotte",
+      traits: "Distinguished, experienced, wise"
+    }, {
+      id: "XrExE9yKIg1WjnnlVkGX",
+      name: "Matilda",
+      traits: "Mature, authoritative, knowledgeable"
+    }, {
+      id: "SAz9YHcvj6GT2YYXdXww",
+      name: "River",
+      traits: "Experienced, calming, professional"
+    }]
   }
 };
-
 const DemoTesting = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -62,20 +111,20 @@ const DemoTesting = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [retellWebClient, setRetellWebClient] = useState<RetellWebClient | null>(null);
-
   useEffect(() => {
     checkUserAccess();
   }, []);
-
   const checkUserAccess = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/signin");
         return;
       }
-
       setIsAdmin(true); // Allow all authenticated users
     } catch (error) {
       console.error('Error checking user access:', error);
@@ -84,27 +133,27 @@ const DemoTesting = () => {
       setLoading(false);
     }
   };
-
   const handleTest = async () => {
     console.log("Starting handleTest function");
-    
     if (!apiKey.trim() || !agentId.trim()) {
       console.log("Missing API key or agent ID");
       toast({
         title: "Missing Information",
         description: "Please provide both API key and Agent ID.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsConnecting(true);
     console.log("Set connecting state to true");
-    
     try {
-      console.log("Creating Retell web call with:", { agentId: agentId.trim() });
-      
-      const { data, error } = await supabase.functions.invoke('create-retell-web-call', {
+      console.log("Creating Retell web call with:", {
+        agentId: agentId.trim()
+      });
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('create-retell-web-call', {
         body: {
           api_key: apiKey.trim(),
           agent_id: agentId.trim(),
@@ -116,21 +165,19 @@ const DemoTesting = () => {
           }
         }
       });
-
-      console.log("Supabase function response:", { data, error });
-
+      console.log("Supabase function response:", {
+        data,
+        error
+      });
       if (error) {
         console.error("Supabase function error:", error);
         throw new Error(`Supabase function error: ${error.message || 'Unknown error'}`);
       }
-
       if (data?.error) {
         console.error("API returned error:", data.error);
         throw new Error(data.error);
       }
-
       console.log("Retell web call response:", data);
-
       if (!data?.access_token) {
         console.error("No access token in response:", data);
         throw new Error("No access token received from Retell API");
@@ -139,54 +186,51 @@ const DemoTesting = () => {
       // Initialize Retell Web Client
       console.log("Initializing Retell Web Client");
       const webClient = new RetellWebClient();
-      
+
       // Set up event listeners
       webClient.on("conversationStarted", () => {
         console.log("Conversation started");
         setIsConnected(true);
         toast({
           title: "Connected",
-          description: "Voice call started successfully!",
+          description: "Voice call started successfully!"
         });
       });
-
-      webClient.on("conversationEnded", ({ code, reason }) => {
+      webClient.on("conversationEnded", ({
+        code,
+        reason
+      }) => {
         console.log("Conversation ended", code, reason);
         setIsConnected(false);
         setIsConnecting(false);
         toast({
           title: "Call Ended",
-          description: "Voice call has ended.",
+          description: "Voice call has ended."
         });
       });
-
-      webClient.on("error", (error) => {
+      webClient.on("error", error => {
         console.error("Retell error:", error);
         setIsConnected(false);
         setIsConnecting(false);
         toast({
-          title: "Call Error", 
+          title: "Call Error",
           description: error.message || "An error occurred during the call.",
-          variant: "destructive",
+          variant: "destructive"
         });
       });
-
-      webClient.on("update", (update) => {
+      webClient.on("update", update => {
         console.log("Call update:", update);
       });
 
       // Start the call
       console.log("Starting call with access token:", data.access_token ? "present" : "missing");
       console.log("Sample rate:", data.sample_rate);
-      
       await webClient.startCall({
         accessToken: data.access_token,
-        sampleRate: data.sample_rate || 24000,
+        sampleRate: data.sample_rate || 24000
       });
-
       console.log("Call started successfully");
       setRetellWebClient(webClient);
-
     } catch (error) {
       console.error("Error testing Retell call:", error);
       console.error("Error stack:", error.stack);
@@ -194,11 +238,10 @@ const DemoTesting = () => {
       toast({
         title: "Test Failed",
         description: `Failed to start call: ${error.message}`,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const handleStopCall = async () => {
     if (retellWebClient) {
       try {
@@ -211,10 +254,8 @@ const DemoTesting = () => {
     setIsConnected(false);
     setIsConnecting(false);
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
+    return <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto p-6">
           <div className="flex items-center justify-center h-64">
@@ -224,13 +265,9 @@ const DemoTesting = () => {
             </div>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <Header />
       <div className="container mx-auto p-6 max-w-4xl">
         {/* Header Section */}
@@ -263,69 +300,17 @@ const DemoTesting = () => {
                   <Label htmlFor="api-key" className="text-sm font-medium flex items-center">
                     🔑 Retell API Key
                   </Label>
-                  <Input
-                    id="api-key"
-                    type="password"
-                    placeholder="key_xxxxxxxxxxxxxxxx"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    disabled={isConnecting || isConnected}
-                  />
+                  <Input id="api-key" type="password" placeholder="key_xxxxxxxxxxxxxxxx" value={apiKey} onChange={e => setApiKey(e.target.value)} className="transition-all duration-200 focus:ring-2 focus:ring-primary/20" disabled={isConnecting || isConnected} />
                 </div>
                 
                 <div className="space-y-3">
                   <Label htmlFor="agent-id" className="text-sm font-medium flex items-center">
                     🤖 Agent ID
                   </Label>
-                  <Input
-                    id="agent-id"
-                    placeholder="agent_xxxxxxxxxxxxxxxx"
-                    value={agentId}
-                    onChange={(e) => setAgentId(e.target.value)}
-                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    disabled={isConnecting || isConnected}
-                  />
+                  <Input id="agent-id" placeholder="agent_xxxxxxxxxxxxxxxx" value={agentId} onChange={e => setAgentId(e.target.value)} className="transition-all duration-200 focus:ring-2 focus:ring-primary/20" disabled={isConnecting || isConnected} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium flex items-center">
-                      👤 Gender
-                    </Label>
-                    <Select value={selectedGender} onValueChange={(value: "male" | "female") => {
-                      setSelectedGender(value);
-                      setSelectedVoice("");
-                    }} disabled={isConnecting || isConnected}>
-                      <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="male">Male</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium flex items-center">
-                      🎂 Age Group
-                    </Label>
-                    <Select value={selectedAge} onValueChange={(value: "young" | "middle" | "senior") => {
-                      setSelectedAge(value);
-                      setSelectedVoice("");
-                    }} disabled={isConnecting || isConnected}>
-                      <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
-                        <SelectValue placeholder="Select age" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="young">Young (18-30)</SelectItem>
-                        <SelectItem value="middle">Middle (30-50)</SelectItem>
-                        <SelectItem value="senior">Senior (50+)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                
 
                 <div className="space-y-3">
                   <Label className="text-sm font-medium flex items-center">
@@ -336,21 +321,17 @@ const DemoTesting = () => {
                       <SelectValue placeholder="Select a voice" />
                     </SelectTrigger>
                     <SelectContent>
-                      {voiceOptions[selectedGender][selectedAge].map((voice) => (
-                        <SelectItem key={voice.id} value={voice.id}>
+                      {voiceOptions[selectedGender][selectedAge].map(voice => <SelectItem key={voice.id} value={voice.id}>
                           <div className="flex flex-col">
                             <span className="font-medium">{voice.name}</span>
                             <span className="text-xs text-muted-foreground">{voice.traits}</span>
                           </div>
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
-                  {selectedVoice && (
-                    <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/30 rounded">
+                  {selectedVoice && <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/30 rounded">
                       Selected: {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name} - {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.traits}
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </div>
 
@@ -382,128 +363,66 @@ const DemoTesting = () => {
                 {/* Enhanced Microphone Design */}
                 <div className="relative">
                   {/* Outer Glow Ring */}
-                  <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
-                    isConnected 
-                      ? 'bg-green-500/10 scale-150 animate-pulse' 
-                      : isConnecting 
-                        ? 'bg-yellow-500/10 scale-125 animate-pulse'
-                        : 'bg-primary/5 scale-100'
-                  }`}></div>
+                  <div className={`absolute inset-0 rounded-full transition-all duration-500 ${isConnected ? 'bg-green-500/10 scale-150 animate-pulse' : isConnecting ? 'bg-yellow-500/10 scale-125 animate-pulse' : 'bg-primary/5 scale-100'}`}></div>
                   
                   {/* Middle Ring */}
-                  <div className={`absolute inset-4 rounded-full border-2 transition-all duration-300 ${
-                    isConnected 
-                      ? 'border-green-400/40 animate-ping' 
-                      : isConnecting 
-                        ? 'border-yellow-400/40 animate-ping'
-                        : 'border-primary/20'
-                  }`}></div>
+                  <div className={`absolute inset-4 rounded-full border-2 transition-all duration-300 ${isConnected ? 'border-green-400/40 animate-ping' : isConnecting ? 'border-yellow-400/40 animate-ping' : 'border-primary/20'}`}></div>
                   
                   {/* Main Microphone Button */}
-                  <div className={`relative w-40 h-40 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                    isConnected 
-                      ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/30 scale-110' 
-                      : isConnecting 
-                        ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30 animate-pulse'
-                        : 'bg-gradient-to-br from-primary to-primary/80 shadow-lg hover:shadow-primary/30 hover:from-primary/90 hover:to-primary'
-                  }`}
-                    onClick={!isConnected && !isConnecting ? handleTest : undefined}
-                  >
+                  <div className={`relative w-40 h-40 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 ${isConnected ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/30 scale-110' : isConnecting ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30 animate-pulse' : 'bg-gradient-to-br from-primary to-primary/80 shadow-lg hover:shadow-primary/30 hover:from-primary/90 hover:to-primary'}`} onClick={!isConnected && !isConnecting ? handleTest : undefined}>
                     {/* Inner Glow */}
                     <div className="absolute inset-2 rounded-full bg-white/10"></div>
                     
                     {/* Microphone Icon */}
-                    {isConnected ? (
-                      <Mic className="w-16 h-16 text-white animate-pulse relative z-10" />
-                    ) : isConnecting ? (
-                      <Mic className="w-16 h-16 text-white relative z-10" />
-                    ) : (
-                      <Mic className="w-16 h-16 text-white relative z-10" />
-                    )}
+                    {isConnected ? <Mic className="w-16 h-16 text-white animate-pulse relative z-10" /> : isConnecting ? <Mic className="w-16 h-16 text-white relative z-10" /> : <Mic className="w-16 h-16 text-white relative z-10" />}
                     
                     {/* Connection Indicator */}
-                    {isConnected && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-2 border-white animate-pulse flex items-center justify-center">
+                    {isConnected && <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-2 border-white animate-pulse flex items-center justify-center">
                         <div className="w-3 h-3 bg-white rounded-full"></div>
-                      </div>
-                    )}
+                      </div>}
                   </div>
                   
                   {/* Audio Level Visualization */}
-                  {isConnected && (
-                    <>
+                  {isConnected && <>
                       <div className="absolute inset-0 border-2 border-green-400/30 rounded-full animate-ping animation-delay-300"></div>
                       <div className="absolute -inset-4 border-2 border-green-400/20 rounded-full animate-ping animation-delay-500"></div>
                       <div className="absolute -inset-8 border-2 border-green-400/10 rounded-full animate-ping animation-delay-700"></div>
-                    </>
-                  )}
+                    </>}
                 </div>
 
                 {/* Status Display */}
                 <div className="text-center space-y-4">
-                  <div className={`text-xl font-semibold transition-colors duration-300 ${
-                    isConnected ? 'text-green-600 dark:text-green-400' 
-                    : isConnecting ? 'text-yellow-600 dark:text-yellow-400' 
-                    : 'text-muted-foreground'
-                  }`}>
-                    {isConnected ? '🎙️ Live Conversation' 
-                     : isConnecting ? '⏳ Connecting...' 
-                     : '🎯 Ready to Connect'}
+                  <div className={`text-xl font-semibold transition-colors duration-300 ${isConnected ? 'text-green-600 dark:text-green-400' : isConnecting ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'}`}>
+                    {isConnected ? '🎙️ Live Conversation' : isConnecting ? '⏳ Connecting...' : '🎯 Ready to Connect'}
                   </div>
                   
-                  <p className={`text-sm transition-colors duration-300 ${
-                    isConnected ? 'text-green-600/80 dark:text-green-400/80' 
-                    : isConnecting ? 'text-yellow-600/80 dark:text-yellow-400/80' 
-                    : 'text-muted-foreground'
-                  }`}>
-                    {isConnected ? 'Speak naturally - your agent is listening' 
-                     : isConnecting ? 'Establishing connection to your agent...' 
-                     : 'Click the microphone to start your conversation'}
+                  <p className={`text-sm transition-colors duration-300 ${isConnected ? 'text-green-600/80 dark:text-green-400/80' : isConnecting ? 'text-yellow-600/80 dark:text-yellow-400/80' : 'text-muted-foreground'}`}>
+                    {isConnected ? 'Speak naturally - your agent is listening' : isConnecting ? 'Establishing connection to your agent...' : 'Click the microphone to start your conversation'}
                   </p>
                 </div>
 
                 {/* Control Buttons */}
                 <div className="flex flex-col items-center space-y-4 w-full">
-                  {!isConnected && !isConnecting && (
-                    <Button
-                      onClick={handleTest}
-                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 text-lg font-medium rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                      disabled={!apiKey.trim() || !agentId.trim()}
-                      size="lg"
-                    >
+                  {!isConnected && !isConnecting && <Button onClick={handleTest} className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 text-lg font-medium rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" disabled={!apiKey.trim() || !agentId.trim()} size="lg">
                       <Mic className="w-5 h-5 mr-3" />
                       Start Conversation
-                    </Button>
-                  )}
+                    </Button>}
 
-                  {isConnecting && (
-                    <div className="flex flex-col items-center space-y-4">
+                  {isConnecting && <div className="flex flex-col items-center space-y-4">
                       <div className="flex items-center space-x-3">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-500"></div>
                         <span className="text-yellow-600 dark:text-yellow-400 font-medium">Connecting to agent...</span>
                       </div>
-                      <Button
-                        onClick={handleStopCall}
-                        variant="outline"
-                        className="border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-6 py-2 transition-all duration-200"
-                        size="sm"
-                      >
+                      <Button onClick={handleStopCall} variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-6 py-2 transition-all duration-200" size="sm">
                         <MicOff className="w-4 h-4 mr-2" />
                         Cancel
                       </Button>
-                    </div>
-                  )}
+                    </div>}
 
-                  {isConnected && (
-                    <Button
-                      onClick={handleStopCall}
-                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 text-lg font-medium rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
-                      size="lg"
-                    >
+                  {isConnected && <Button onClick={handleStopCall} className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 text-lg font-medium rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105" size="lg">
                       <MicOff className="w-5 h-5 mr-3" />
                       End Conversation
-                    </Button>
-                  )}
+                    </Button>}
                 </div>
               </div>
             </CardContent>
@@ -537,8 +456,6 @@ const DemoTesting = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default DemoTesting;
