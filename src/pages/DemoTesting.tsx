@@ -298,7 +298,7 @@ const DemoTesting = () => {
               <div className="space-y-5">
                 <div className="space-y-3">
                   <Label htmlFor="api-key" className="text-sm font-medium flex items-center">
-                    🔑 Retell API Key
+                    🔑 Retell API Key (API Only)
                   </Label>
                   <Input id="api-key" type="password" placeholder="key_xxxxxxxxxxxxxxxx" value={apiKey} onChange={e => setApiKey(e.target.value)} className="transition-all duration-200 focus:ring-2 focus:ring-primary/20" disabled={isConnecting || isConnected} />
                 </div>
