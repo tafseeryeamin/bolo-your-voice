@@ -478,7 +478,8 @@ const AgentConfig = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto p-6 max-w-4xl">
         <div className="mb-8">
