@@ -208,44 +208,115 @@ const voiceOptions = {
 };
 
 // Language options
-const languageOptions = [
-  { code: "en-US", name: "English (US)" },
-  { code: "en-IN", name: "English (India)" },
-  { code: "en-GB", name: "English (UK)" },
-  { code: "en-AU", name: "English (Australia)" },
-  { code: "en-NZ", name: "English (New Zealand)" },
-  { code: "de-DE", name: "German (Germany)" },
-  { code: "es-ES", name: "Spanish (Spain)" },
-  { code: "es-419", name: "Spanish (Latin America)" },
-  { code: "hi-IN", name: "Hindi (India)" },
-  { code: "fr-FR", name: "French (France)" },
-  { code: "fr-CA", name: "French (Canada)" },
-  { code: "ja-JP", name: "Japanese" },
-  { code: "pt-PT", name: "Portuguese (Portugal)" },
-  { code: "pt-BR", name: "Portuguese (Brazil)" },
-  { code: "zh-CN", name: "Chinese (Simplified)" },
-  { code: "ru-RU", name: "Russian" },
-  { code: "it-IT", name: "Italian" },
-  { code: "ko-KR", name: "Korean" },
-  { code: "nl-NL", name: "Dutch (Netherlands)" },
-  { code: "nl-BE", name: "Dutch (Belgium)" },
-  { code: "pl-PL", name: "Polish" },
-  { code: "tr-TR", name: "Turkish" },
-  { code: "th-TH", name: "Thai" },
-  { code: "vi-VN", name: "Vietnamese" },
-  { code: "ro-RO", name: "Romanian" },
-  { code: "bg-BG", name: "Bulgarian" },
-  { code: "ca-ES", name: "Catalan" },
-  { code: "da-DK", name: "Danish" },
-  { code: "fi-FI", name: "Finnish" },
-  { code: "el-GR", name: "Greek" },
-  { code: "hu-HU", name: "Hungarian" },
-  { code: "id-ID", name: "Indonesian" },
-  { code: "no-NO", name: "Norwegian" },
-  { code: "sk-SK", name: "Slovak" },
-  { code: "sv-SE", name: "Swedish" },
-  { code: "multi", name: "Multi-language" }
-];
+const languageOptions = [{
+  code: "en-US",
+  name: "English (US)"
+}, {
+  code: "en-IN",
+  name: "English (India)"
+}, {
+  code: "en-GB",
+  name: "English (UK)"
+}, {
+  code: "en-AU",
+  name: "English (Australia)"
+}, {
+  code: "en-NZ",
+  name: "English (New Zealand)"
+}, {
+  code: "de-DE",
+  name: "German (Germany)"
+}, {
+  code: "es-ES",
+  name: "Spanish (Spain)"
+}, {
+  code: "es-419",
+  name: "Spanish (Latin America)"
+}, {
+  code: "hi-IN",
+  name: "Hindi (India)"
+}, {
+  code: "fr-FR",
+  name: "French (France)"
+}, {
+  code: "fr-CA",
+  name: "French (Canada)"
+}, {
+  code: "ja-JP",
+  name: "Japanese"
+}, {
+  code: "pt-PT",
+  name: "Portuguese (Portugal)"
+}, {
+  code: "pt-BR",
+  name: "Portuguese (Brazil)"
+}, {
+  code: "zh-CN",
+  name: "Chinese (Simplified)"
+}, {
+  code: "ru-RU",
+  name: "Russian"
+}, {
+  code: "it-IT",
+  name: "Italian"
+}, {
+  code: "ko-KR",
+  name: "Korean"
+}, {
+  code: "nl-NL",
+  name: "Dutch (Netherlands)"
+}, {
+  code: "nl-BE",
+  name: "Dutch (Belgium)"
+}, {
+  code: "pl-PL",
+  name: "Polish"
+}, {
+  code: "tr-TR",
+  name: "Turkish"
+}, {
+  code: "th-TH",
+  name: "Thai"
+}, {
+  code: "vi-VN",
+  name: "Vietnamese"
+}, {
+  code: "ro-RO",
+  name: "Romanian"
+}, {
+  code: "bg-BG",
+  name: "Bulgarian"
+}, {
+  code: "ca-ES",
+  name: "Catalan"
+}, {
+  code: "da-DK",
+  name: "Danish"
+}, {
+  code: "fi-FI",
+  name: "Finnish"
+}, {
+  code: "el-GR",
+  name: "Greek"
+}, {
+  code: "hu-HU",
+  name: "Hungarian"
+}, {
+  code: "id-ID",
+  name: "Indonesian"
+}, {
+  code: "no-NO",
+  name: "Norwegian"
+}, {
+  code: "sk-SK",
+  name: "Slovak"
+}, {
+  code: "sv-SE",
+  name: "Swedish"
+}, {
+  code: "multi",
+  name: "Multi-language"
+}];
 
 // Flatten all voices for backward compatibility
 const voices = Object.values(voiceOptions).flatMap(gender => Object.values(gender).flatMap(age => age));
@@ -324,12 +395,11 @@ const AgentConfig = () => {
           }
           if (foundVoice) break;
         }
-        
+
         // Set language if available
         if (agent.language) {
           setSelectedLanguage(agent.language);
         }
-        
         setAgentPrompt(agent.prompt || "");
         setFirstMessage(agent.begin_message || "");
 
@@ -478,8 +548,7 @@ const AgentConfig = () => {
       });
     }
   };
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto p-6 max-w-4xl">
         <div className="mb-8">
@@ -579,55 +648,17 @@ const AgentConfig = () => {
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border z-50 max-h-64 overflow-y-auto">
-                      {languageOptions.map((lang) => (
-                        <SelectItem key={lang.code} value={lang.code}>
+                      {languageOptions.map(lang => <SelectItem key={lang.code} value={lang.code}>
                           {lang.name}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
 
-                {selectedGender && selectedAge && (
-                  <div>
-                    <Label>Voice</Label>
-                    <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Select a voice" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border z-50 max-h-64 overflow-y-auto">
-                        {voiceOptions[selectedGender][selectedAge].map((voice) => (
-                          <SelectItem key={voice.id} value={voice.id}>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{voice.name}</span>
-                              <span className="text-xs text-muted-foreground">{voice.trait}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                {selectedGender && selectedAge}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-                <div>
-                  <Label className="text-sm font-medium">Voice Model</Label>
-                  <p className="text-sm text-muted-foreground">eleven_turbo_v2</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Language</Label>
-                  <p className="text-sm text-muted-foreground">{selectedLanguage}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Version</Label>
-                  <p className="text-sm text-muted-foreground">0</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Selected Voice ID</Label>
-                  <p className="text-sm text-muted-foreground font-mono">{selectedVoice}</p>
-                </div>
-              </div>
+              
 
               <div>
                 <Label>Responsiveness</Label>
@@ -647,8 +678,7 @@ const AgentConfig = () => {
                   <Switch id="backchannel" checked={enableBackchannel} onCheckedChange={setEnableBackchannel} />
                 </div>
                 
-                {enableBackchannel && (
-                  <div>
+                {enableBackchannel && <div>
                     <Label>Backchannel Frequency</Label>
                     <div className="mt-2">
                       <Slider value={backchannelFrequency} onValueChange={setBackchannelFrequency} min={0} max={2} step={0.1} className="w-full" />
@@ -658,8 +688,7 @@ const AgentConfig = () => {
                         <span>High (2)</span>
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
             </CardContent>
           </Card>
@@ -692,8 +721,6 @@ const AgentConfig = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AgentConfig;
