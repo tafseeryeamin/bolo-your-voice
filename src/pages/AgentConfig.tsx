@@ -207,6 +207,46 @@ const voiceOptions = {
   }
 };
 
+// Language options
+const languageOptions = [
+  { code: "en-US", name: "English (US)" },
+  { code: "en-IN", name: "English (India)" },
+  { code: "en-GB", name: "English (UK)" },
+  { code: "en-AU", name: "English (Australia)" },
+  { code: "en-NZ", name: "English (New Zealand)" },
+  { code: "de-DE", name: "German (Germany)" },
+  { code: "es-ES", name: "Spanish (Spain)" },
+  { code: "es-419", name: "Spanish (Latin America)" },
+  { code: "hi-IN", name: "Hindi (India)" },
+  { code: "fr-FR", name: "French (France)" },
+  { code: "fr-CA", name: "French (Canada)" },
+  { code: "ja-JP", name: "Japanese" },
+  { code: "pt-PT", name: "Portuguese (Portugal)" },
+  { code: "pt-BR", name: "Portuguese (Brazil)" },
+  { code: "zh-CN", name: "Chinese (Simplified)" },
+  { code: "ru-RU", name: "Russian" },
+  { code: "it-IT", name: "Italian" },
+  { code: "ko-KR", name: "Korean" },
+  { code: "nl-NL", name: "Dutch (Netherlands)" },
+  { code: "nl-BE", name: "Dutch (Belgium)" },
+  { code: "pl-PL", name: "Polish" },
+  { code: "tr-TR", name: "Turkish" },
+  { code: "th-TH", name: "Thai" },
+  { code: "vi-VN", name: "Vietnamese" },
+  { code: "ro-RO", name: "Romanian" },
+  { code: "bg-BG", name: "Bulgarian" },
+  { code: "ca-ES", name: "Catalan" },
+  { code: "da-DK", name: "Danish" },
+  { code: "fi-FI", name: "Finnish" },
+  { code: "el-GR", name: "Greek" },
+  { code: "hu-HU", name: "Hungarian" },
+  { code: "id-ID", name: "Indonesian" },
+  { code: "no-NO", name: "Norwegian" },
+  { code: "sk-SK", name: "Slovak" },
+  { code: "sv-SE", name: "Swedish" },
+  { code: "multi", name: "Multi-language" }
+];
+
 // Flatten all voices for backward compatibility
 const voices = Object.values(voiceOptions).flatMap(gender => Object.values(gender).flatMap(age => age));
 const AgentConfig = () => {
@@ -222,6 +262,7 @@ const AgentConfig = () => {
   const [selectedVoice, setSelectedVoice] = useState("11labs-Amritanshu");
   const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
   const [selectedAge, setSelectedAge] = useState<"young" | "middle" | "senior">("middle");
+  const [selectedLanguage, setSelectedLanguage] = useState("en-US");
   const [agentPrompt, setAgentPrompt] = useState("");
   const [firstMessage, setFirstMessage] = useState("");
   const [responsiveness, setResponsiveness] = useState([1]);
@@ -283,6 +324,12 @@ const AgentConfig = () => {
           }
           if (foundVoice) break;
         }
+        
+        // Set language if available
+        if (agent.language) {
+          setSelectedLanguage(agent.language);
+        }
+        
         setAgentPrompt(agent.prompt || "");
         setFirstMessage(agent.begin_message || "");
 
@@ -342,7 +389,7 @@ const AgentConfig = () => {
         name: agentName,
         user_id: user.id,
         voice_id: selectedVoice,
-        language: 'en-US',
+        language: selectedLanguage,
         description: agentPrompt,
         prompt: agentPrompt,
         begin_message: firstMessage || null,
@@ -524,57 +571,94 @@ const AgentConfig = () => {
                   </div>
                 </div>
 
-                
-
-                <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-                  <div>
-                    <Label className="text-sm font-medium">Voice Model</Label>
-                    <p className="text-sm text-muted-foreground">eleven_turbo_v2</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Language</Label>
-                    <p className="text-sm text-muted-foreground">en-US</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Version</Label>
-                    <p className="text-sm text-muted-foreground">0</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Selected Voice ID</Label>
-                    <p className="text-sm text-muted-foreground font-mono">{selectedVoice}</p>
-                  </div>
+                <div>
+                  <Label>Language</Label>
+                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border z-50 max-h-64 overflow-y-auto">
+                      {languageOptions.map((lang) => (
+                        <SelectItem key={lang.code} value={lang.code}>
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
+                {selectedGender && selectedAge && (
+                  <div>
+                    <Label>Voice</Label>
+                    <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select a voice" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border z-50 max-h-64 overflow-y-auto">
+                        {voiceOptions[selectedGender][selectedAge].map((voice) => (
+                          <SelectItem key={voice.id} value={voice.id}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{voice.name}</span>
+                              <span className="text-xs text-muted-foreground">{voice.trait}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                 <div>
-                  <Label>Responsiveness</Label>
-                  <div className="mt-2">
-                    <Slider value={responsiveness} onValueChange={setResponsiveness} min={0} max={2} step={0.1} className="w-full" />
-                    <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                      <span>Slow (0)</span>
-                      <span className="font-medium">{responsiveness[0]}</span>
-                      <span>Fast (2)</span>
+                  <Label className="text-sm font-medium">Voice Model</Label>
+                  <p className="text-sm text-muted-foreground">eleven_turbo_v2</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Language</Label>
+                  <p className="text-sm text-muted-foreground">{selectedLanguage}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Version</Label>
+                  <p className="text-sm text-muted-foreground">0</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Selected Voice ID</Label>
+                  <p className="text-sm text-muted-foreground font-mono">{selectedVoice}</p>
+                </div>
+              </div>
+
+              <div>
+                <Label>Responsiveness</Label>
+                <div className="mt-2">
+                  <Slider value={responsiveness} onValueChange={setResponsiveness} min={0} max={2} step={0.1} className="w-full" />
+                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                    <span>Slow (0)</span>
+                    <span className="font-medium">{responsiveness[0]}</span>
+                    <span>Fast (2)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="backchannel">Enable Backchannel</Label>
+                  <Switch id="backchannel" checked={enableBackchannel} onCheckedChange={setEnableBackchannel} />
+                </div>
+                
+                {enableBackchannel && (
+                  <div>
+                    <Label>Backchannel Frequency</Label>
+                    <div className="mt-2">
+                      <Slider value={backchannelFrequency} onValueChange={setBackchannelFrequency} min={0} max={2} step={0.1} className="w-full" />
+                      <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                        <span>Low (0)</span>
+                        <span className="font-medium">{backchannelFrequency[0]}</span>
+                        <span>High (2)</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="backchannel">Enable Backchannel</Label>
-                    <Switch id="backchannel" checked={enableBackchannel} onCheckedChange={setEnableBackchannel} />
-                  </div>
-                  
-                  {enableBackchannel && <div>
-                      <Label>Backchannel Frequency</Label>
-                      <div className="mt-2">
-                        <Slider value={backchannelFrequency} onValueChange={setBackchannelFrequency} min={0} max={2} step={0.1} className="w-full" />
-                        <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                          <span>Low (0)</span>
-                          <span className="font-medium">{backchannelFrequency[0]}</span>
-                          <span>High (2)</span>
-                        </div>
-                      </div>
-                    </div>}
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -607,6 +691,8 @@ const AgentConfig = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AgentConfig;
