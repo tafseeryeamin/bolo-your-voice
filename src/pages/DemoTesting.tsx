@@ -312,27 +312,7 @@ const DemoTesting = () => {
 
                 
 
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium flex items-center">
-                    🎤 Voice Selection
-                  </Label>
-                  <Select value={selectedVoice} onValueChange={setSelectedVoice} disabled={isConnecting || isConnected}>
-                    <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
-                      <SelectValue placeholder="Select a voice" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {voiceOptions[selectedGender][selectedAge].map(voice => <SelectItem key={voice.id} value={voice.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{voice.name}</span>
-                            <span className="text-xs text-muted-foreground">{voice.traits}</span>
-                          </div>
-                        </SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {selectedVoice && <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/30 rounded">
-                      Selected: {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name} - {voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.traits}
-                    </div>}
-                </div>
+                
               </div>
 
               <div className="bg-muted/30 p-4 rounded-lg border-l-4 border-primary/30">
