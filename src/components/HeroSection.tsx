@@ -24,12 +24,12 @@ const HeroSection = () => {
         </div>
         
         <h1 className="text-5xl md:text-7xl mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent font-bold">
-          Integrate AI Voice Assistant to Website
+          Stop Losing Leads to Boring Websites
         </h1>
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-          Let people know about you or your company through intelligent voice interactions. 
-          Transform how your audience connects with your brand.
+          Spending big on ads but visitors leave without converting? Your website feels outdated while competitors thrive? 
+          <span className="text-voice-accent font-semibold">Bolo's AI voice solutions</span> transform how customers interact with your business.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -39,30 +39,30 @@ const HeroSection = () => {
           </Button>
         </div>
         
-        {/* Features Preview */}
+        {/* Service Areas Preview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50">
+          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300">
             <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto">
               <Mic className="w-6 h-6 text-voice-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Natural Conversations</h3>
-            <p className="text-muted-foreground text-sm">Engage users with human-like voice interactions</p>
+            <h3 className="text-lg font-semibold mb-2">Booking & Support</h3>
+            <p className="text-muted-foreground text-sm">Handle bookings, FAQ, and general inquiries with intelligent voice assistants</p>
           </div>
           
-          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50">
+          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300">
             <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto">
               <Zap className="w-6 h-6 text-voice-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Easy Integration</h3>
-            <p className="text-muted-foreground text-sm">Simple API to add voice AI to any platform</p>
+            <h3 className="text-lg font-semibold mb-2">Ecommerce Assistant</h3>
+            <p className="text-muted-foreground text-sm">Product info, order tracking, and smart redirects for seamless shopping experience</p>
           </div>
           
-          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50">
+          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300">
             <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto">
               <ArrowRight className="w-6 h-6 text-voice-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Brand Awareness</h3>
-            <p className="text-muted-foreground text-sm">Let voice AI tell your company story</p>
+            <h3 className="text-lg font-semibold mb-2">Custom Solutions</h3>
+            <p className="text-muted-foreground text-sm">Tailored voice AI for SaaS, agencies, and any business ready to innovate</p>
           </div>
         </div>
       </div>
