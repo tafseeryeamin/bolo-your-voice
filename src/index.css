@@ -30,6 +30,12 @@ All colors MUST be HSL.
     /* Voice Accent - Bright Cyan */
     --voice-accent: 180 100% 50%;
     --voice-accent-muted: 180 100% 20%;
+    --voice-glow: 180 100% 85%;
+
+    /* Futuristic Neon Colors */
+    --neon-blue: 220 100% 70%;
+    --neon-purple: 280 100% 70%;
+    --neon-cyan: 180 100% 70%;
 
     /* Animation Colors */
     --anim-purple: 280 100% 70%;
@@ -57,6 +63,8 @@ All colors MUST be HSL.
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-voice: linear-gradient(45deg, hsl(var(--voice-accent-muted)), hsl(var(--voice-accent)));
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
+    --gradient-neon: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-blue)), hsl(var(--neon-purple)));
+    --gradient-glow: radial-gradient(circle at center, hsl(var(--voice-accent) / 0.3), transparent 70%);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,47 +75,32 @@ All colors MUST be HSL.
     --shadow-card: 0 10px 25px -5px hsl(var(--background) / 0.5);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -132,6 +125,76 @@ All colors MUST be HSL.
   }
 }
 
+/* Custom futuristic animations */
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--voice-accent) / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--voice-accent) / 0.8), 0 0 60px hsl(var(--voice-accent) / 0.4);
+  }
+}
+
+@keyframes glow-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes float-up-delayed {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes float-up-slow {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
+}
+
 @keyframes pulse-glow {
   0% {
     box-shadow: 0 0 20px hsl(var(--voice-accent) / 0.3);
@@ -148,6 +211,53 @@ All colors MUST be HSL.
   
   .gradient-hero {
     background: var(--gradient-hero);
+  }
+
+  .gradient-voice {
+    background: var(--gradient-voice);
+  }
+
+  .animate-float-up {
+    animation: float-up 12s linear infinite;
+  }
+
+  .animate-float-up-delayed {
+    animation: float-up-delayed 15s linear infinite;
+  }
+
+  .animate-float-up-slow {
+    animation: float-up-slow 20s linear infinite;
+  }
+
+  .animate-neon-pulse {
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-glow-orbit {
+    animation: glow-orbit 20s linear infinite;
+  }
+
+  .glassmorphism {
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-border {
+    border: 1px solid hsl(var(--voice-accent));
+    box-shadow: 0 0 20px hsl(var(--voice-accent) / 0.3), inset 0 0 20px hsl(var(--voice-accent) / 0.1);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px hsl(var(--voice-accent) / 0.6), 0 0 60px hsl(var(--voice-accent) / 0.3);
+    transform: translateY(-2px);
+  }
+
+  .gradient-orb {
+    background: var(--gradient-glow);
+    border-radius: 50%;
+    filter: blur(40px);
+  }
 }
 
 /* Floating animations */
@@ -166,10 +276,5 @@ All colors MUST be HSL.
   }
   50% {
     transform: translateY(10px);
-  }
-}
-  
-  .gradient-voice {
-    background: var(--gradient-voice);
   }
 }

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { RetellWebClient } from 'retell-client-js-sdk';
+import { Mic, MicOff } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const VoiceCallButton = () => {
   const [isCallActive, setIsCallActive] = useState(false);
@@ -46,12 +48,40 @@ const VoiceCallButton = () => {
   });
 
   return (
-    <button 
-      onClick={isCallActive ? stopCall : startCall}
-      className="bg-voice-accent hover:bg-voice-muted text-primary-foreground font-bold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-voice"
+    <motion.div
+      className="fixed bottom-6 right-6 z-50"
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 2, type: "spring", stiffness: 200 }}
     >
-      {isCallActive ? 'End Call' : 'Start Voice Call'}
-    </button>
+      <motion.button 
+        onClick={isCallActive ? stopCall : startCall}
+        className={`
+          w-16 h-16 rounded-full glassmorphism neon-border
+          flex items-center justify-center
+          transition-all duration-300 hover-glow
+          ${isCallActive ? 'animate-neon-pulse' : 'animate-pulse'}
+        `}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isCallActive ? (
+          <MicOff className="w-6 h-6 text-voice-accent" />
+        ) : (
+          <Mic className="w-6 h-6 text-voice-accent" />
+        )}
+      </motion.button>
+      
+      {/* Floating label */}
+      <motion.div
+        className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-background/90 backdrop-blur-sm rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 0, y: 0 }}
+        whileHover={{ opacity: 1, y: -5 }}
+      >
+        {isCallActive ? 'End Voice Call' : 'Start Voice Call'}
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -35,7 +35,13 @@ export default {
 				},
 				voice: {
 					accent: 'hsl(var(--voice-accent))',
-					muted: 'hsl(var(--voice-accent-muted))'
+					muted: 'hsl(var(--voice-accent-muted))',
+					glow: 'hsl(var(--voice-glow))'
+				},
+				neon: {
+					blue: 'hsl(var(--neon-blue))',
+					purple: 'hsl(var(--neon-purple))',
+					cyan: 'hsl(var(--neon-cyan))'
 				},
 				animation: {
 					purple: 'hsl(var(--anim-purple))',
