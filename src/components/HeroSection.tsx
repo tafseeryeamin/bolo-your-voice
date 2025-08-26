@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mic, Zap } from "lucide-react";
+import { ArrowRight, Mic, Zap, Calendar, ShoppingCart, Navigation } from "lucide-react";
 import heroImage from "@/assets/hero-voice-ai.jpg";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import AnimatedTextSlider from "@/components/AnimatedTextSlider";
 const HeroSection = () => {
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
@@ -24,13 +25,19 @@ const HeroSection = () => {
         </div>
         
         <h1 className="text-5xl md:text-7xl mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent font-bold">
-          Stop Losing Leads to Boring Websites
+          Turn Visitors into Customers with AI Voice Solutions
         </h1>
         
-        <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-          Spending big on ads but visitors leave without converting? Your website feels outdated while competitors thrive? 
-          <span className="text-voice-accent font-semibold">Bolo's AI voice solutions</span> transform how customers interact with your business.
-        </p>
+        <div className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed min-h-[80px] flex items-center justify-center">
+          <AnimatedTextSlider 
+            texts={[
+              "Spending a lot on ads but missing leads?",
+              "Is your website boring or hard to navigate?", 
+              "Want to keep up with the future of business?"
+            ]}
+            className="text-center"
+          />
+        </div>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <Button variant="hero" size="lg" className="text-lg px-8 py-6" data-cal-link="tafser-yeamin-8jqc8u/bolo" data-cal-namespace="bolo" data-cal-config='{"layout":"month_view"}'>
@@ -41,28 +48,28 @@ const HeroSection = () => {
         
         {/* Service Areas Preview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300">
-            <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto">
-              <Mic className="w-6 h-6 text-voice-accent" />
+          <div className="group p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 hover:scale-105 transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto group-hover:bg-voice-accent/30 transition-colors duration-300">
+              <Calendar className="w-6 h-6 text-voice-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Booking & Support</h3>
-            <p className="text-muted-foreground text-sm">Handle bookings, FAQ, and general inquiries with intelligent voice assistants</p>
+            <h3 className="text-lg font-semibold mb-2">Booking, FAQ & Inquiries</h3>
+            <p className="text-muted-foreground text-sm">Let customers instantly book, ask questions, and get answers with voice.</p>
           </div>
           
-          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300">
-            <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto">
-              <Zap className="w-6 h-6 text-voice-accent" />
+          <div className="group p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 hover:scale-105 transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto group-hover:bg-voice-accent/30 transition-colors duration-300">
+              <ShoppingCart className="w-6 h-6 text-voice-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Ecommerce Assistant</h3>
-            <p className="text-muted-foreground text-sm">Product info, order tracking, and smart redirects for seamless shopping experience</p>
+            <h3 className="text-lg font-semibold mb-2">E-commerce Product Info</h3>
+            <p className="text-muted-foreground text-sm">Help shoppers find products, learn details, and get recommendations hands-free.</p>
           </div>
           
-          <div className="p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 transition-all duration-300">
-            <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto">
-              <ArrowRight className="w-6 h-6 text-voice-accent" />
+          <div className="group p-6 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:bg-card/70 hover:scale-105 transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-voice-accent/20 flex items-center justify-center mb-4 mx-auto group-hover:bg-voice-accent/30 transition-colors duration-300">
+              <Navigation className="w-6 h-6 text-voice-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Custom Solutions</h3>
-            <p className="text-muted-foreground text-sm">Tailored voice AI for SaaS, agencies, and any business ready to innovate</p>
+            <h3 className="text-lg font-semibold mb-2">Redirect & Track Orders</h3>
+            <p className="text-muted-foreground text-sm">Guide users to the right pages and track orders via voice in real-time.</p>
           </div>
         </div>
       </div>
