@@ -74,6 +74,9 @@ const Header = () => {
                   <Button variant="ghost" onClick={() => navigate("/demo-testing")}>
                     Demo & Testing
                   </Button>
+                  <Button variant="ghost" onClick={() => navigate("/widget-generator")}>
+                    Widget Generator
+                  </Button>
                 </>
               )}
             </>

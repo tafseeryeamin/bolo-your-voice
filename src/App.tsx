@@ -13,6 +13,7 @@ import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
 import TestAgent from "./pages/TestAgent";
 import DemoTesting from "./pages/DemoTesting";
+import WidgetGenerator from "./pages/WidgetGenerator";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingElements from "./components/FloatingElements";
 
@@ -54,6 +55,11 @@ const App = () => (
           <Route path="/demo-testing" element={
             <ProtectedRoute>
               <DemoTesting />
+            </ProtectedRoute>
+          } />
+          <Route path="/widget-generator" element={
+            <ProtectedRoute>
+              <WidgetGenerator />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
