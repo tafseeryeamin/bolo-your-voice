@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Copy, Download, Eye, Settings, Code, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
 const WidgetGenerator = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [config, setConfig] = useState({
     publicKey: '',
     agentId: '',
@@ -27,12 +28,9 @@ const WidgetGenerator = () => {
     welcomeMessage: 'Hi! How can I help you today?',
     offlineMessage: 'We\'re currently offline. Please leave a message!'
   });
-
   const [preview, setPreview] = useState(false);
-
   const generateEmbedCode = () => {
     const widgetUrl = `${config.customDomain}/widget.js`;
-    
     if (config.widgetType === 'floating') {
       return `<!-- Bolo AI Voice Widget -->
 <script
@@ -72,7 +70,6 @@ const WidgetGenerator = () => {
 ></script>`;
     }
   };
-
   const generateWidgetJS = () => {
     return `// Bolo AI Voice Widget - White Label Solution
 (function() {
@@ -256,29 +253,19 @@ const WidgetGenerator = () => {
     }
   };
 
-  // Start voice chat using Voice API
+  // Start voice chat using Retell
   window.startVoiceChat = async function() {
     try {
-      // Connect to voice API endpoint
-      const response = await fetch(\`\${window.location.origin}/api/voice/connect\`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': \`Bearer \${config.publicKey}\`
-        },
-        body: JSON.stringify({
-          agentId: config.agentId,
-          agentVersion: config.agentVersion
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        // Initialize voice connection
-        console.log('Voice chat started successfully');
-      } else {
-        throw new Error('Failed to connect to voice service');
+      // Here we would integrate with Retell's actual API
+      // For now, we'll use the existing Retell widget functionality
+      const retellScript = document.createElement('script');
+      retellScript.src = 'https://dashboard.retellai.com/retell-widget.js';
+      retellScript.setAttribute('data-public-key', config.publicKey);
+      retellScript.setAttribute('data-agent-id', config.agentId);
+      if (config.agentVersion !== 'latest') {
+        retellScript.setAttribute('data-agent-version', config.agentVersion);
       }
+      document.head.appendChild(retellScript);
     } catch (error) {
       console.error('Error starting voice chat:', error);
       alert('Unable to start voice chat. Please try again.');
@@ -299,17 +286,17 @@ const WidgetGenerator = () => {
   }
 })();`;
   };
-
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied to clipboard!",
-      description: `${type} code has been copied to your clipboard.`,
+      description: `${type} code has been copied to your clipboard.`
     });
   };
-
   const downloadFile = (content: string, filename: string) => {
-    const blob = new Blob([content], { type: 'text/plain' });
+    const blob = new Blob([content], {
+      type: 'text/plain'
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -318,15 +305,12 @@ const WidgetGenerator = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
     toast({
       title: "File downloaded!",
-      description: `${filename} has been downloaded.`,
+      description: `${filename} has been downloaded.`
     });
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted p-6">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -336,9 +320,7 @@ const WidgetGenerator = () => {
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Create embeddable AI voice widgets for your customers. White-label solution that serves from your domain.
           </p>
-          <Badge variant="secondary" className="text-sm">
-            White Label Solution
-          </Badge>
+          
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -365,58 +347,52 @@ const WidgetGenerator = () => {
                   <TabsContent value="basic" className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="publicKey">Voice API Key</Label>
-                      <Input
-                        id="publicKey"
-                        placeholder="key_xxxxxxxxxxxxxxxxxxxxx"
-                        value={config.publicKey}
-                        onChange={(e) => setConfig({...config, publicKey: e.target.value})}
-                      />
+                      <Input id="publicKey" placeholder="key_xxxxxxxxxxxxxxxxxxxxx" value={config.publicKey} onChange={e => setConfig({
+                      ...config,
+                      publicKey: e.target.value
+                    })} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="agentId">Agent ID</Label>
-                      <Input
-                        id="agentId"
-                        placeholder="agent_xxxxxxxxxxxxxxxxxxx"
-                        value={config.agentId}
-                        onChange={(e) => setConfig({...config, agentId: e.target.value})}
-                      />
+                      <Input id="agentId" placeholder="agent_xxxxxxxxxxxxxxxxxxx" value={config.agentId} onChange={e => setConfig({
+                      ...config,
+                      agentId: e.target.value
+                    })} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="agentVersion">Agent Version (Optional)</Label>
-                      <Input
-                        id="agentVersion"
-                        placeholder="Leave empty for latest"
-                        value={config.agentVersion}
-                        onChange={(e) => setConfig({...config, agentVersion: e.target.value})}
-                      />
+                      <Input id="agentVersion" placeholder="Leave empty for latest" value={config.agentVersion} onChange={e => setConfig({
+                      ...config,
+                      agentVersion: e.target.value
+                    })} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="title">Widget Title</Label>
-                      <Input
-                        id="title"
-                        value={config.title}
-                        onChange={(e) => setConfig({...config, title: e.target.value})}
-                      />
+                      <Input id="title" value={config.title} onChange={e => setConfig({
+                      ...config,
+                      title: e.target.value
+                    })} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="logoUrl">Logo URL (Optional)</Label>
-                      <Input
-                        id="logoUrl"
-                        placeholder="https://your-domain.com/logo.png"
-                        value={config.logoUrl}
-                        onChange={(e) => setConfig({...config, logoUrl: e.target.value})}
-                      />
+                      <Input id="logoUrl" placeholder="https://your-domain.com/logo.png" value={config.logoUrl} onChange={e => setConfig({
+                      ...config,
+                      logoUrl: e.target.value
+                    })} />
                     </div>
                   </TabsContent>
 
                   <TabsContent value="styling" className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="widgetType">Widget Type</Label>
-                      <Select value={config.widgetType} onValueChange={(value) => setConfig({...config, widgetType: value})}>
+                      <Select value={config.widgetType} onValueChange={value => setConfig({
+                      ...config,
+                      widgetType: value
+                    })}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -427,10 +403,12 @@ const WidgetGenerator = () => {
                       </Select>
                     </div>
 
-                    {config.widgetType === 'floating' && (
-                      <div className="space-y-2">
+                    {config.widgetType === 'floating' && <div className="space-y-2">
                         <Label htmlFor="position">Position</Label>
-                        <Select value={config.position} onValueChange={(value) => setConfig({...config, position: value})}>
+                        <Select value={config.position} onValueChange={value => setConfig({
+                      ...config,
+                      position: value
+                    })}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -441,66 +419,54 @@ const WidgetGenerator = () => {
                             <SelectItem value="top-left">Top Left</SelectItem>
                           </SelectContent>
                         </Select>
-                      </div>
-                    )}
+                      </div>}
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="primaryColor">Primary Color</Label>
                         <div className="flex gap-2">
-                          <Input
-                            id="primaryColor"
-                            type="color"
-                            value={config.primaryColor}
-                            onChange={(e) => setConfig({...config, primaryColor: e.target.value})}
-                            className="w-16 h-10 p-1"
-                          />
-                          <Input
-                            value={config.primaryColor}
-                            onChange={(e) => setConfig({...config, primaryColor: e.target.value})}
-                            className="flex-1"
-                          />
+                          <Input id="primaryColor" type="color" value={config.primaryColor} onChange={e => setConfig({
+                          ...config,
+                          primaryColor: e.target.value
+                        })} className="w-16 h-10 p-1" />
+                          <Input value={config.primaryColor} onChange={e => setConfig({
+                          ...config,
+                          primaryColor: e.target.value
+                        })} className="flex-1" />
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="secondaryColor">Secondary Color</Label>
                         <div className="flex gap-2">
-                          <Input
-                            id="secondaryColor"
-                            type="color"
-                            value={config.secondaryColor}
-                            onChange={(e) => setConfig({...config, secondaryColor: e.target.value})}
-                            className="w-16 h-10 p-1"
-                          />
-                          <Input
-                            value={config.secondaryColor}
-                            onChange={(e) => setConfig({...config, secondaryColor: e.target.value})}
-                            className="flex-1"
-                          />
+                          <Input id="secondaryColor" type="color" value={config.secondaryColor} onChange={e => setConfig({
+                          ...config,
+                          secondaryColor: e.target.value
+                        })} className="w-16 h-10 p-1" />
+                          <Input value={config.secondaryColor} onChange={e => setConfig({
+                          ...config,
+                          secondaryColor: e.target.value
+                        })} className="flex-1" />
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="buttonText">Button Text</Label>
-                      <Input
-                        id="buttonText"
-                        value={config.buttonText}
-                        onChange={(e) => setConfig({...config, buttonText: e.target.value})}
-                      />
+                      <Input id="buttonText" value={config.buttonText} onChange={e => setConfig({
+                      ...config,
+                      buttonText: e.target.value
+                    })} />
                     </div>
                   </TabsContent>
 
                   <TabsContent value="advanced" className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="customDomain">Your Domain</Label>
-                      <Input
-                        id="customDomain"
-                        value={config.customDomain}
-                        onChange={(e) => setConfig({...config, customDomain: e.target.value})}
-                        placeholder="https://your-domain.com"
-                      />
+                      <Input id="customDomain" value={config.customDomain} onChange={e => setConfig({
+                      ...config,
+                      customDomain: e.target.value
+                    })} placeholder="https://your-domain.com" />
                       <p className="text-sm text-muted-foreground">
                         The widget will be served from this domain (white-label)
                       </p>
@@ -508,22 +474,18 @@ const WidgetGenerator = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="welcomeMessage">Welcome Message</Label>
-                      <Textarea
-                        id="welcomeMessage"
-                        value={config.welcomeMessage}
-                        onChange={(e) => setConfig({...config, welcomeMessage: e.target.value})}
-                        rows={3}
-                      />
+                      <Textarea id="welcomeMessage" value={config.welcomeMessage} onChange={e => setConfig({
+                      ...config,
+                      welcomeMessage: e.target.value
+                    })} rows={3} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="offlineMessage">Offline Message</Label>
-                      <Textarea
-                        id="offlineMessage"
-                        value={config.offlineMessage}
-                        onChange={(e) => setConfig({...config, offlineMessage: e.target.value})}
-                        rows={3}
-                      />
+                      <Textarea id="offlineMessage" value={config.offlineMessage} onChange={e => setConfig({
+                      ...config,
+                      offlineMessage: e.target.value
+                    })} rows={3} />
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -554,29 +516,15 @@ const WidgetGenerator = () => {
                     <div className="space-y-2">
                       <Label>HTML Embed Code</Label>
                       <div className="relative">
-                        <Textarea
-                          value={generateEmbedCode()}
-                          readOnly
-                          rows={8}
-                          className="font-mono text-sm"
-                        />
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="absolute top-2 right-2"
-                          onClick={() => copyToClipboard(generateEmbedCode(), "Embed")}
-                        >
+                        <Textarea value={generateEmbedCode()} readOnly rows={8} className="font-mono text-sm" />
+                        <Button size="sm" variant="outline" className="absolute top-2 right-2" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")}>
                           <Copy className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => copyToClipboard(generateEmbedCode(), "Embed")}
-                        className="flex items-center gap-2"
-                      >
+                      <Button variant="outline" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")} className="flex items-center gap-2">
                         <Copy className="w-4 h-4" />
                         Copy Embed Code
                       </Button>
@@ -587,37 +535,19 @@ const WidgetGenerator = () => {
                     <div className="space-y-2">
                       <Label>widget.js File Content</Label>
                       <div className="relative">
-                        <Textarea
-                          value={generateWidgetJS()}
-                          readOnly
-                          rows={8}
-                          className="font-mono text-sm"
-                        />
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="absolute top-2 right-2"
-                          onClick={() => copyToClipboard(generateWidgetJS(), "Widget JS")}
-                        >
+                        <Textarea value={generateWidgetJS()} readOnly rows={8} className="font-mono text-sm" />
+                        <Button size="sm" variant="outline" className="absolute top-2 right-2" onClick={() => copyToClipboard(generateWidgetJS(), "Widget JS")}>
                           <Copy className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => copyToClipboard(generateWidgetJS(), "Widget JS")}
-                        className="flex items-center gap-2"
-                      >
+                      <Button variant="outline" onClick={() => copyToClipboard(generateWidgetJS(), "Widget JS")} className="flex items-center gap-2">
                         <Copy className="w-4 h-4" />
                         Copy JS Code
                       </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => downloadFile(generateWidgetJS(), 'widget.js')}
-                        className="flex items-center gap-2"
-                      >
+                      <Button variant="outline" onClick={() => downloadFile(generateWidgetJS(), 'widget.js')} className="flex items-center gap-2">
                         <Download className="w-4 h-4" />
                         Download widget.js
                       </Button>
@@ -629,7 +559,7 @@ const WidgetGenerator = () => {
                         <li>Download the widget.js file and host it on your domain</li>
                         <li>Update the script src in the embed code to point to your hosted file</li>
                         <li>Provide the embed code to your customers</li>
-                        <li>Widget will appear with your branding (completely white-labeled)</li>
+                        <li>Widget will appear with your branding (no mention of Retell)</li>
                       </ol>
                     </div>
                   </TabsContent>
@@ -654,49 +584,34 @@ const WidgetGenerator = () => {
                     Website Content Area
                   </div>
                   
-                  {config.widgetType === 'floating' ? (
-                    <div
-                      className={`fixed w-14 h-14 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer transition-transform hover:scale-110`}
-                      style={{
-                        background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`,
-                        [config.position.includes('bottom') ? 'bottom' : 'top']: '20px',
-                        [config.position.includes('right') ? 'right' : 'left']: '20px'
-                      }}
-                    >
+                  {config.widgetType === 'floating' ? <div className={`fixed w-14 h-14 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer transition-transform hover:scale-110`} style={{
+                  background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`,
+                  [config.position.includes('bottom') ? 'bottom' : 'top']: '20px',
+                  [config.position.includes('right') ? 'right' : 'left']: '20px'
+                }}>
                       🎤
-                    </div>
-                  ) : (
-                    <div className="max-w-sm mx-auto border rounded-lg overflow-hidden bg-white">
-                      <div
-                        className="p-4 text-white font-semibold"
-                        style={{
-                          background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
-                        }}
-                      >
+                    </div> : <div className="max-w-sm mx-auto border rounded-lg overflow-hidden bg-white">
+                      <div className="p-4 text-white font-semibold" style={{
+                    background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
+                  }}>
                         {config.title}
                       </div>
                       <div className="p-6 text-center">
                         <div className="text-4xl mb-4">🎤</div>
-                        <div
-                          className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white text-xl mb-4 cursor-pointer"
-                          style={{
-                            background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
-                          }}
-                        >
+                        <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white text-xl mb-4 cursor-pointer" style={{
+                      background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
+                    }}>
                           🎙️
                         </div>
                         <p className="text-sm text-gray-600">{config.welcomeMessage}</p>
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default WidgetGenerator;
