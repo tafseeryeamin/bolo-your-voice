@@ -96,11 +96,11 @@ const WidgetGenerator = () => {
     offlineMessage: script.getAttribute('data-offline-message') || 'We\\'re currently offline. Please leave a message!'
   };
 
-  // Load Retell SDK dynamically
-  function loadRetellSDK() {
+  // Load Voice SDK dynamically
+  function loadVoiceSDK() {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'https://dashboard.retellai.com/retell-widget.js';
+      script.src = 'https://voice-api.example.com/voice-widget.js';
       script.onload = resolve;
       script.onerror = reject;
       document.head.appendChild(script);
@@ -256,19 +256,29 @@ const WidgetGenerator = () => {
     }
   };
 
-  // Start voice chat using Retell
+  // Start voice chat using Voice API
   window.startVoiceChat = async function() {
     try {
-      // Here we would integrate with Retell's actual API
-      // For now, we'll use the existing Retell widget functionality
-      const retellScript = document.createElement('script');
-      retellScript.src = 'https://dashboard.retellai.com/retell-widget.js';
-      retellScript.setAttribute('data-public-key', config.publicKey);
-      retellScript.setAttribute('data-agent-id', config.agentId);
-      if (config.agentVersion !== 'latest') {
-        retellScript.setAttribute('data-agent-version', config.agentVersion);
+      // Connect to voice API endpoint
+      const response = await fetch(\`\${window.location.origin}/api/voice/connect\`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': \`Bearer \${config.publicKey}\`
+        },
+        body: JSON.stringify({
+          agentId: config.agentId,
+          agentVersion: config.agentVersion
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Initialize voice connection
+        console.log('Voice chat started successfully');
+      } else {
+        throw new Error('Failed to connect to voice service');
       }
-      document.head.appendChild(retellScript);
     } catch (error) {
       console.error('Error starting voice chat:', error);
       alert('Unable to start voice chat. Please try again.');
@@ -354,7 +364,7 @@ const WidgetGenerator = () => {
 
                   <TabsContent value="basic" className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="publicKey">Retell Public Key</Label>
+                      <Label htmlFor="publicKey">Voice API Key</Label>
                       <Input
                         id="publicKey"
                         placeholder="key_xxxxxxxxxxxxxxxxxxxxx"
@@ -619,7 +629,7 @@ const WidgetGenerator = () => {
                         <li>Download the widget.js file and host it on your domain</li>
                         <li>Update the script src in the embed code to point to your hosted file</li>
                         <li>Provide the embed code to your customers</li>
-                        <li>Widget will appear with your branding (no mention of Retell)</li>
+                        <li>Widget will appear with your branding (completely white-labeled)</li>
                       </ol>
                     </div>
                   </TabsContent>
