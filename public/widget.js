@@ -1,369 +1,401 @@
-(function() {
-  // Voice Widget Configuration
-  const script = document.getElementById('bolo-voice-widget');
-  const config = {
-    publicKey: script.getAttribute('data-public-key'),
-    agentId: script.getAttribute('data-agent-id'),
-    title: script.getAttribute('data-title') || 'Voice Assistant',
-    logoUrl: script.getAttribute('data-logo-url'),
-    primaryColor: script.getAttribute('data-primary-color') || '#6366F1',
-    secondaryColor: script.getAttribute('data-secondary-color') || '#8B5CF6',
-    position: script.getAttribute('data-position') || 'bottom-right',
-    buttonText: script.getAttribute('data-button-text') || 'Start a conversation',
-    welcomeMessage: script.getAttribute('data-welcome-message') || 'Hi there, How can we help?',
-    offlineMessage: script.getAttribute('data-offline-message') || 'We\'re currently offline. Please leave a message!'
+import React, { useState } from 'react';
+import { Upload, Copy, Check, Save, Sparkles } from 'lucide-react';
+
+const WidgetGenerator = () => {
+  const [config, setConfig] = useState({
+    publicKey: 'key_e784586ccfd13c1285c857d650ac',
+    agentId: 'agent_9624b5655618cedb8031e80ada',
+    title: 'Talk to AI',
+    logoUrl: '',
+    primaryColor: '#6366F1',
+    secondaryColor: '#8B5CF6',
+    position: 'bottom-right',
+    buttonText: 'Start a conversation',
+    welcomeMessage: 'Hi! How can I help you today?',
+    offlineMessage: 'We\'re currently offline. Please leave a message!'
+  });
+
+  const [activeTab, setActiveTab] = useState('embed');
+  const [copiedEmbed, setCopiedEmbed] = useState(false);
+  const [isWidgetSaved, setIsWidgetSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      // Create a temporary URL for preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setConfig(prev => ({
+          ...prev,
+          logoUrl: e.target?.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  // Load Retell SDK
-  function loadVoiceSDK() {
-    return new Promise((resolve, reject) => {
-      if (window.RetellWebClient) {
-        resolve(window.RetellWebClient);
-        return;
-      }
+  const handleSaveWidget = async () => {
+    setIsSaving(true);
+    
+    try {
+      // Simulate saving the widget configuration
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const sdk = document.createElement('script');
-      sdk.src = 'https://cdn.jsdelivr.net/npm/retell-client-js-sdk@2.0.7/dist/retell-client-js-sdk.umd.js';
-      sdk.onload = () => resolve(window.RetellWebClient);
-      sdk.onerror = reject;
-      document.head.appendChild(sdk);
-    });
-  }
+      // In a real implementation, you would:
+      // 1. Upload the logo file to your server/CDN
+      // 2. Save the widget configuration to your database
+      // 3. Generate a unique widget ID
+      // 4. Return the hosted widget URL
+      
+      setIsWidgetSaved(true);
+      
+      // Show success for 3 seconds, then allow re-saving
+      setTimeout(() => {
+        setIsWidgetSaved(false);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error saving widget:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-  // Create Widget UI with Bolo design
-  function createWidget() {
-    const widget = document.createElement('div');
-    widget.id = 'voice-widget-container';
-    
-    // Add widget styles
-    const styles = document.createElement('style');
-    styles.textContent = `
-      @keyframes mic-pulse {
-        0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); transform: scale(1); }
-        70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); transform: scale(1.05); }
-        100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); transform: scale(1); }
-      }
-      
-      .voice-widget-button-active {
-        animation: mic-pulse 2s infinite;
-      }
-      
-      .voice-gradient {
-        background: linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor});
-      }
-    `;
-    document.head.appendChild(styles);
-    
-    widget.innerHTML = `
-      <!-- Floating Button -->
-      <div id="voice-widget-button" style="
-        position: fixed;
-        ${config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
-        ${config.position.includes('top') ? 'top: 20px;' : 'bottom: 20px;'}
-        z-index: 10000;
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor});
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-      ">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-        </svg>
-      </div>
-      
-      <!-- Voice Modal -->
-      <div id="voice-widget-modal" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        z-index: 10001;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-family: system-ui, -apple-system, sans-serif;
-      ">
-        <div style="
-          background: linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor});
-          border-radius: 24px;
-          padding: 0;
-          max-width: 380px;
-          width: 90%;
-          text-align: center;
-          color: white;
-          overflow: hidden;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        ">
-          <!-- Header with logo -->
-          <div style="
-            padding: 32px 24px 16px 24px;
-            position: relative;
-          ">
-            ${config.logoUrl ? `
-              <div style="
-                width: 60px;
-                height: 60px;
-                background: rgba(0,0,0,0.2);
-                border-radius: 50%;
-                margin: 0 auto 16px auto;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-              ">
-                <img src="${config.logoUrl}" style="
-                  width: 40px;
-                  height: 40px;
-                  object-fit: contain;
-                  filter: brightness(0) invert(1);
-                " alt="Logo" />
+  const generateEmbedCode = () => {
+    return `<!-- Bolo AI Voice Widget -->
+<script
+  id="bolo-voice-widget"
+  src="https://preview--bolo-your-voice.lovable.app/widget.js"
+  type="module"
+  data-public-key="${config.publicKey}"
+  data-agent-id="${config.agentId}"
+  data-title="${config.title}"
+  ${config.logoUrl ? `data-logo-url="${config.logoUrl}"` : ''}
+  data-primary-color="${config.primaryColor}"
+  data-secondary-color="${config.secondaryColor}"
+  data-position="${config.position}"
+  data-button-text="${config.buttonText}"
+  data-welcome-message="${config.welcomeMessage}"
+  data-offline-message="${config.offlineMessage}"
+></script>`;
+  };
+
+  const copyToClipboard = (text: string, setCopied: (value: boolean) => void) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Widget Generator
+          </h1>
+          <p className="text-xl text-purple-200 max-w-2xl mx-auto">
+            Customize your AI voice widget with your branding and generate embeddable code for your website
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Configuration Panel */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <h2 className="text-2xl font-bold text-white mb-6">Widget Configuration</h2>
+            
+            <div className="space-y-6">
+              {/* API Configuration */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  API Key
+                </label>
+                <input
+                  type="text"
+                  value={config.publicKey}
+                  onChange={(e) => setConfig(prev => ({ ...prev, publicKey: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400"
+                  placeholder="Enter your API key"
+                />
               </div>
-            ` : `
-              <div style="
-                width: 60px;
-                height: 60px;
-                background: rgba(0,0,0,0.2);
-                border-radius: 50%;
-                margin: 0 auto 16px auto;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 28px;
-              ">
-                🎤
+
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Agent ID
+                </label>
+                <input
+                  type="text"
+                  value={config.agentId}
+                  onChange={(e) => setConfig(prev => ({ ...prev, agentId: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400"
+                  placeholder="Enter your agent ID"
+                />
               </div>
-            `}
-            
-            <h2 style="
-              margin: 0 0 8px 0;
-              font-size: 28px;
-              font-weight: 400;
-              line-height: 1.2;
-            ">${config.welcomeMessage}</h2>
+
+              {/* Widget Appearance */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Widget Title
+                </label>
+                <input
+                  type="text"
+                  value={config.title}
+                  onChange={(e) => setConfig(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400"
+                  placeholder="Widget title"
+                />
+              </div>
+
+              {/* Logo Upload */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Logo Upload
+                </label>
+                <div className="flex items-center space-x-4">
+                  <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose File
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {logoFile && (
+                    <span className="text-sm text-purple-200">
+                      {logoFile.name}
+                    </span>
+                  )}
+                </div>
+                {config.logoUrl && (
+                  <div className="mt-2">
+                    <img src={config.logoUrl} alt="Logo preview" className="w-12 h-12 object-contain bg-white/10 rounded-lg p-2" />
+                  </div>
+                )}
+              </div>
+
+              {/* Colors */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">
+                    Primary Color
+                  </label>
+                  <input
+                    type="color"
+                    value={config.primaryColor}
+                    onChange={(e) => setConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
+                    className="w-full h-12 bg-white/10 border border-white/20 rounded-lg cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">
+                    Secondary Color
+                  </label>
+                  <input
+                    type="color"
+                    value={config.secondaryColor}
+                    onChange={(e) => setConfig(prev => ({ ...prev, secondaryColor: e.target.value }))}
+                    className="w-full h-12 bg-white/10 border border-white/20 rounded-lg cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Position */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Widget Position
+                </label>
+                <select
+                  value={config.position}
+                  onChange={(e) => setConfig(prev => ({ ...prev, position: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-400"
+                >
+                  <option value="bottom-right">Bottom Right</option>
+                  <option value="bottom-left">Bottom Left</option>
+                  <option value="top-right">Top Right</option>
+                  <option value="top-left">Top Left</option>
+                </select>
+              </div>
+
+              {/* Messages */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Welcome Message
+                </label>
+                <input
+                  type="text"
+                  value={config.welcomeMessage}
+                  onChange={(e) => setConfig(prev => ({ ...prev, welcomeMessage: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400"
+                  placeholder="Welcome message"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Offline Message
+                </label>
+                <input
+                  type="text"
+                  value={config.offlineMessage}
+                  onChange={(e) => setConfig(prev => ({ ...prev, offlineMessage: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-400"
+                  placeholder="Offline message"
+                />
+              </div>
+
+              {/* Save Widget Button */}
+              <div className="pt-4 border-t border-white/20">
+                <button
+                  onClick={handleSaveWidget}
+                  disabled={isSaving || isWidgetSaved}
+                  className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 ${
+                    isWidgetSaved
+                      ? 'bg-green-600 text-white'
+                      : isSaving
+                      ? 'bg-purple-600/50 text-white/70 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 hover:scale-105 transform'
+                  }`}
+                >
+                  {isSaving ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      Saving Widget...
+                    </div>
+                  ) : isWidgetSaved ? (
+                    <div className="flex items-center justify-center">
+                      <Check className="w-5 h-5 mr-3" />
+                      Widget Saved Successfully!
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 mr-3" />
+                      Save & Generate Widget
+                    </div>
+                  )}
+                </button>
+                
+                {isWidgetSaved && (
+                  <p className="text-center text-green-300 text-sm mt-2">
+                    ✅ Your widget is ready! Copy the embed code below.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-          
-          <!-- Voice status and mic button -->
-          <div style="
-            background: rgba(255,255,255,0.1);
-            margin: 16px 24px 24px 24px;
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(10px);
-          ">
-            <div id="mic-container" style="
-              width: 80px;
-              height: 80px;
-              margin: 0 auto 16px auto;
-              border-radius: 50%;
-              background: rgba(255,255,255,0.2);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              border: 3px solid rgba(255,255,255,0.3);
-            ">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="color: white;">
-                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-              </svg>
+
+          {/* Preview and Code Panel */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <h2 className="text-2xl font-bold text-white mb-6">Widget Preview & Code</h2>
+
+            {/* Widget Preview */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-white mb-4">Live Preview</h3>
+              <div className="relative bg-gray-800 rounded-lg p-8 min-h-[200px] border-2 border-dashed border-gray-600">
+                <div className="text-center text-gray-400 mb-4">
+                  Widget Preview (Click Save to activate)
+                </div>
+                
+                {/* Simulated floating button */}
+                <div 
+                  className={`absolute ${config.position.includes('right') ? 'right-4' : 'left-4'} ${config.position.includes('top') ? 'top-4' : 'bottom-4'} w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer transition-all hover:scale-110`}
+                  style={{ 
+                    background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`,
+                    opacity: isWidgetSaved ? 1 : 0.5
+                  }}
+                >
+                  {config.logoUrl ? (
+                    <img src={config.logoUrl} alt="Logo" className="w-8 h-8 object-contain filter invert" />
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                  )}
+                </div>
+              </div>
             </div>
-            
-            <div id="voice-status" style="
-              color: rgba(255,255,255,0.9);
-              font-size: 14px;
-              margin-bottom: 16px;
-            ">
-              Tap the microphone to start
+
+            {/* Tabs */}
+            <div className="border-b border-white/20 mb-6">
+              <nav className="flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('embed')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === 'embed'
+                      ? 'border-purple-400 text-purple-400'
+                      : 'border-transparent text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Embed Code
+                </button>
+              </nav>
             </div>
-            
-            <button id="end-call" style="
-              background: rgba(220, 53, 69, 0.9);
-              color: white;
-              border: none;
-              border-radius: 12px;
-              padding: 12px 24px;
-              cursor: pointer;
-              font-weight: 600;
-              font-size: 14px;
-              display: none;
-              margin: 0 auto;
-            ">End Call</button>
-          </div>
-          
-          <!-- Bottom navigation bar -->
-          <div style="
-            background: rgba(255,255,255,0.1);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-          ">
-            <div style="
-              display: flex;
-              align-items: center;
-              color: rgba(255,255,255,0.8);
-              font-size: 14px;
-            ">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-              </svg>
-              Home
+
+            {/* Embed Code Tab */}
+            {activeTab === 'embed' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-white">HTML Embed Code</h3>
+                  <button
+                    onClick={() => copyToClipboard(generateEmbedCode(), setCopiedEmbed)}
+                    disabled={!isWidgetSaved}
+                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      !isWidgetSaved 
+                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                        : copiedEmbed
+                        ? 'bg-green-600 text-white'
+                        : 'bg-purple-600 text-white hover:bg-purple-700'
+                    }`}
+                  >
+                    {copiedEmbed ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy Code
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                <div className={`bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 border ${!isWidgetSaved ? 'opacity-50' : ''}`}>
+                  <pre className="whitespace-pre-wrap break-words">
+                    {generateEmbedCode()}
+                  </pre>
+                </div>
+                
+                {!isWidgetSaved && (
+                  <div className="text-center text-yellow-300 text-sm p-4 bg-yellow-900/20 rounded-lg border border-yellow-500/20">
+                    ⚠️ Please save your widget configuration first to generate the embed code.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Setup Instructions */}
+            <div className="mt-8 p-4 bg-blue-900/20 rounded-lg border border-blue-500/20">
+              <h4 className="text-blue-300 font-semibold mb-2">Setup Instructions:</h4>
+              <ol className="text-blue-200 text-sm space-y-1 list-decimal list-inside">
+                <li>Configure your widget settings above</li>
+                <li>Click "Save & Generate Widget" to create your widget</li>
+                <li>Copy the embed code</li>
+                <li>Paste it into your website's HTML</li>
+                <li>The voice widget will appear on your site!</li>
+              </ol>
             </div>
-            <button id="close-widget" style="
-              background: none;
-              border: none;
-              color: rgba(255,255,255,0.8);
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              font-size: 14px;
-            ">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-              </svg>
-              Close
-            </button>
           </div>
         </div>
       </div>
-    `;
-    
-    document.body.appendChild(widget);
-    setupEventListeners();
-  }
+    </div>
+  );
+};
 
-  // Event Listeners
-  function setupEventListeners() {
-    const button = document.getElementById('voice-widget-button');
-    const modal = document.getElementById('voice-widget-modal');
-    const closeBtn = document.getElementById('close-widget');
-    const startBtn = document.getElementById('mic-container');
-    const endBtn = document.getElementById('end-call');
-    const status = document.getElementById('voice-status');
-
-    let webClient = null;
-
-    button.addEventListener('click', () => {
-      modal.style.display = 'flex';
-    });
-
-    closeBtn.addEventListener('click', () => {
-      if (webClient) {
-        webClient.stopCall();
-      }
-      modal.style.display = 'none';
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        if (webClient) {
-          webClient.stopCall();
-        }
-        modal.style.display = 'none';
-      }
-    });
-
-    startBtn.addEventListener('click', async () => {
-      try {
-        console.log('Starting voice call with config:', { publicKey: config.publicKey, agentId: config.agentId });
-        
-        // Validate required config
-        if (!config.publicKey) {
-          throw new Error('API key is required. Please check your data-public-key attribute.');
-        }
-        
-        if (!config.agentId) {
-          throw new Error('Agent ID is required. Please check your data-agent-id attribute.');
-        }
-
-        const RetellWebClient = await loadVoiceSDK();
-        webClient = new RetellWebClient();
-
-        webClient.on('call_started', () => {
-          console.log('Voice call started successfully');
-          status.textContent = 'Call connected. Start speaking!';
-          startBtn.style.display = 'none';
-          endBtn.style.display = 'inline-block';
-          button.classList.add('voice-widget-button-active');
-        });
-
-        webClient.on('call_ended', () => {
-          console.log('Voice call ended');
-          status.textContent = 'Call ended. Click start to begin new conversation.';
-          startBtn.style.display = 'inline-block';
-          endBtn.style.display = 'none';
-          button.classList.remove('voice-widget-button-active');
-        });
-
-        webClient.on('error', (error) => {
-          console.error('Voice call error:', error);
-          status.textContent = 'Error: ' + error.message;
-          startBtn.style.display = 'inline-block';
-          endBtn.style.display = 'none';
-          button.classList.remove('voice-widget-button-active');
-        });
-
-        status.textContent = 'Connecting...';
-        
-        // Create web call with BOTH api_key and agent_id
-        console.log('Making API call to create web call...');
-        const response = await fetch('https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1/create-retell-web-call', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            api_key: config.publicKey,  // Now sending the API key!
-            agent_id: config.agentId
-          })
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-          console.error('API Error:', response.status, data);
-          throw new Error(data.error || 'Failed to start call');
-        }
-
-        console.log('Web call created successfully:', data);
-
-        await webClient.startCall({
-          accessToken: data.access_token,
-          sampleRate: data.sample_rate,
-          enableUpdate: true
-        });
-
-      } catch (error) {
-        console.error('Voice call error:', error);
-        status.textContent = 'Error starting call: ' + error.message;
-        button.classList.remove('voice-widget-button-active');
-      }
-    });
-
-    endBtn.addEventListener('click', () => {
-      if (webClient) {
-        webClient.stopCall();
-      }
-    });
-  }
-
-  // Initialize widget when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', createWidget);
-  } else {
-    createWidget();
-  }
-})();
+export default WidgetGenerator;
