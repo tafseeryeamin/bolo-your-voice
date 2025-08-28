@@ -695,22 +695,8 @@ const AgentConfig = () => {
 
           {/* Testing Section */}
           <Card>
-            <CardHeader>
-              <CardTitle>Test & Deploy</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Ready to test your agent? Save your configuration first, then test or deploy.
-              </p>
-              <div className="flex space-x-4">
-                <Button onClick={() => navigate(`/test-agent?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)} className="flex-1" disabled={!agentName}>
-                  Test Agent
-                </Button>
-                <Button onClick={() => navigate(`/demo-testing?agent_id=${existingAgentId || 'new'}&agent_name=${encodeURIComponent(agentName)}`)} variant="outline" className="flex-1" disabled={!agentName}>
-                  Deploy Agent
-                </Button>
-              </div>
-            </CardContent>
+            
+            
           </Card>
 
           {/* Save Button */}
