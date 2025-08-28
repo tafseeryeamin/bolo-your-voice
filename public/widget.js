@@ -173,7 +173,7 @@
               cursor: pointer;
               transition: all 0.3s ease;
               border: 3px solid rgba(255,255,255,0.3);
-            " id="start-call">
+            ">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="color: white;">
                 <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
@@ -250,7 +250,7 @@
     const button = document.getElementById('voice-widget-button');
     const modal = document.getElementById('voice-widget-modal');
     const closeBtn = document.getElementById('close-widget');
-    const startBtn = document.getElementById('start-call');
+    const startBtn = document.getElementById('mic-container');
     const endBtn = document.getElementById('end-call');
     const status = document.getElementById('voice-status');
 
@@ -278,36 +278,55 @@
 
     startBtn.addEventListener('click', async () => {
       try {
+        console.log('Starting voice call with config:', { publicKey: config.publicKey, agentId: config.agentId });
+        
+        // Validate required config
+        if (!config.publicKey) {
+          throw new Error('API key is required. Please check your data-public-key attribute.');
+        }
+        
+        if (!config.agentId) {
+          throw new Error('Agent ID is required. Please check your data-agent-id attribute.');
+        }
+
         const RetellWebClient = await loadVoiceSDK();
         webClient = new RetellWebClient();
 
         webClient.on('call_started', () => {
+          console.log('Voice call started successfully');
           status.textContent = 'Call connected. Start speaking!';
           startBtn.style.display = 'none';
           endBtn.style.display = 'inline-block';
+          button.classList.add('voice-widget-button-active');
         });
 
         webClient.on('call_ended', () => {
+          console.log('Voice call ended');
           status.textContent = 'Call ended. Click start to begin new conversation.';
           startBtn.style.display = 'inline-block';
           endBtn.style.display = 'none';
+          button.classList.remove('voice-widget-button-active');
         });
 
         webClient.on('error', (error) => {
+          console.error('Voice call error:', error);
           status.textContent = 'Error: ' + error.message;
           startBtn.style.display = 'inline-block';
           endBtn.style.display = 'none';
+          button.classList.remove('voice-widget-button-active');
         });
 
         status.textContent = 'Connecting...';
         
-        // Create web call
+        // Create web call with BOTH api_key and agent_id
+        console.log('Making API call to create web call...');
         const response = await fetch('https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1/create-retell-web-call', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            api_key: config.publicKey,  // Now sending the API key!
             agent_id: config.agentId
           })
         });
@@ -315,8 +334,11 @@
         const data = await response.json();
         
         if (!response.ok) {
+          console.error('API Error:', response.status, data);
           throw new Error(data.error || 'Failed to start call');
         }
+
+        console.log('Web call created successfully:', data);
 
         await webClient.startCall({
           accessToken: data.access_token,
@@ -327,6 +349,7 @@
       } catch (error) {
         console.error('Voice call error:', error);
         status.textContent = 'Error starting call: ' + error.message;
+        button.classList.remove('voice-widget-button-active');
       }
     });
 
