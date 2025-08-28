@@ -17,29 +17,28 @@ const WidgetGenerator = () => {
     publicKey: '',
     agentId: '',
     agentVersion: '',
-    title: 'Chat with us!',
+    title: 'Voice Assistant',
     logoUrl: '',
-    primaryColor: '#3B82F6',
-    secondaryColor: '#1E40AF',
+    primaryColor: '#6366F1',
+    secondaryColor: '#8B5CF6',
     widgetType: 'floating',
     position: 'bottom-right',
     customDomain: window.location.origin,
-    buttonText: 'Chat with AI',
-    welcomeMessage: 'Hi! How can I help you today?',
+    buttonText: 'Start a conversation',
+    welcomeMessage: 'Hi there, How can we help?',
     offlineMessage: 'We\'re currently offline. Please leave a message!'
   });
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [preview, setPreview] = useState(false);
   const generateEmbedCode = () => {
     const widgetUrl = `${config.customDomain}/widget.js`;
-    if (config.widgetType === 'floating') {
-      return `<!-- Bolo AI Voice Widget -->
+    return `<!-- AI Voice Widget -->
 <script
   id="bolo-voice-widget"
   src="${widgetUrl}"
-  type="module"
   data-public-key="${config.publicKey}"
   data-agent-id="${config.agentId}"
-  ${config.agentVersion ? `data-agent-version="${config.agentVersion}"` : ''}
   data-title="${config.title}"
   ${config.logoUrl ? `data-logo-url="${config.logoUrl}"` : ''}
   data-primary-color="${config.primaryColor}"
@@ -49,242 +48,6 @@ const WidgetGenerator = () => {
   data-welcome-message="${config.welcomeMessage}"
   data-offline-message="${config.offlineMessage}"
 ></script>`;
-    } else {
-      return `<!-- Bolo AI Voice Widget - Inline -->
-<div id="bolo-chat-container"></div>
-<script
-  id="bolo-voice-widget"
-  src="${widgetUrl}"
-  type="module"
-  data-public-key="${config.publicKey}"
-  data-agent-id="${config.agentId}"
-  ${config.agentVersion ? `data-agent-version="${config.agentVersion}"` : ''}
-  data-title="${config.title}"
-  ${config.logoUrl ? `data-logo-url="${config.logoUrl}"` : ''}
-  data-primary-color="${config.primaryColor}"
-  data-secondary-color="${config.secondaryColor}"
-  data-mode="inline"
-  data-container="bolo-chat-container"
-  data-welcome-message="${config.welcomeMessage}"
-  data-offline-message="${config.offlineMessage}"
-></script>`;
-    }
-  };
-  const generateWidgetJS = () => {
-    return `// Bolo AI Voice Widget - White Label Solution
-(function() {
-  'use strict';
-  
-  // Get configuration from script tag
-  const script = document.getElementById('bolo-voice-widget');
-  const config = {
-    publicKey: script.getAttribute('data-public-key'),
-    agentId: script.getAttribute('data-agent-id'),
-    agentVersion: script.getAttribute('data-agent-version') || 'latest',
-    title: script.getAttribute('data-title') || 'Chat with us!',
-    logoUrl: script.getAttribute('data-logo-url'),
-    primaryColor: script.getAttribute('data-primary-color') || '#3B82F6',
-    secondaryColor: script.getAttribute('data-secondary-color') || '#1E40AF',
-    position: script.getAttribute('data-position') || 'bottom-right',
-    mode: script.getAttribute('data-mode') || 'floating',
-    container: script.getAttribute('data-container'),
-    buttonText: script.getAttribute('data-button-text') || 'Chat with AI',
-    welcomeMessage: script.getAttribute('data-welcome-message') || 'Hi! How can I help you today?',
-    offlineMessage: script.getAttribute('data-offline-message') || 'We\\'re currently offline. Please leave a message!'
-  };
-
-  // Load Voice SDK dynamically
-  function loadVoiceSDK() {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://voice-api.example.com/voice-widget.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // Create widget styles
-  function createStyles() {
-    const styles = \`
-      .bolo-widget-button {
-        position: fixed;
-        \${config.position.includes('bottom') ? 'bottom: 20px;' : 'top: 20px;'}
-        \${config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, \${config.primaryColor}, \${config.secondaryColor});
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-      }
-      
-      .bolo-widget-button:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      }
-      
-      .bolo-chat-window {
-        position: fixed;
-        \${config.position.includes('bottom') ? 'bottom: 90px;' : 'top: 90px;'}
-        \${config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
-        width: 350px;
-        height: 500px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        z-index: 10001;
-        display: none;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      
-      .bolo-chat-header {
-        background: linear-gradient(135deg, \${config.primaryColor}, \${config.secondaryColor});
-        color: white;
-        padding: 16px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      
-      .bolo-chat-content {
-        flex: 1;
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        color: #666;
-      }
-      
-      .bolo-voice-button {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, \${config.primaryColor}, \${config.secondaryColor});
-        border: none;
-        color: white;
-        font-size: 32px;
-        cursor: pointer;
-        margin: 20px 0;
-        transition: all 0.3s ease;
-      }
-      
-      .bolo-voice-button:hover {
-        transform: scale(1.05);
-      }
-      
-      .bolo-close-button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-      }
-    \`;
-    
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
-  }
-
-  // Create widget HTML
-  function createWidget() {
-    if (config.mode === 'inline') {
-      const container = document.getElementById(config.container);
-      if (container) {
-        container.innerHTML = \`
-          <div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; max-width: 400px;">
-            <div class="bolo-chat-header">
-              <span>\${config.title}</span>
-            </div>
-            <div class="bolo-chat-content">
-              <div>🎤</div>
-              <button class="bolo-voice-button" onclick="startVoiceChat()">🎙️</button>
-              <p>\${config.welcomeMessage}</p>
-            </div>
-          </div>
-        \`;
-      }
-    } else {
-      // Floating widget
-      const button = document.createElement('button');
-      button.className = 'bolo-widget-button';
-      button.innerHTML = '🎤';
-      button.onclick = toggleChat;
-      
-      const chatWindow = document.createElement('div');
-      chatWindow.className = 'bolo-chat-window';
-      chatWindow.id = 'bolo-chat-window';
-      chatWindow.innerHTML = \`
-        <div class="bolo-chat-header">
-          <span>\${config.title}</span>
-          <button class="bolo-close-button" onclick="toggleChat()">×</button>
-        </div>
-        <div class="bolo-chat-content">
-          <div style="font-size: 48px; margin-bottom: 16px;">🎤</div>
-          <button class="bolo-voice-button" onclick="startVoiceChat()">🎙️</button>
-          <p>\${config.welcomeMessage}</p>
-          <small style="margin-top: 16px; opacity: 0.7;">Click the microphone to start talking</small>
-        </div>
-      \`;
-      
-      document.body.appendChild(button);
-      document.body.appendChild(chatWindow);
-    }
-  }
-
-  // Toggle chat window
-  window.toggleChat = function() {
-    const chatWindow = document.getElementById('bolo-chat-window');
-    if (chatWindow) {
-      chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
-    }
-  };
-
-  // Start voice chat using Retell
-  window.startVoiceChat = async function() {
-    try {
-      // Here we would integrate with Retell's actual API
-      // For now, we'll use the existing Retell widget functionality
-      const retellScript = document.createElement('script');
-      retellScript.src = 'https://dashboard.retellai.com/retell-widget.js';
-      retellScript.setAttribute('data-public-key', config.publicKey);
-      retellScript.setAttribute('data-agent-id', config.agentId);
-      if (config.agentVersion !== 'latest') {
-        retellScript.setAttribute('data-agent-version', config.agentVersion);
-      }
-      document.head.appendChild(retellScript);
-    } catch (error) {
-      console.error('Error starting voice chat:', error);
-      alert('Unable to start voice chat. Please try again.');
-    }
-  };
-
-  // Initialize widget
-  function init() {
-    createStyles();
-    createWidget();
-  }
-
-  // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();`;
   };
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
@@ -378,7 +141,33 @@ const WidgetGenerator = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="logoUrl">Logo URL (Optional)</Label>
+                      <Label htmlFor="logoFile">Logo Upload</Label>
+                      <Input 
+                        id="logoFile" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setLogoFile(file);
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              setConfig({
+                                ...config,
+                                logoUrl: e.target?.result as string
+                              });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Upload your brand logo (PNG, JPG, SVG)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="logoUrl">Or Logo URL</Label>
                       <Input id="logoUrl" placeholder="https://your-domain.com/logo.png" value={config.logoUrl} onChange={e => setConfig({
                       ...config,
                       logoUrl: e.target.value
@@ -506,64 +295,34 @@ const WidgetGenerator = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="embed" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="embed">Embed Code</TabsTrigger>
-                    <TabsTrigger value="widget">Widget.js</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="embed" className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>HTML Embed Code</Label>
-                      <div className="relative">
-                        <Textarea value={generateEmbedCode()} readOnly rows={8} className="font-mono text-sm" />
-                        <Button size="sm" variant="outline" className="absolute top-2 right-2" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")}>
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")} className="flex items-center gap-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>HTML Embed Code</Label>
+                    <div className="relative">
+                      <Textarea value={generateEmbedCode()} readOnly rows={10} className="font-mono text-sm" />
+                      <Button size="sm" variant="outline" className="absolute top-2 right-2" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")}>
                         <Copy className="w-4 h-4" />
-                        Copy Embed Code
                       </Button>
                     </div>
-                  </TabsContent>
+                  </div>
 
-                  <TabsContent value="widget" className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>widget.js File Content</Label>
-                      <div className="relative">
-                        <Textarea value={generateWidgetJS()} readOnly rows={8} className="font-mono text-sm" />
-                        <Button size="sm" variant="outline" className="absolute top-2 right-2" onClick={() => copyToClipboard(generateWidgetJS(), "Widget JS")}>
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")} className="flex items-center gap-2">
+                      <Copy className="w-4 h-4" />
+                      Copy Embed Code
+                    </Button>
+                  </div>
 
-                    <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => copyToClipboard(generateWidgetJS(), "Widget JS")} className="flex items-center gap-2">
-                        <Copy className="w-4 h-4" />
-                        Copy JS Code
-                      </Button>
-                      <Button variant="outline" onClick={() => downloadFile(generateWidgetJS(), 'widget.js')} className="flex items-center gap-2">
-                        <Download className="w-4 h-4" />
-                        Download widget.js
-                      </Button>
-                    </div>
-
-                    <div className="p-4 bg-muted rounded-lg">
-                      <h4 className="font-semibold mb-2">Setup Instructions:</h4>
-                      <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                        <li>Download the widget.js file and host it on your domain</li>
-                        <li>Update the script src in the embed code to point to your hosted file</li>
-                        <li>Provide the embed code to your customers</li>
-                        <li>Widget will appear with your branding (no mention of Retell)</li>
-                      </ol>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                  <div className="p-4 bg-muted rounded-lg">
+                    <h4 className="font-semibold mb-2">Setup Instructions:</h4>
+                    <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+                      <li>Widget is hosted directly from your domain</li>
+                      <li>Copy the embed code and provide it to your customers</li>
+                      <li>Customers paste the code on their website</li>
+                      <li>Widget appears with your branding and Bolo's design</li>
+                    </ol>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
