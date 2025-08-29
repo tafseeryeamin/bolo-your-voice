@@ -55,7 +55,7 @@ const DeploymentSection = () => {
         </div>
         
         {/* Bento Box Grid */}
-        <div className="grid grid-cols-12 grid-rows-6 gap-4 h-[800px]">
+        <div className="grid grid-cols-12 grid-rows-6 gap-4 h-[800px] rounded-2xl bg-gray-950">
           {/* Large feature - spans 6x4 */}
           <div className="col-span-6 row-span-4 group relative animate-fade-in" style={{
           animationDelay: features[0].delay
@@ -120,9 +120,9 @@ const DeploymentSection = () => {
                 <div className="flex items-center gap-4 h-full">
                   <div className="p-4 rounded-xl bg-primary/20 backdrop-blur-sm">
                     {(() => {
-                      const IconComponent = features[index].icon;
-                      return <IconComponent className="w-8 h-8 text-white" />;
-                    })()}
+                  const IconComponent = features[index].icon;
+                  return <IconComponent className="w-8 h-8 text-white" />;
+                })()}
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-white mb-3">
@@ -150,9 +150,9 @@ const DeploymentSection = () => {
             <div className="relative h-full p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-500 hover:bg-white/10 hover:scale-105">
               <div className="p-3 rounded-xl bg-primary/20 backdrop-blur-sm w-fit mb-4">
                 {(() => {
-                  const IconComponent = features[5].icon;
-                  return <IconComponent className="w-6 h-6 text-white" />;
-                })()}
+                const IconComponent = features[5].icon;
+                return <IconComponent className="w-6 h-6 text-white" />;
+              })()}
               </div>
               <h3 className="text-lg font-semibold text-white mb-3">
                 {features[5].title}
