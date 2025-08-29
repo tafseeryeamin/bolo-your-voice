@@ -43,7 +43,7 @@ const DeploymentSection = () => {
     size: "small",
     mockup: "api"
   }];
-  return <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-primary/10">
+  return <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-primary/10 bg-[#14eba1]/[0.34]">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -55,7 +55,7 @@ const DeploymentSection = () => {
         </div>
         
         {/* Bento Box Grid */}
-        <div className="grid grid-cols-12 grid-rows-6 gap-4 h-[800px] rounded-2xl bg-gray-950">
+        <div className="grid grid-cols-12 grid-rows-6 gap-4 h-[800px] rounded-2xl bg-[#684fb5]/15">
           {/* Large feature - spans 6x4 */}
           <div className="col-span-6 row-span-4 group relative animate-fade-in" style={{
           animationDelay: features[0].delay
