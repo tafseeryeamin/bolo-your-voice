@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity, Bell, Check } from "lucide-react";
+import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity, Bell, Check, Code } from "lucide-react";
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -288,7 +288,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="notifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="notifications" className="relative">
               Notifications
               {notifications.filter(n => !n.read).length > 0 && (
@@ -299,6 +299,7 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="agents">Agents</TabsTrigger>
+            <TabsTrigger value="widgets">Widgets</TabsTrigger>
             <TabsTrigger value="activity">Activity Logs</TabsTrigger>
             <TabsTrigger value="create-user">Create User</TabsTrigger>
           </TabsList>
@@ -483,6 +484,31 @@ const Admin = () => {
                     ))}
                   </TableBody>
                 </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="widgets" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Widget Management
+                </CardTitle>
+                <CardDescription>
+                  View and manage all voice widgets created by users
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={() => navigate('/admin/widgets')}
+                    className="flex items-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View All Widgets
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

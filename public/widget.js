@@ -87,13 +87,23 @@
       justify-content: center;
     `;
 
-    // Create animated mic icon (Bolo style)
+    // Create Bolo "B" icon as default
     const micIcon = document.createElement('div');
     micIcon.innerHTML = `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style="transition: all 0.3s ease;">
-        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-      </svg>
+      <div style="
+        width: 32px; 
+        height: 32px; 
+        background: rgba(255,255,255,0.2); 
+        border-radius: 8px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: bold;
+        font-size: 18px;
+        color: white;
+        transition: all 0.3s ease;
+      ">B</div>
     `;
 
     // Add pulsing animation for when talking

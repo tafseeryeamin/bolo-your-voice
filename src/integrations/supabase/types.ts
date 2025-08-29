@@ -188,6 +188,60 @@ export type Database = {
         }
         Relationships: []
       }
+      widgets: {
+        Row: {
+          agent_id: string
+          button_text: string
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          offline_message: string
+          position: string
+          primary_color: string
+          public_key: string
+          secondary_color: string
+          title: string
+          updated_at: string
+          user_id: string
+          welcome_message: string
+        }
+        Insert: {
+          agent_id: string
+          button_text?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          offline_message?: string
+          position?: string
+          primary_color?: string
+          public_key: string
+          secondary_color?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+          welcome_message?: string
+        }
+        Update: {
+          agent_id?: string
+          button_text?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          offline_message?: string
+          position?: string
+          primary_color?: string
+          public_key?: string
+          secondary_color?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          welcome_message?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
