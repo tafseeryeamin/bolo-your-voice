@@ -178,49 +178,37 @@ const HowItWorksSection = () => {
                       </TooltipContent>
                     </Tooltip>
 
-                    {/* Animated Dotted Line */}
+                    {/* Descriptive Transition */}
                     {index < flowSteps.length - 1 && (
                       <div className="flex-1 relative">
                         <motion.div 
-                          className="relative h-1"
-                          style={{
-                            background: `linear-gradient(90deg, transparent 0%, ${
-                              useTransform(progressSteps[index], [0, 1], ['transparent', 'hsl(var(--primary))'])
-                            } 50%, transparent 100%)`
-                          }}
+                          className="flex items-center justify-center px-8"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: index * 0.2 + 0.5 }}
                         >
-                          {/* Dotted line */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            {Array.from({ length: 20 }).map((_, dotIndex) => (
-                              <motion.div
-                                key={dotIndex}
-                                className="w-2 h-2 rounded-full mx-1"
-                                style={{
-                                  backgroundColor: useTransform(
-                                    progressSteps[index],
-                                    [0, dotIndex / 20, (dotIndex + 1) / 20, 1],
-                                    ['hsl(var(--muted))', 'hsl(var(--muted))', 'hsl(var(--primary))', 'hsl(var(--primary))']
-                                  )
-                                }}
-                                animate={{
-                                  scale: [1, 1.2, 1],
-                                  opacity: [0.5, 1, 0.5]
-                                }}
-                                transition={{
-                                  duration: 2,
-                                  delay: dotIndex * 0.1,
-                                  repeat: Infinity,
-                                  repeatType: "reverse"
-                                }}
-                              />
-                            ))}
+                          <div className="text-center bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/30 shadow-sm">
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                              className="mb-2 flex justify-center"
+                            >
+                              <Zap className="w-5 h-5 text-primary" />
+                            </motion.div>
+                            <p className="text-sm text-muted-foreground font-medium">
+                              {index === 0 && "Instant connection established"}
+                              {index === 1 && "AI analyzes visitor intent"}
+                              {index === 2 && "Personalized engagement begins"}
+                              {index === 3 && "Lead nurturing activated"}
+                            </p>
                           </div>
                         </motion.div>
 
                         {/* Arrow */}
                         <motion.div
-                          className="absolute right-0 top-1/2 transform -translate-y-1/2"
-                          animate={{ x: [0, 5, 0] }}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                          animate={{ y: [0, -5, 0] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
                         >
                           <ArrowDown className="w-6 h-6 text-primary rotate-90" />
