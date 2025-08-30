@@ -1,18 +1,26 @@
-import { motion } from "framer-motion";
-import { User, MessageCircle, Calendar, HelpCircle, Headphones, ShoppingCart, Mail, Bell } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { User, MessageCircle, Calendar, HelpCircle, Headphones, ShoppingCart, Mail, Bell, ArrowDown, Zap, Target, Users } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const HowItWorksSection = () => {
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
+  const [activeStep, setActiveStep] = useState<number>(1);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 0.8", "end 0.2"]
+  });
 
   const flowSteps = [
     {
       id: 1,
       title: "Visitor Arrives",
       description: "Website visitor lands on your page looking for solutions",
-      icon: User,
+      icon: Users,
       tooltip: "Your potential customers discover your website through search, ads, or referrals",
+      color: "from-blue-400 to-blue-600",
       position: { x: 0, y: 0 }
     },
     {
@@ -21,19 +29,21 @@ const HowItWorksSection = () => {
       description: "Visitor clicks the AI chat button",
       icon: MessageCircle,
       tooltip: "One-click access to your AI Sales Assistant - no forms, no waiting",
-      position: { x: 200, y: 0 }
+      color: "from-green-400 to-green-600",
+      position: { x: 0, y: 200 }
     },
     {
       id: 3,
       title: "AI Offers Options",
       description: "AI presents 3 helpful pathways",
-      icon: HelpCircle,
+      icon: Target,
       tooltip: "Smart routing based on visitor intent and behavior patterns",
-      position: { x: 400, y: 0 },
+      color: "from-purple-400 to-purple-600",
+      position: { x: 0, y: 400 },
       options: [
-        { icon: Calendar, label: "Book Appointment", color: "text-blue-500" },
-        { icon: HelpCircle, label: "Get Answers", color: "text-green-500" },
-        { icon: ShoppingCart, label: "Buy Now", color: "text-purple-500" }
+        { icon: Calendar, label: "Book Appointment", color: "text-blue-500", bgColor: "bg-blue-50" },
+        { icon: HelpCircle, label: "Get Answers", color: "text-green-500", bgColor: "bg-green-50" },
+        { icon: ShoppingCart, label: "Buy Now", color: "text-purple-500", bgColor: "bg-purple-50" }
       ]
     },
     {
@@ -42,7 +52,8 @@ const HowItWorksSection = () => {
       description: "AI captures email for follow-up",
       icon: Mail,
       tooltip: "Seamless contact collection with high conversion rates",
-      position: { x: 600, y: 0 }
+      color: "from-orange-400 to-orange-600",
+      position: { x: 0, y: 600 }
     },
     {
       id: 5,
@@ -50,19 +61,22 @@ const HowItWorksSection = () => {
       description: "Automated reminders & nurturing",
       icon: Bell,
       tooltip: "Intelligent follow-up sequences to convert leads into customers",
-      position: { x: 800, y: 0 }
+      color: "from-pink-400 to-pink-600",
+      position: { x: 0, y: 800 }
     }
   ];
 
-  const arrows = [
-    { from: 0, to: 1, delay: 0.5 },
-    { from: 1, to: 2, delay: 1.0 },
-    { from: 2, to: 3, delay: 1.5 },
-    { from: 3, to: 4, delay: 2.0 }
-  ];
+  // Transform scroll progress to step activation
+  const step1Progress = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
+  const step2Progress = useTransform(scrollYProgress, [0.2, 0.4], [0, 1]);
+  const step3Progress = useTransform(scrollYProgress, [0.4, 0.6], [0, 1]);
+  const step4Progress = useTransform(scrollYProgress, [0.6, 0.8], [0, 1]);
+  const step5Progress = useTransform(scrollYProgress, [0.8, 1], [0, 1]);
+
+  const progressSteps = [step1Progress, step2Progress, step3Progress, step4Progress, step5Progress];
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-background to-secondary/10 overflow-hidden">
+    <section ref={sectionRef} className="py-20 px-4 bg-gradient-to-b from-background to-secondary/10 overflow-hidden min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -81,98 +95,138 @@ const HowItWorksSection = () => {
           </p>
         </motion.div>
 
-        {/* Flow Diagram */}
+        {/* Interactive Flow Diagram */}
         <TooltipProvider>
-          <div className="relative max-w-6xl mx-auto">
-            {/* Flow Steps */}
-            <div className="flex justify-between items-start relative">
+          <div className="relative max-w-4xl mx-auto">
+            {/* Vertical Flow */}
+            <div className="relative">
               {flowSteps.map((step, index) => (
                 <motion.div
                   key={step.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                  className="flex flex-col items-center relative z-10"
-                  onMouseEnter={() => setHoveredStep(step.id)}
-                  onMouseLeave={() => setHoveredStep(null)}
+                  className="relative mb-32 last:mb-0"
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
                 >
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`
-                          relative bg-card rounded-2xl p-6 shadow-lg border border-border/50
-                          cursor-pointer transition-all duration-300 w-48 h-56
-                          ${hoveredStep === step.id ? 'shadow-xl border-primary/50 bg-primary/5' : ''}
-                        `}
-                      >
-                        {/* Step Number */}
-                        <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                          {step.id}
-                        </div>
-
-                        {/* Icon */}
-                        <div className="mb-4 flex justify-center">
-                          <div className={`p-3 rounded-xl ${hoveredStep === step.id ? 'bg-primary/10' : 'bg-secondary/50'} transition-colors`}>
-                            <step.icon className={`w-8 h-8 ${hoveredStep === step.id ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div className={`flex items-center gap-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+                    {/* Step Card */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <motion.div
+                          whileHover={{ scale: 1.02, y: -5 }}
+                          onMouseEnter={() => setHoveredStep(step.id)}
+                          onMouseLeave={() => setHoveredStep(null)}
+                          className={`
+                            relative bg-card rounded-3xl p-8 shadow-xl border border-border/50
+                            cursor-pointer transition-all duration-500 w-80 h-64
+                            bg-gradient-to-br ${step.color} backdrop-blur-sm
+                            ${hoveredStep === step.id ? 'shadow-2xl border-white/30 bg-opacity-90' : 'bg-opacity-10'}
+                          `}
+                        >
+                          {/* Step Number */}
+                          <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                            {step.id}
                           </div>
-                        </div>
 
-                        {/* Content */}
-                        <div className="text-center">
-                          <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-                        </div>
+                          {/* Icon */}
+                          <div className="mb-6 flex justify-center">
+                            <motion.div 
+                              className={`p-4 rounded-2xl backdrop-blur-sm border border-white/20 ${
+                                hoveredStep === step.id ? 'bg-white/20 scale-110' : 'bg-white/10'
+                              } transition-all duration-300`}
+                              whileHover={{ rotate: [0, -10, 10, 0] }}
+                            >
+                              <step.icon className="w-10 h-10 text-white drop-shadow-lg" />
+                            </motion.div>
+                          </div>
 
-                        {/* Options for step 3 */}
-                        {step.options && hoveredStep === step.id && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 bg-popover border rounded-lg p-3 shadow-lg z-20 w-56"
-                          >
-                            {step.options.map((option, idx) => (
-                              <div key={idx} className="flex items-center gap-2 py-1">
-                                <option.icon className={`w-4 h-4 ${option.color}`} />
-                                <span className="text-sm">{option.label}</span>
-                              </div>
+                          {/* Content */}
+                          <div className="text-center text-white">
+                            <h3 className="font-bold text-2xl mb-3 drop-shadow-md">{step.title}</h3>
+                            <p className="text-white/90 leading-relaxed drop-shadow-sm">{step.description}</p>
+                          </div>
+
+                          {/* Interactive Options for step 3 */}
+                          {step.options && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ 
+                                opacity: hoveredStep === step.id ? 1 : 0, 
+                                scale: hoveredStep === step.id ? 1 : 0.8 
+                              }}
+                              className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-3"
+                            >
+                              {step.options.map((option, idx) => (
+                                <motion.div
+                                  key={idx}
+                                  initial={{ x: -20 }}
+                                  animate={{ x: hoveredStep === step.id ? 0 : -20 }}
+                                  transition={{ delay: idx * 0.1 }}
+                                  className={`flex items-center gap-3 ${option.bgColor} p-3 rounded-xl shadow-lg border border-white/20 backdrop-blur-sm min-w-48`}
+                                >
+                                  <option.icon className={`w-5 h-5 ${option.color}`} />
+                                  <span className="text-sm font-medium">{option.label}</span>
+                                </motion.div>
+                              ))}
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      </TooltipTrigger>
+                      <TooltipContent side={index % 2 === 0 ? "right" : "left"}>
+                        <p>{step.tooltip}</p>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    {/* Animated Dotted Line */}
+                    {index < flowSteps.length - 1 && (
+                      <div className="flex-1 relative">
+                        <motion.div 
+                          className="relative h-1"
+                          style={{
+                            background: `linear-gradient(90deg, transparent 0%, ${
+                              useTransform(progressSteps[index], [0, 1], ['transparent', 'hsl(var(--primary))'])
+                            } 50%, transparent 100%)`
+                          }}
+                        >
+                          {/* Dotted line */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {Array.from({ length: 20 }).map((_, dotIndex) => (
+                              <motion.div
+                                key={dotIndex}
+                                className="w-2 h-2 rounded-full mx-1"
+                                style={{
+                                  backgroundColor: useTransform(
+                                    progressSteps[index],
+                                    [0, dotIndex / 20, (dotIndex + 1) / 20, 1],
+                                    ['hsl(var(--muted))', 'hsl(var(--muted))', 'hsl(var(--primary))', 'hsl(var(--primary))']
+                                  )
+                                }}
+                                animate={{
+                                  scale: [1, 1.2, 1],
+                                  opacity: [0.5, 1, 0.5]
+                                }}
+                                transition={{
+                                  duration: 2,
+                                  delay: dotIndex * 0.1,
+                                  repeat: Infinity,
+                                  repeatType: "reverse"
+                                }}
+                              />
                             ))}
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{step.tooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </motion.div>
-              ))}
-            </div>
+                          </div>
+                        </motion.div>
 
-            {/* Animated Arrows */}
-            <div className="absolute top-20 left-0 w-full h-2 flex items-center justify-between px-24">
-              {arrows.map((arrow, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scaleX: 0, opacity: 0 }}
-                  whileInView={{ scaleX: 1, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: arrow.delay }}
-                  className="flex-1 relative mx-4"
-                  style={{ originX: 0 }}
-                >
-                  <div className="h-0.5 bg-gradient-to-r from-primary/50 to-primary relative">
-                    <motion.div
-                      initial={{ x: -10, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: arrow.delay + 0.3 }}
-                      className="absolute -right-1 top-1/2 transform -translate-y-1/2"
-                    >
-                      <div className="w-0 h-0 border-l-[6px] border-l-primary border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent" />
-                    </motion.div>
+                        {/* Arrow */}
+                        <motion.div
+                          className="absolute right-0 top-1/2 transform -translate-y-1/2"
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <ArrowDown className="w-6 h-6 text-primary rotate-90" />
+                        </motion.div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -192,9 +246,9 @@ const HowItWorksSection = () => {
             Ready to capture more leads and boost your conversion rates?
           </p>
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-shadow"
+            className="px-8 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Start Your Free Trial
           </motion.button>
