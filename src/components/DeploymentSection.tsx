@@ -43,6 +43,21 @@ const DeploymentSection = () => {
     size: "small",
     mockup: "api"
   }];
-  return;
+  return (
+    <section className="py-20 px-4 bg-gradient-to-b from-background to-secondary/10">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-16">Deploy Anywhere</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <div key={index} className="text-center">
+              <feature.icon className="w-12 h-12 mx-auto mb-4 text-primary" />
+              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+              <p className="text-muted-foreground">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 };
 export default DeploymentSection;
