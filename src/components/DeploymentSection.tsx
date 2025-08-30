@@ -48,7 +48,7 @@ const DeploymentSection = () => {
         <h2 className="text-3xl font-bold text-center mb-16">Deploy Anywhere</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => <div key={index} className="text-center">
-              <feature.icon className="w-12 h-12 mx-auto mb-4 text-primary bg-teal-200" />
+              <feature.icon className="w-12 h-12 mx-auto mb-4 text-primary bg-gray-300" />
               <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
               <p className="text-muted-foreground">{feature.description}</p>
             </div>)}
