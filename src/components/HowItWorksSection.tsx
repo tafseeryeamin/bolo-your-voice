@@ -76,7 +76,7 @@ const HowItWorksSection = () => {
   const progressSteps = [step1Progress, step2Progress, step3Progress, step4Progress, step5Progress];
 
   return (
-    <section ref={sectionRef} className="py-20 px-4 bg-gradient-to-b from-background to-secondary/10 overflow-hidden min-h-screen">
+    <section ref={sectionRef} className="py-20 px-4 bg-gradient-to-b from-background to-background/50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -103,7 +103,7 @@ const HowItWorksSection = () => {
               {flowSteps.map((step, index) => (
                 <motion.div
                   key={step.id}
-                  className="relative mb-32 last:mb-0"
+                  className="relative mb-20 last:mb-0"
                   initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -118,33 +118,32 @@ const HowItWorksSection = () => {
                           onMouseEnter={() => setHoveredStep(step.id)}
                           onMouseLeave={() => setHoveredStep(null)}
                           className={`
-                            relative bg-card rounded-3xl p-8 shadow-xl border border-border/50
-                            cursor-pointer transition-all duration-500 w-80 h-64
-                            bg-gradient-to-br ${step.color} backdrop-blur-sm
-                            ${hoveredStep === step.id ? 'shadow-2xl border-white/30 bg-opacity-90' : 'bg-opacity-10'}
+                            relative bg-card/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50
+                            cursor-pointer transition-all duration-500 w-80 h-56 hover:shadow-xl
+                            ${hoveredStep === step.id ? 'border-primary/50 bg-card' : ''}
                           `}
                         >
                           {/* Step Number */}
-                          <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                          <div className="absolute -top-3 -left-3 w-10 h-10 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
                             {step.id}
                           </div>
 
                           {/* Icon */}
-                          <div className="mb-6 flex justify-center">
+                          <div className="mb-4 flex justify-center">
                             <motion.div 
-                              className={`p-4 rounded-2xl backdrop-blur-sm border border-white/20 ${
-                                hoveredStep === step.id ? 'bg-white/20 scale-110' : 'bg-white/10'
+                              className={`p-3 rounded-xl ${
+                                hoveredStep === step.id ? 'bg-primary/10 scale-110' : 'bg-secondary/50'
                               } transition-all duration-300`}
                               whileHover={{ rotate: [0, -10, 10, 0] }}
                             >
-                              <step.icon className="w-10 h-10 text-white drop-shadow-lg" />
+                              <step.icon className={`w-8 h-8 ${hoveredStep === step.id ? 'text-primary' : 'text-muted-foreground'}`} />
                             </motion.div>
                           </div>
 
                           {/* Content */}
-                          <div className="text-center text-white">
-                            <h3 className="font-bold text-2xl mb-3 drop-shadow-md">{step.title}</h3>
-                            <p className="text-white/90 leading-relaxed drop-shadow-sm">{step.description}</p>
+                          <div className="text-center">
+                            <h3 className="font-semibold text-xl mb-2">{step.title}</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                           </div>
 
                           {/* Interactive Options for step 3 */}
@@ -163,7 +162,7 @@ const HowItWorksSection = () => {
                                   initial={{ x: -20 }}
                                   animate={{ x: hoveredStep === step.id ? 0 : -20 }}
                                   transition={{ delay: idx * 0.1 }}
-                                  className={`flex items-center gap-3 ${option.bgColor} p-3 rounded-xl shadow-lg border border-white/20 backdrop-blur-sm min-w-48`}
+                                  className="flex items-center gap-3 bg-card p-3 rounded-xl shadow-lg border border-border/50 backdrop-blur-sm min-w-48"
                                 >
                                   <option.icon className={`w-5 h-5 ${option.color}`} />
                                   <span className="text-sm font-medium">{option.label}</span>
