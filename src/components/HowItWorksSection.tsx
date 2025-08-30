@@ -27,51 +27,7 @@ const HowItWorksSection = () => {
     delay: "0.6s"
   }];
   return <section className="py-20 px-4 bg-gradient-to-b from-background to-secondary/10 overflow-hidden">
-      <div className="container mx-auto max-w-7xl">
-        <div className="text-center mb-16 animate-fade-in">
-          <p className="text-sm text-white/70 mb-4 tracking-wide uppercase">Value</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-            How It Works
-          </h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, index) => {
-          const IconComponent = step.icon;
-          return <Card key={index} className="relative group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 bg-card/30 backdrop-blur-sm border-white/10 hover:border-primary/30 animate-fade-in hover:scale-105 hover:-translate-y-2" style={{
-            animationDelay: step.delay
-          }}>
-                <CardContent className="p-8 relative overflow-hidden">
-                  {/* Floating background gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[#10a3fe]/0" />
-                  
-                  {/* Icon with animation */}
-                  <div className="mb-6 relative">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors duration-300 group-hover:animate-pulse bg-slate-50">
-                      <IconComponent className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
-                    </div>
-                    <span className="text-6xl font-bold leading-none transition-colors duration-300 text-slate-50">
-                      {step.number}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-primary transition-colors duration-300">
-                    {step.title}
-                  </h3>
-                  
-                  <p className="text-sm text-white/80 mb-8 leading-relaxed group-hover:text-white transition-colors duration-300">
-                    {step.description}
-                  </p>
-                  
-                  {/* Animated progress bar */}
-                  <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-primary to-primary/60 w-0 group-hover:w-full transition-all duration-1000 ease-out" />
-                  </div>
-                </CardContent>
-              </Card>;
-        })}
-        </div>
-      </div>
+      
     </section>;
 };
 export default HowItWorksSection;
