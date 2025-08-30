@@ -250,17 +250,8 @@ const HowItWorksSection = () => {
         duration: 0.6,
         delay: 0.5
       }} className="text-center mt-20">
-          <p className="text-lg text-muted-foreground mb-6">
-            Ready to capture more leads and boost your conversion rates?
-          </p>
-          <motion.button whileHover={{
-          scale: 1.05,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
-        }} whileTap={{
-          scale: 0.95
-        }} className="px-8 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-            Start Your Free Trial
-          </motion.button>
+          
+          
         </motion.div>
       </div>
     </section>;
