@@ -205,7 +205,6 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          api_key: config.publicKey,
           agent_id: config.agentId
         }),
       });
