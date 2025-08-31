@@ -203,7 +203,6 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.publicKey}`,
         },
         body: JSON.stringify({
           api_key: config.publicKey,

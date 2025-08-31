@@ -157,14 +157,6 @@ const SignIn = () => {
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-primary/20" />
       
-      {/* Back to Home Button */}
-      <button 
-        onClick={() => navigate("/")}
-        className="absolute top-6 left-6 z-20 flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span>Back to Home</span>
-      </button>
       
       {/* Content */}
       <div className="relative z-10 w-full max-w-md px-6">
