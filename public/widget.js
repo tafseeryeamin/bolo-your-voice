@@ -211,6 +211,12 @@
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Bolo Voice Widget: API error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText,
+          agentId: config.agentId
+        });
         throw new Error(`Failed to create web call: ${response.status} - ${errorText}`);
       }
 
@@ -218,7 +224,11 @@
       console.log('Bolo Voice Widget: Web call created successfully', data);
       return data;
     } catch (error) {
-      console.error('Bolo Voice Widget: Error creating web call:', error);
+      console.error('Bolo Voice Widget: Error creating web call:', {
+        error: error.message,
+        agentId: config.agentId,
+        stack: error.stack
+      });
       throw error;
     }
   }
