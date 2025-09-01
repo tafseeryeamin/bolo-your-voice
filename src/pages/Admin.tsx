@@ -9,26 +9,59 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity, Bell, Check, Code } from "lucide-react";
+import { LogOut, UserPlus, Users, Eye, Shield, Bot, Activity, Bell, Check, Code, Save, Download } from "lucide-react";
+
+interface Widget {
+  id: string;
+  user_id: string;
+  agent_id: string;
+  public_key: string;
+  title: string;
+  logo_url?: string;
+  primary_color: string;
+  secondary_color: string;
+  position: string;
+  button_text: string;
+  welcome_message: string;
+  offline_message: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+  };
+}
+
 const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
+  const [widgets, setWidgets] = useState<Widget[]>([]);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [widgetStats, setWidgetStats] = useState({
+    total: 0,
+    active: 0,
+    inactive: 0
+  });
   
   const [roleUpdateLoading, setRoleUpdateLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
   useEffect(() => {
     checkAuth();
     fetchUsers();
     fetchAgents();
+    fetchWidgets();
     fetchActivityLogs();
     fetchNotifications();
   }, []);
+
   const checkAuth = async () => {
     const {
       data: {
@@ -39,6 +72,7 @@ const Admin = () => {
       navigate("/sign-in");
     }
   };
+
   const fetchUsers = async () => {
     try {
       // Fetch users from profiles table
@@ -108,6 +142,47 @@ const Admin = () => {
       setAgents(agentsWithProfiles);
     } catch (error) {
       console.error("Error fetching agents:", error);
+    }
+  };
+
+  const fetchWidgets = async () => {
+    try {
+      // Fetch widgets with user profiles
+      const { data: widgets, error: widgetsError } = await supabase
+        .from('widgets')
+        .select(`
+          *,
+          profiles:user_id (
+            email,
+            first_name,
+            last_name
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (widgetsError) {
+        console.error("Error fetching widgets:", widgetsError);
+        toast({
+          title: "Error fetching widgets",
+          description: widgetsError.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const widgetData = widgets || [];
+      setWidgets(widgetData);
+
+      // Calculate widget statistics
+      const stats = {
+        total: widgetData.length,
+        active: widgetData.filter(w => w.is_active).length,
+        inactive: widgetData.filter(w => !w.is_active).length
+      };
+      setWidgetStats(stats);
+
+    } catch (error) {
+      console.error("Error fetching widgets:", error);
     }
   };
 
@@ -191,6 +266,70 @@ const Admin = () => {
     }
   };
 
+  const toggleWidgetStatus = async (widgetId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('widgets')
+        .update({ is_active: !currentStatus, updated_at: new Date().toISOString() })
+        .eq('id', widgetId);
+
+      if (error) throw error;
+
+      // Refresh widgets list
+      fetchWidgets();
+      
+      toast({
+        title: "Success",
+        description: `Widget ${currentStatus ? 'deactivated' : 'activated'} successfully`,
+      });
+    } catch (error) {
+      console.error('Error updating widget:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update widget status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const saveWidgetData = async () => {
+    try {
+      // Create a backup of all widget data
+      const widgetBackup = {
+        timestamp: new Date().toISOString(),
+        widgets: widgets,
+        stats: widgetStats,
+        total_count: widgets.length
+      };
+
+      // You can save this to a file or send to an endpoint
+      const dataStr = JSON.stringify(widgetBackup, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `widget-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Widget data exported successfully",
+      });
+
+    } catch (error) {
+      console.error('Error saving widget data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save widget data",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -228,6 +367,7 @@ const Admin = () => {
       setLoading(false);
     }
   };
+
   const handleRoleChange = async (userId: string, newRole: "admin" | "moderator" | "user") => {
     setRoleUpdateLoading(userId);
     try {
@@ -266,12 +406,15 @@ const Admin = () => {
       setRoleUpdateLoading(null);
     }
   };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/sign-in");
   };
-  return <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+
+  return (
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
@@ -287,8 +430,51 @@ const Admin = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="notifications" className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{users.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Agents</CardTitle>
+              <Bot className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{agents.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Widgets</CardTitle>
+              <Code className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{widgetStats.active}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Widgets</CardTitle>
+              <Code className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{widgetStats.total}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="widgets" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="widgets">
+              Widgets ({widgetStats.total})
+            </TabsTrigger>
             <TabsTrigger value="notifications" className="relative">
               Notifications
               {notifications.filter(n => !n.read).length > 0 && (
@@ -299,10 +485,101 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="agents">Agents</TabsTrigger>
-            <TabsTrigger value="widgets">Widgets</TabsTrigger>
             <TabsTrigger value="activity">Activity Logs</TabsTrigger>
             <TabsTrigger value="create-user">Create User</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="widgets" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="w-5 h-5" />
+                      Widget Management
+                    </CardTitle>
+                    <CardDescription>
+                      Manage all voice widgets created by users. Active: {widgetStats.active}, Inactive: {widgetStats.inactive}
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={saveWidgetData} variant="outline" size="sm">
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Data
+                    </Button>
+                    <Button onClick={fetchWidgets} variant="outline" size="sm">
+                      Refresh
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {widgets.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No widgets found
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {widgets.map((widget) => (
+                      <Card key={widget.id} className="border-l-4" style={{ borderLeftColor: widget.primary_color }}>
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{widget.title}</CardTitle>
+                              <CardDescription className="space-y-1">
+                                <div>Owner: {widget.profiles?.email || 'Unknown'}</div>
+                                <div>Agent ID: {widget.agent_id}</div>
+                                <div>Created: {new Date(widget.created_at).toLocaleDateString()}</div>
+                              </CardDescription>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className={`px-2 py-1 rounded text-xs font-semibold ${
+                                widget.is_active 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {widget.is_active ? 'Active' : 'Inactive'}
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => toggleWidgetStatus(widget.id, widget.is_active)}
+                              >
+                                {widget.is_active ? 'Deactivate' : 'Activate'}
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <strong>Position:</strong> {widget.position}
+                            </div>
+                            <div>
+                              <strong>Button Text:</strong> {widget.button_text}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <strong>Colors:</strong>
+                              <span className="w-4 h-4 rounded border" style={{ backgroundColor: widget.primary_color }}></span>
+                              <span className="w-4 h-4 rounded border" style={{ backgroundColor: widget.secondary_color }}></span>
+                            </div>
+                          </div>
+                          <div className="mt-4 pt-4 border-t">
+                            <div className="text-xs text-muted-foreground">
+                              <strong>Welcome:</strong> {widget.welcome_message}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              <strong>Offline:</strong> {widget.offline_message}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
             <Card>
@@ -488,31 +765,6 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="widgets" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Code className="w-5 h-5" />
-                  Widget Management
-                </CardTitle>
-                <CardDescription>
-                  View and manage all voice widgets created by users
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center">
-                  <Button 
-                    onClick={() => navigate('/admin/widgets')}
-                    className="flex items-center gap-2"
-                  >
-                    <Eye className="w-4 h-4" />
-                    View All Widgets
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="activity" className="space-y-6">
             <Card>
               <CardHeader>
@@ -565,11 +817,27 @@ const Admin = () => {
                 <form onSubmit={handleCreateUser} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="new-email" className="text-foreground">Email</Label>
-                    <Input id="new-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter user email" required className="bg-input border-border text-foreground" />
+                    <Input 
+                      id="new-email" 
+                      type="email" 
+                      value={email} 
+                      onChange={e => setEmail(e.target.value)} 
+                      placeholder="Enter user email" 
+                      required 
+                      className="bg-input border-border text-foreground" 
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="new-password" className="text-foreground">Password</Label>
-                    <Input id="new-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter user password" required className="bg-input border-border text-foreground" />
+                    <Input 
+                      id="new-password" 
+                      type="password" 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                      placeholder="Enter user password" 
+                      required 
+                      className="bg-input border-border text-foreground" 
+                    />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading} variant="default">
                     {loading ? "Creating user..." : "Create User"}
@@ -580,6 +848,8 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Admin;
