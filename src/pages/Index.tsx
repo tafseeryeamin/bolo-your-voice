@@ -8,7 +8,7 @@ import VoiceCallButton from "@/components/VoiceCallButton";
 const Index = () => {
   return <div className="min-h-screen bg-background">
       <Header />
-      <main>
+      <main className="pt-20">
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
