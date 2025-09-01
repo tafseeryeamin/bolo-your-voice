@@ -25,8 +25,14 @@
   console.log('Bolo Voice Widget: Configuration loaded', config);
 
   // Validate required configuration
-  if (!config.publicKey || !config.agentId) {
-    console.error('Bolo Voice Widget: Missing required configuration (publicKey or agentId)');
+  if (!config.agentId) {
+    console.error('Bolo Voice Widget: Missing required configuration (agentId)');
+    return;
+  }
+
+  // Check HTTPS requirement
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    console.error('Bolo Voice Widget: HTTPS is required for microphone access');
     return;
   }
 
@@ -233,6 +239,39 @@
     }
   }
 
+  // Check microphone permissions
+  async function checkMicrophonePermission() {
+    try {
+      // Check if MediaDevices API is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Microphone access is not supported in this browser');
+      }
+
+      // Request microphone permission
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Stop the stream immediately - we just needed permission
+      stream.getTracks().forEach(track => track.stop());
+      
+      console.log('Bolo Voice Widget: Microphone permission granted');
+      return true;
+    } catch (error) {
+      console.error('Bolo Voice Widget: Microphone permission error:', error);
+      
+      if (error.name === 'NotAllowedError') {
+        alert('Microphone access is required for voice calls. Please allow microphone access and try again.');
+      } else if (error.name === 'NotFoundError') {
+        alert('No microphone found. Please connect a microphone and try again.');
+      } else if (error.name === 'NotSupportedError') {
+        alert('Microphone access is not supported in this browser. Please try a different browser.');
+      } else {
+        alert('Could not access microphone: ' + error.message);
+      }
+      
+      return false;
+    }
+  }
+
   // Start voice call
   async function startCall(pulseRing) {
     if (isConnecting || isConnected) {
@@ -248,6 +287,17 @@
       if (pulseRing) {
         pulseRing.style.opacity = '0.5';
         pulseRing.classList.add('pulse-active');
+      }
+
+      // Check microphone permission first
+      const hasPermission = await checkMicrophonePermission();
+      if (!hasPermission) {
+        isConnecting = false;
+        if (pulseRing) {
+          pulseRing.style.opacity = '0';
+          pulseRing.classList.remove('pulse-active');
+        }
+        return;
       }
 
       // Load SDK if not already loaded
@@ -292,7 +342,18 @@
           pulseRing.style.opacity = '0';
           pulseRing.classList.remove('pulse-active');
         }
-        alert('Failed to connect to voice service. Please try again.');
+        
+        // Provide specific error messages
+        let errorMessage = 'Failed to connect to voice service.';
+        if (error.message && error.message.includes('permission')) {
+          errorMessage = 'Microphone permission is required. Please allow access and try again.';
+        } else if (error.message && error.message.includes('network')) {
+          errorMessage = 'Network connection failed. Please check your internet and try again.';
+        } else if (error.message && error.message.includes('token')) {
+          errorMessage = 'Authentication failed. Please check your configuration.';
+        }
+        
+        alert(errorMessage + ' If the problem persists, please contact support.');
       });
 
       retellWebClient.on('update', (update) => {
@@ -311,7 +372,18 @@
         pulseRing.style.opacity = '0';
         pulseRing.classList.remove('pulse-active');
       }
-      alert('Failed to start voice call. Please check your configuration and try again.');
+      
+      // Provide specific error messages based on error type
+      let errorMessage = 'Failed to start voice call.';
+      if (error.message.includes('Failed to create web call')) {
+        errorMessage = 'Could not connect to voice service. Please check your agent configuration.';
+      } else if (error.message.includes('SDK')) {
+        errorMessage = 'Voice service is temporarily unavailable. Please try again in a moment.';
+      } else if (error.message.includes('access token')) {
+        errorMessage = 'Authentication failed. Please verify your configuration.';
+      }
+      
+      alert(errorMessage + ' If the problem persists, please contact support.');
     }
   }
 

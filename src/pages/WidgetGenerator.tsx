@@ -15,7 +15,6 @@ const WidgetGenerator = () => {
     toast
   } = useToast();
   const [config, setConfig] = useState({
-    publicKey: '',
     agentId: '',
     agentVersion: '',
     title: 'Voice Assistant',
@@ -40,7 +39,6 @@ const WidgetGenerator = () => {
 <script
   id="bolo-voice-widget"
   src="${widgetUrl}"
-  data-public-key="${config.publicKey}"
   data-agent-id="${config.agentId}"
   data-title="${config.title}"
   ${config.logoUrl ? `data-logo-url="${config.logoUrl}"` : ''}
@@ -59,75 +57,9 @@ const WidgetGenerator = () => {
       description: `${type} code has been copied to your clipboard.`
     });
   };
-  const handleSaveWidget = async () => {
-    setIsSaving(true);
-    
-    try {
-      // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to save widgets",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!config.publicKey || !config.agentId) {
-        toast({
-          title: "Missing required fields",
-          description: "Please fill in API Key and Agent ID",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Save widget configuration to database
-      const { data, error } = await supabase
-        .from('widgets')
-        .insert({
-          user_id: user.id,
-          agent_id: config.agentId,
-          public_key: config.publicKey,
-          title: config.title,
-          logo_url: config.logoUrl,
-          primary_color: config.primaryColor,
-          secondary_color: config.secondaryColor,
-          position: config.position,
-          button_text: config.buttonText,
-          welcome_message: config.welcomeMessage,
-          offline_message: config.offlineMessage,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      setIsWidgetSaved(true);
-
-      toast({
-        title: "Widget saved successfully!",
-        description: "Your widget configuration has been saved and is ready to use.",
-      });
-      
-      // Show success for 3 seconds, then allow re-saving
-      setTimeout(() => {
-        setIsWidgetSaved(false);
-      }, 3000);
-      
-    } catch (error) {
-      console.error('Error saving widget:', error);
-      toast({
-        title: "Error saving widget",
-        description: error.message || "Failed to save widget configuration",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
+  const handleDownloadConfig = () => {
+    const configJson = JSON.stringify(config, null, 2);
+    downloadFile(configJson, 'widget-config.json');
   };
 
   const downloadFile = (content: string, filename: string) => {
@@ -183,19 +115,14 @@ const WidgetGenerator = () => {
 
                   <TabsContent value="basic" className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="publicKey">Voice API Key</Label>
-                      <Input id="publicKey" placeholder="key_xxxxxxxxxxxxxxxxxxxxx" value={config.publicKey} onChange={e => setConfig({
-                      ...config,
-                      publicKey: e.target.value
-                    })} />
-                    </div>
-
-                    <div className="space-y-2">
                       <Label htmlFor="agentId">Agent ID</Label>
                       <Input id="agentId" placeholder="agent_xxxxxxxxxxxxxxxxxxx" value={config.agentId} onChange={e => setConfig({
                       ...config,
                       agentId: e.target.value
                     })} />
+                      <p className="text-sm text-muted-foreground">
+                        Your Retell AI agent ID (API key is configured securely on the server)
+                      </p>
                     </div>
 
                     <div className="space-y-2">
@@ -382,28 +309,11 @@ const WidgetGenerator = () => {
 
                   <div className="flex gap-2">
                     <Button 
-                      onClick={handleSaveWidget}
-                      disabled={isSaving || isWidgetSaved}
-                      className={`flex items-center gap-2 ${
-                        isWidgetSaved ? 'bg-green-600 hover:bg-green-700' : ''
-                      }`}
+                      onClick={handleDownloadConfig}
+                      className="flex items-center gap-2"
                     >
-                      {isSaving ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Saving...
-                        </>
-                      ) : isWidgetSaved ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          Saved!
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4" />
-                          Save Widget
-                        </>
-                      )}
+                      <Download className="w-4 h-4" />
+                      Download Config
                     </Button>
                     <Button variant="outline" onClick={() => copyToClipboard(generateEmbedCode(), "Embed")} className="flex items-center gap-2">
                       <Copy className="w-4 h-4" />
