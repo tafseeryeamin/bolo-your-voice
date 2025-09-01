@@ -2,9 +2,10 @@
   'use strict';
 
   // Configuration and initialization
-  const WIDGET_VERSION = '1.2.0';
+  const WIDGET_VERSION = '1.2.1';
   const API_BASE_URL = 'https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1';
   const RETELL_SDK_URL = 'https://cdn.jsdelivr.net/npm/retell-client-js-sdk@2.0.7/dist/web/index.js';
+  const STORAGE_KEY = 'bolo-voice-widget-state';
   
   // Find the script element (multiple fallback methods)
   function findScriptElement() {
@@ -49,7 +50,82 @@
     offlineMessage: script.getAttribute('data-offline-message') || 'We\'re currently offline. Please leave a message!',
     debug: script.getAttribute('data-debug') === 'true',
     reportErrors: script.getAttribute('data-report-errors') === 'true',
-    customApiUrl: script.getAttribute('data-api-url') // Allow custom API endpoint
+    customApiUrl: script.getAttribute('data-api-url'), // Allow custom API endpoint
+    persistState: script.getAttribute('data-persist-state') !== 'false', // Default to true
+    storageType: script.getAttribute('data-storage-type') || 'localStorage' // localStorage or sessionStorage
+  };
+
+  // Storage utility functions
+  const storage = {
+    isSupported() {
+      try {
+        const testKey = '__bolo_test__';
+        const storageObj = config.storageType === 'sessionStorage' ? window.sessionStorage : window.localStorage;
+        storageObj.setItem(testKey, 'test');
+        storageObj.removeItem(testKey);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+
+    save(data) {
+      if (!config.persistState || !this.isSupported()) return;
+      
+      try {
+        const storageObj = config.storageType === 'sessionStorage' ? window.sessionStorage : window.localStorage;
+        const existingData = this.load() || {};
+        const mergedData = { 
+          ...existingData, 
+          ...data, 
+          lastUpdated: new Date().toISOString(),
+          version: WIDGET_VERSION,
+          agentId: config.agentId
+        };
+        storageObj.setItem(STORAGE_KEY, JSON.stringify(mergedData));
+        debugLog('State saved:', mergedData);
+      } catch (e) {
+        debugLog('Failed to save state:', e);
+        reportError(e, { context: 'storage_save' });
+      }
+    },
+
+    load() {
+      if (!config.persistState || !this.isSupported()) return null;
+      
+      try {
+        const storageObj = config.storageType === 'sessionStorage' ? window.sessionStorage : window.localStorage;
+        const data = storageObj.getItem(STORAGE_KEY);
+        if (!data) return null;
+        
+        const parsed = JSON.parse(data);
+        // Validate that the stored data is for the same agent
+        if (parsed.agentId && parsed.agentId !== config.agentId) {
+          debugLog('Stored data is for different agent, clearing');
+          this.clear();
+          return null;
+        }
+        
+        debugLog('State loaded:', parsed);
+        return parsed;
+      } catch (e) {
+        debugLog('Failed to load state:', e);
+        reportError(e, { context: 'storage_load' });
+        return null;
+      }
+    },
+
+    clear() {
+      if (!this.isSupported()) return;
+      
+      try {
+        const storageObj = config.storageType === 'sessionStorage' ? window.sessionStorage : window.localStorage;
+        storageObj.removeItem(STORAGE_KEY);
+        debugLog('State cleared');
+      } catch (e) {
+        debugLog('Failed to clear state:', e);
+      }
+    }
   };
 
   // Debug logging function
@@ -158,11 +234,37 @@
     return;
   }
 
-  // Global state
+  // Global state with persistence support
   let isConnected = false;
   let isConnecting = false;
   let retellWebClient = null;
   let widgetElements = {};
+  let widgetState = {
+    position: config.position,
+    isMinimized: false,
+    callCount: 0,
+    lastCallTime: null,
+    userPreferences: {},
+    ...storage.load() // Load saved state
+  };
+
+  // Save state whenever it changes
+  function saveState() {
+    storage.save({
+      position: widgetState.position,
+      isMinimized: widgetState.isMinimized,
+      callCount: widgetState.callCount,
+      lastCallTime: widgetState.lastCallTime,
+      userPreferences: widgetState.userPreferences
+    });
+  }
+
+  // Update widget state
+  function updateWidgetState(updates) {
+    Object.assign(widgetState, updates);
+    saveState();
+    debugLog('Widget state updated:', widgetState);
+  }
 
   // Create external stylesheet to avoid CSP issues
   function createStylesheet() {
@@ -198,6 +300,16 @@
       .bolo-widget-button:hover {
         transform: scale(1.1) !important;
       }
+
+      .bolo-widget-minimized {
+        opacity: 0.7 !important;
+        transform: scale(0.8) !important;
+      }
+
+      .bolo-widget-dragging {
+        z-index: 10001 !important;
+        cursor: grabbing !important;
+      }
       
       @media (max-width: 768px) {
         #bolo-voice-widget-container {
@@ -209,6 +321,88 @@
     document.head.appendChild(style);
   }
 
+  // Make widget draggable
+  function makeDraggable(element, container) {
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    element.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+
+    // Touch events for mobile
+    element.addEventListener('touchstart', dragStart);
+    document.addEventListener('touchmove', drag);
+    document.addEventListener('touchend', dragEnd);
+
+    function dragStart(e) {
+      if (e.type === 'touchstart') {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+      } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+      }
+
+      if (e.target === element) {
+        isDragging = true;
+        container.classList.add('bolo-widget-dragging');
+      }
+    }
+
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        
+        if (e.type === 'touchmove') {
+          currentX = e.touches[0].clientX - initialX;
+          currentY = e.touches[0].clientY - initialY;
+        } else {
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+        }
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        // Keep widget within viewport bounds
+        const rect = container.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width;
+        const maxY = window.innerHeight - rect.height;
+        
+        currentX = Math.max(0, Math.min(maxX, currentX));
+        currentY = Math.max(0, Math.min(maxY, currentY));
+
+        container.style.transform = `translate(${currentX}px, ${currentY}px)`;
+        container.style.right = 'auto';
+        container.style.bottom = 'auto';
+        container.style.left = '0px';
+        container.style.top = '0px';
+      }
+    }
+
+    function dragEnd() {
+      if (isDragging) {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+        container.classList.remove('bolo-widget-dragging');
+        
+        // Save new position
+        updateWidgetState({
+          position: 'custom',
+          customX: currentX,
+          customY: currentY
+        });
+      }
+    }
+  }
+
   // Create widget container
   function createWidget() {
     debugLog('Creating widget...');
@@ -218,13 +412,36 @@
     
     const container = document.createElement('div');
     container.id = 'bolo-voice-widget-container';
+    
+    // Apply saved position
+    let positionStyle = '';
+    if (widgetState.position === 'custom' && widgetState.customX !== undefined && widgetState.customY !== undefined) {
+      positionStyle = `
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        transform: translate(${widgetState.customX}px, ${widgetState.customY}px);
+      `;
+    } else {
+      positionStyle = `
+        position: fixed;
+        ${config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
+        ${config.position.includes('top') ? 'top: 20px;' : 'bottom: 20px;'}
+      `;
+    }
+    
     container.style.cssText = `
-      position: fixed;
-      ${config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
-      ${config.position.includes('top') ? 'top: 20px;' : 'bottom: 20px;'}
+      ${positionStyle}
       z-index: 10000;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      user-select: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     `;
+
+    // Apply minimized state
+    if (widgetState.isMinimized) {
+      container.classList.add('bolo-widget-minimized');
+    }
 
     // Create floating button
     const button = document.createElement('button');
@@ -240,7 +457,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      cursor: grab;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: none;
@@ -248,6 +465,35 @@
       position: relative;
       overflow: hidden;
     `;
+
+    // Create context menu button
+    const contextButton = document.createElement('button');
+    contextButton.innerHTML = '⋯';
+    contextButton.style.cssText = `
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    `;
+
+    // Show/hide context button on hover
+    button.addEventListener('mouseenter', () => {
+      contextButton.style.display = 'flex';
+    });
+    
+    container.addEventListener('mouseleave', () => {
+      contextButton.style.display = 'none';
+    });
 
     // Create icon container
     const iconContainer = document.createElement('div');
@@ -311,16 +557,21 @@
     iconContainer.appendChild(iconElement);
     iconContainer.appendChild(pulseRing);
     button.appendChild(iconContainer);
+    button.appendChild(contextButton);
     container.appendChild(button);
     
     // Add to DOM
     document.body.appendChild(container);
 
     // Store references
-    widgetElements = { container, button, pulseRing, iconElement };
+    widgetElements = { container, button, pulseRing, iconElement, contextButton };
+
+    // Make widget draggable
+    makeDraggable(button, container);
 
     // Add event listeners
     button.addEventListener('click', handleButtonClick);
+    contextButton.addEventListener('click', handleContextMenu);
     
     // Add keyboard accessibility
     button.addEventListener('keydown', (e) => {
@@ -332,6 +583,117 @@
 
     debugLog('Widget created successfully');
     return widgetElements;
+  }
+
+  // Handle context menu
+  function handleContextMenu(e) {
+    e.stopPropagation();
+    
+    // Create simple context menu
+    const menu = document.createElement('div');
+    menu.style.cssText = `
+      position: fixed;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10002;
+      padding: 8px;
+      font-size: 14px;
+      min-width: 120px;
+    `;
+    
+    const buttonRect = widgetElements.button.getBoundingClientRect();
+    menu.style.left = `${buttonRect.right + 10}px`;
+    menu.style.top = `${buttonRect.top}px`;
+
+    // Menu items
+    const items = [
+      { text: widgetState.isMinimized ? 'Show' : 'Minimize', action: toggleMinimize },
+      { text: 'Reset Position', action: resetPosition },
+      { text: `Calls: ${widgetState.callCount}`, action: null },
+      { text: 'Clear Data', action: clearAllData }
+    ];
+
+    items.forEach(item => {
+      const menuItem = document.createElement('div');
+      menuItem.textContent = item.text;
+      menuItem.style.cssText = `
+        padding: 8px 12px;
+        cursor: ${item.action ? 'pointer' : 'default'};
+        border-radius: 4px;
+        ${item.action ? 'background: transparent;' : 'color: #666; font-size: 12px;'}
+      `;
+      
+      if (item.action) {
+        menuItem.addEventListener('mouseenter', () => {
+          menuItem.style.background = '#f0f0f0';
+        });
+        menuItem.addEventListener('mouseleave', () => {
+          menuItem.style.background = 'transparent';
+        });
+        menuItem.addEventListener('click', () => {
+          item.action();
+          document.body.removeChild(menu);
+        });
+      }
+      
+      menu.appendChild(menuItem);
+    });
+
+    document.body.appendChild(menu);
+
+    // Remove menu when clicking outside
+    setTimeout(() => {
+      document.addEventListener('click', function removeMenu() {
+        if (document.body.contains(menu)) {
+          document.body.removeChild(menu);
+        }
+        document.removeEventListener('click', removeMenu);
+      });
+    }, 100);
+  }
+
+  // Toggle minimize state
+  function toggleMinimize() {
+    widgetState.isMinimized = !widgetState.isMinimized;
+    saveState();
+    
+    if (widgetState.isMinimized) {
+      widgetElements.container.classList.add('bolo-widget-minimized');
+    } else {
+      widgetElements.container.classList.remove('bolo-widget-minimized');
+    }
+  }
+
+  // Reset widget position
+  function resetPosition() {
+    const container = widgetElements.container;
+    container.style.transform = '';
+    container.style.left = '';
+    container.style.top = '';
+    container.style.right = config.position.includes('right') ? '20px' : '';
+    container.style.bottom = config.position.includes('bottom') ? '20px' : '';
+    
+    updateWidgetState({
+      position: config.position,
+      customX: undefined,
+      customY: undefined
+    });
+  }
+
+  // Clear all saved data
+  function clearAllData() {
+    if (confirm('Clear all widget data? This will reset position, call count, and preferences.')) {
+      storage.clear();
+      widgetState = {
+        position: config.position,
+        isMinimized: false,
+        callCount: 0,
+        lastCallTime: null,
+        userPreferences: {}
+      };
+      resetPosition();
+    }
   }
 
   // Load Retell SDK with retry mechanism
@@ -481,15 +843,6 @@
     switch (state) {
       case 'connecting':
         button.classList.add('bolo-connecting');
-        button.setAttribute('aria-label', 'Connecting...');
-        break;
-      case 'connected':
-        pulseRing.classList.add('bolo-pulse-active');
-        pulseRing.style.opacity = '1';
-        button.setAttribute('aria-label', 'End call');
-        break;
-      case 'idle':
-      default:
         button.setAttribute('aria-label', config.buttonText);
         break;
     }
@@ -528,6 +881,12 @@
         isConnected = true;
         isConnecting = false;
         updateButtonState('connected');
+        
+        // Update call statistics
+        updateWidgetState({
+          callCount: widgetState.callCount + 1,
+          lastCallTime: new Date().toISOString()
+        });
       });
 
       retellWebClient.on('call_ended', () => {
@@ -536,6 +895,11 @@
         isConnecting = false;
         updateButtonState('idle');
         retellWebClient = null;
+        
+        // Save call end time
+        updateWidgetState({
+          lastCallTime: new Date().toISOString()
+        });
       });
 
       retellWebClient.on('error', (error) => {
@@ -664,8 +1028,17 @@
       debugLog('Page hidden, maintaining call');
     } else if (!document.hidden) {
       debugLog('Page visible');
+      // Save state when page becomes visible again
+      saveState();
     }
   });
+
+  // Auto-save state periodically (every 30 seconds)
+  setInterval(() => {
+    if (config.persistState) {
+      saveState();
+    }
+  }, 30000);
 
   // Global error handler for uncaught widget errors
   window.addEventListener('error', (event) => {
@@ -683,12 +1056,35 @@
   debugLog(`Initializing Bolo Voice Widget v${WIDGET_VERSION}...`);
   initWidget();
 
-  // Expose cleanup function globally for manual cleanup if needed
+  // Expose enhanced API globally for manual control if needed
   window.BoloVoiceWidget = {
     version: WIDGET_VERSION,
     cleanup: cleanup,
-    getState: () => ({ isConnected, isConnecting }),
-    config: config
+    getState: () => ({ 
+      isConnected, 
+      isConnecting, 
+      widgetState,
+      storageSupported: storage.isSupported()
+    }),
+    config: config,
+    saveState: saveState,
+    clearData: storage.clear,
+    resetPosition: resetPosition,
+    toggleMinimize: toggleMinimize,
+    updatePreferences: (prefs) => {
+      updateWidgetState({ 
+        userPreferences: { ...widgetState.userPreferences, ...prefs }
+      });
+    }
   };
 
-})();
+})();-label', 'Connecting...');
+        break;
+      case 'connected':
+        pulseRing.classList.add('bolo-pulse-active');
+        pulseRing.style.opacity = '1';
+        button.setAttribute('aria-label', 'End call');
+        break;
+      case 'idle':
+      default:
+        button.setAttribute('aria
