@@ -565,7 +565,7 @@ const WidgetGenerator = () => {
                   
                   {config.widgetType === 'floating' ? (
                     <div 
-                      className={`absolute w-14 h-14 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer transition-transform hover:scale-110`} 
+                      className="absolute w-14 h-14 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer transition-transform hover:scale-110" 
                       style={{
                         background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`,
                         [config.position.includes('bottom') ? 'bottom' : 'top']: '20px',
