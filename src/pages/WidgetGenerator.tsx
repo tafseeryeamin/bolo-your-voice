@@ -39,19 +39,6 @@ const WidgetGenerator = () => {
   const livePreviewRef = useRef<HTMLIFrameElement | null>(null);
   const testPreviewRef = useRef<HTMLIFrameElement | null>(null);
 
-  const liveEmbedCode = useMemo(() => generateEmbedCode(), [
-    config.agentId,
-    config.title,
-    config.logoUrl,
-    config.primaryColor,
-    config.secondaryColor,
-    config.widgetType,
-    config.position,
-    config.customDomain,
-    config.supabaseFunctionsUrl,
-    config.buttonText,
-  ]);
-
   const writeIframeHtml = (iframe: HTMLIFrameElement, bodyHtml: string) => {
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (!doc) return;
@@ -60,12 +47,6 @@ const WidgetGenerator = () => {
     doc.close();
   };
 
-  useEffect(() => {
-    // Update live preview iframe whenever embed changes
-    if (livePreviewRef.current) {
-      writeIframeHtml(livePreviewRef.current, liveEmbedCode);
-    }
-  }, [liveEmbedCode]);
   const generateEmbedCode = () => {
     const widgetUrl = `${config.customDomain}/eleven-widget.js`;
     const apiUrl = `${config.supabaseFunctionsUrl}/create-eleven-web-call`;
@@ -83,6 +64,25 @@ const WidgetGenerator = () => {
   data-button-text="${config.buttonText}"
 ></script>`;
   };
+  const liveEmbedCode = useMemo(() => generateEmbedCode(), [
+    config.agentId,
+    config.title,
+    config.logoUrl,
+    config.primaryColor,
+    config.secondaryColor,
+    config.widgetType,
+    config.position,
+    config.customDomain,
+    config.supabaseFunctionsUrl,
+    config.buttonText,
+  ]);
+
+  useEffect(() => {
+    // Update live preview iframe whenever embed changes
+    if (livePreviewRef.current) {
+      writeIframeHtml(livePreviewRef.current, liveEmbedCode);
+    }
+  }, [liveEmbedCode]);
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
     toast({
