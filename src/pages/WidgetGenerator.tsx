@@ -38,7 +38,7 @@ const WidgetGenerator = () => {
   const [showTestPreview, setShowTestPreview] = useState(false);
   const generateEmbedCode = () => {
     const widgetUrl = `${config.customDomain}/eleven-widget.js`;
-    const apiUrl = `${config.supabaseFunctionsUrl}/create-elevenlabs-session`;
+    const apiUrl = `${config.supabaseFunctionsUrl}/create-eleven-web-call`;
     return `<!-- ElevenLabs Voice Widget (white-labeled) -->
 <script
   id="bolo-eleven-widget"

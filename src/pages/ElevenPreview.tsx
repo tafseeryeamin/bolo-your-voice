@@ -8,6 +8,7 @@ const ElevenPreview = () => {
     script.defer = true;
     // NOTE: Replace with real agent id via env/config when available
     script.setAttribute('data-agent-id', 'YOUR_ELEVEN_AGENT_ID');
+    script.setAttribute('data-api-url', 'https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1/create-eleven-web-call');
     script.setAttribute('data-debug', 'true');
     document.body.appendChild(script);
     return () => { script.remove(); };
