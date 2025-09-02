@@ -85,7 +85,7 @@
     const session = await createSession();
     // Expected fields vary; prefer websocket/webrtc join data
     // Fallbacks are placeholders; user will provide specifics
-    const { rtc_session_id, client_secret, ice_servers } = session;
+    const { rtc_session_id, client_secret, ice_servers, join_url } = session;
 
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     pc = new RTCPeerConnection({ iceServers: ice_servers || [{ urls: 'stun:stun.l.google.com:19302' }] });
@@ -99,17 +99,40 @@
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    const joinRes = await fetch(`${config.apiUrl}/join`, { // optional server-side join helper
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rtc_session_id, client_secret, sdp: offer.sdp, type: offer.type })
-    }).catch(() => null);
+    let answerPayload = null;
+    try {
+      // Prefer a provided join_url from backend/session
+      const targetUrl = join_url || config.apiUrl;
+      const res = await fetch(targetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'join',
+          rtc_session_id,
+          client_secret,
+          offer: { sdp: offer.sdp, type: offer.type }
+        })
+      });
+      if (res.ok) {
+        answerPayload = await res.json();
+      } else {
+        const t = await res.text();
+        throw new Error(`Join failed ${res.status}: ${t}`);
+      }
+    } catch (err) {
+      console.error('Join error', err);
+      alert('Join step failed. Please ensure your function handles SDP exchange in the same URL or returns join_url.');
+      stopCall();
+      return;
+    }
 
-    if (joinRes && joinRes.ok) {
-      const answer = await joinRes.json();
-      await pc.setRemoteDescription(answer);
-    } else {
-      console.warn('No join helper; please implement WebRTC join on server.');
+    try {
+      const remote = answerPayload.answer || answerPayload; // support {answer:{sdp,type}} or plain
+      await pc.setRemoteDescription(new RTCSessionDescription(remote));
+    } catch (err) {
+      console.error('Failed to set remote description', err, answerPayload);
+      alert('Invalid SDP answer from server.');
+      stopCall();
     }
   }
 
