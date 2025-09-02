@@ -507,6 +507,8 @@ const WidgetGenerator = () => {
                       <h4 className="font-semibold mb-2">Test Preview:</h4>
                       <iframe ref={testPreviewRef} title="Test Widget"
                         className="w-full h-[320px] bg-background border rounded"
+                        allow="microphone; autoplay; clipboard-read; clipboard-write"
+                        allowFullScreen
                       />
                       <p className="text-sm text-muted-foreground mt-2">
                         If the widget doesn't appear, check the console for errors or verify the embed code format.
@@ -531,6 +533,8 @@ const WidgetGenerator = () => {
               <CardContent>
                 <iframe ref={livePreviewRef} title="Live Widget"
                   className="w-full h-[320px] bg-white border rounded"
+                  allow="microphone; autoplay; clipboard-read; clipboard-write"
+                  allowFullScreen
                 />
               </CardContent>
             </Card>
