@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +36,36 @@ const WidgetGenerator = () => {
   const [isWidgetSaved, setIsWidgetSaved] = useState(false);
   const [testCode, setTestCode] = useState('');
   const [showTestPreview, setShowTestPreview] = useState(false);
+  const livePreviewRef = useRef<HTMLIFrameElement | null>(null);
+  const testPreviewRef = useRef<HTMLIFrameElement | null>(null);
+
+  const liveEmbedCode = useMemo(() => generateEmbedCode(), [
+    config.agentId,
+    config.title,
+    config.logoUrl,
+    config.primaryColor,
+    config.secondaryColor,
+    config.widgetType,
+    config.position,
+    config.customDomain,
+    config.supabaseFunctionsUrl,
+    config.buttonText,
+  ]);
+
+  const writeIframeHtml = (iframe: HTMLIFrameElement, bodyHtml: string) => {
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) return;
+    doc.open();
+    doc.write(`<!doctype html><html><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/></head><body>${bodyHtml}</body></html>`);
+    doc.close();
+  };
+
+  useEffect(() => {
+    // Update live preview iframe whenever embed changes
+    if (livePreviewRef.current) {
+      writeIframeHtml(livePreviewRef.current, liveEmbedCode);
+    }
+  }, [liveEmbedCode]);
   const generateEmbedCode = () => {
     const widgetUrl = `${config.customDomain}/eleven-widget.js`;
     const apiUrl = `${config.supabaseFunctionsUrl}/create-eleven-web-call`;
@@ -150,6 +180,12 @@ const WidgetGenerator = () => {
       return;
     }
     setShowTestPreview(true);
+    // Defer iframe write to next tick so iframe is mounted
+    setTimeout(() => {
+      if (testPreviewRef.current) {
+        writeIframeHtml(testPreviewRef.current, testCode);
+      }
+    }, 0);
   };
   return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -457,6 +493,9 @@ const WidgetGenerator = () => {
                       onClick={() => {
                         setTestCode('');
                         setShowTestPreview(false);
+                        if (testPreviewRef.current) {
+                          writeIframeHtml(testPreviewRef.current, '');
+                        }
                       }}
                     >
                       Clear
@@ -466,15 +505,9 @@ const WidgetGenerator = () => {
                   {showTestPreview && testCode && (
                     <div className="border rounded-lg p-4 bg-muted">
                       <h4 className="font-semibold mb-2">Test Preview:</h4>
-                      <div className="border rounded-lg p-8 bg-background min-h-[200px] relative">
-                        <div className="text-center text-muted-foreground mb-4">
-                          Testing Widget Code...
-                        </div>
-                        <div 
-                          dangerouslySetInnerHTML={{ __html: testCode }}
-                          className="w-full"
-                        />
-                      </div>
+                      <iframe ref={testPreviewRef} title="Test Widget"
+                        className="w-full h-[320px] bg-background border rounded"
+                      />
                       <p className="text-sm text-muted-foreground mt-2">
                         If the widget doesn't appear, check the console for errors or verify the embed code format.
                       </p>
@@ -484,46 +517,21 @@ const WidgetGenerator = () => {
               </CardContent>
             </Card>
 
-            {/* Preview Card */}
+            {/* Real Widget Preview (iframe executes scripts) */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="w-5 h-5" />
-                  Widget Preview
+                  Live Widget Preview
                 </CardTitle>
                 <CardDescription>
-                  See how your widget will look
+                  See how your widget will look with your current settings
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="border rounded-lg p-8 bg-gray-50 min-h-[200px] relative">
-                  <div className="text-center text-muted-foreground mb-8">
-                    Website Content Area
-                  </div>
-                  
-                  {config.widgetType === 'floating' ? <div className={`fixed w-14 h-14 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer transition-transform hover:scale-110`} style={{
-                  background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`,
-                  [config.position.includes('bottom') ? 'bottom' : 'top']: '20px',
-                  [config.position.includes('right') ? 'right' : 'left']: '20px'
-                }}>
-                      🎤
-                    </div> : <div className="max-w-sm mx-auto border rounded-lg overflow-hidden bg-white">
-                      <div className="p-4 text-white font-semibold" style={{
-                    background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
-                  }}>
-                        {config.title}
-                      </div>
-                      <div className="p-6 text-center">
-                        <div className="text-4xl mb-4">🎤</div>
-                        <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white text-xl mb-4 cursor-pointer" style={{
-                      background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
-                    }}>
-                          🎙️
-                        </div>
-                        <p className="text-sm text-gray-600">{config.welcomeMessage}</p>
-                      </div>
-                    </div>}
-                </div>
+                <iframe ref={livePreviewRef} title="Live Widget"
+                  className="w-full h-[320px] bg-white border rounded"
+                />
               </CardContent>
             </Card>
           </div>

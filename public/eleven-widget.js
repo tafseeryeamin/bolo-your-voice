@@ -79,13 +79,25 @@
 
   let pc = null;
   let mediaStream = null;
+  let tokenOnlyMode = false;
 
   async function startCall() {
     log('Starting Eleven call');
     const session = await createSession();
     // Expected fields vary; prefer websocket/webrtc join data
     // Fallbacks are placeholders; user will provide specifics
-    const { rtc_session_id, client_secret, ice_servers, join_url } = session;
+    const { rtc_session_id, client_secret, ice_servers, join_url, token, access_token } = session;
+
+    // If backend returns a token (ConvAI token API), switch to token-only visual mode
+    const conversationToken = token || access_token;
+    if (conversationToken && !rtc_session_id && !client_secret) {
+      tokenOnlyMode = true;
+      // Visual success to prove white-label + backend works
+      const ring = document.querySelector('.bolo-pulse-ring');
+      if (ring) { ring.classList.add('bolo-pulse-active'); ring.style.opacity = '1'; }
+      alert('Session token received. Audio call requires ElevenLabs WebRTC join; backend is working.');
+      return;
+    }
 
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     pc = new RTCPeerConnection({ iceServers: ice_servers || [{ urls: 'stun:stun.l.google.com:19302' }] });
@@ -121,7 +133,7 @@
       }
     } catch (err) {
       console.error('Join error', err);
-      alert('Join step failed. Please ensure your function handles SDP exchange in the same URL or returns join_url.');
+      alert('Join failed. Ensure your function supports SDP exchange or returns join_url.');
       stopCall();
       return;
     }
