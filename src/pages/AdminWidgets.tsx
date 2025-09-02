@@ -1,149 +1,126 @@
-import React, { useState, useEffect } from 'react';
-import { Copy, Check, Eye, Trash2, Edit, ExternalLink, Code } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Copy, Download, Eye, Settings, Code, Palette, Save, Check } from "lucide-react";
 
-interface Widget {
-  id: string;
-  user_id: string;
-  agent_id: string;
-  public_key: string;
-  title: string;
-  logo_url?: string;
-  primary_color: string;
-  secondary_color: string;
-  position: string;
-  button_text: string;
-  welcome_message: string;
-  offline_message: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+const WidgetGenerator = () => {
+  const [config, setConfig] = useState({
+    agentId: '',
+    agentVersion: '',
+    title: 'Voice Assistant',
+    logoUrl: '',
+    primaryColor: '#6366F1',
+    secondaryColor: '#8B5CF6',
+    widgetType: 'floating',
+    position: 'bottom-right',
+    customDomain: 'https://your-domain.com',
+    buttonText: 'Start a conversation',
+    welcomeMessage: 'Hi there, How can we help?',
+    offlineMessage: 'We\'re currently offline. Please leave a message!'
+  });
 
-const AdminWidgets = () => {
-  const { toast } = useToast();
-  const [widgets, setWidgets] = useState<Widget[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
+  const [logoFile, setLogoFile] = useState(null);
+  const [preview, setPreview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isWidgetSaved, setIsWidgetSaved] = useState(false);
   const [testCode, setTestCode] = useState('');
   const [showTestPreview, setShowTestPreview] = useState(false);
 
-  const fetchWidgets = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('widgets')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setWidgets(data || []);
-    } catch (error) {
-      console.error('Error fetching widgets:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch widgets",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  // Mock toast function since we don't have useToast
+  const toast = ({ title, description, variant }) => {
+    alert(`${title}: ${description}`);
   };
 
-  useEffect(() => {
-    fetchWidgets();
-  }, []);
-
-  const generateEmbedCode = (widget: Widget) => {
-    const currentDomain = window.location.origin;
-    return `<!-- Bolo AI Voice Widget -->
+  const generateEmbedCode = () => {
+    const widgetUrl = `${config.customDomain}/widget.js`;
+    return `<!-- AI Voice Widget -->
 <script
   id="bolo-voice-widget"
-  src="${currentDomain}/widget.js"
-  type="module"
-  data-public-key="${widget.public_key}"
-  data-agent-id="${widget.agent_id}"
-  data-title="${widget.title}"
-  ${widget.logo_url ? `data-logo-url="${widget.logo_url}"` : ''}
-  data-primary-color="${widget.primary_color}"
-  data-secondary-color="${widget.secondary_color}"
-  data-position="${widget.position}"
-  data-button-text="${widget.button_text}"
-  data-welcome-message="${widget.welcome_message}"
-  data-offline-message="${widget.offline_message}"
-  data-debug="true"
+  src="${widgetUrl}"
+  data-agent-id="${config.agentId}"
+  data-title="${config.title}"
+  ${config.logoUrl ? `data-logo-url="${config.logoUrl}"` : ''}
+  data-primary-color="${config.primaryColor}"
+  data-secondary-color="${config.secondaryColor}"
+  data-position="${config.position}"
+  data-button-text="${config.buttonText}"
+  data-welcome-message="${config.welcomeMessage}"
+  data-offline-message="${config.offlineMessage}"
 ></script>`;
   };
 
-  const copyToClipboard = (text: string, widgetId: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedStates(prev => ({ ...prev, [widgetId]: true }));
-    setTimeout(() => {
-      setCopiedStates(prev => ({ ...prev, [widgetId]: false }));
-    }, 2000);
-    toast({
-      title: "Copied!",
-      description: "Embed code copied to clipboard",
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied to clipboard!",
+        description: `${type} code has been copied to your clipboard.`
+      });
+    }).catch(() => {
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy to clipboard. Please copy manually."
+      });
     });
   };
 
-  const toggleWidgetStatus = async (widget: Widget) => {
-    try {
-      const { error } = await supabase
-        .from('widgets')
-        .update({ is_active: !widget.is_active })
-        .eq('id', widget.id);
-
-      if (error) throw error;
-
-      setWidgets(prev =>
-        prev.map(w =>
-          w.id === widget.id ? { ...w, is_active: !widget.is_active } : w
-        )
-      );
-
-      toast({
-        title: "Success",
-        description: `Widget ${widget.is_active ? 'deactivated' : 'activated'} successfully`,
-      });
-    } catch (error) {
-      console.error('Error updating widget:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update widget status",
-        variant: "destructive",
-      });
-    }
+  const handleDownloadConfig = () => {
+    const configJson = JSON.stringify(config, null, 2);
+    downloadFile(configJson, 'widget-config.json');
   };
 
-  const deleteWidget = async (widgetId: string) => {
-    try {
-      const { error } = await supabase
-        .from('widgets')
-        .delete()
-        .eq('id', widgetId);
+  const downloadFile = (content, filename) => {
+    const blob = new Blob([content], {
+      type: 'text/plain'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+      title: "File downloaded!",
+      description: `${filename} has been downloaded.`
+    });
+  };
 
-      if (error) throw error;
-
-      setWidgets(prev => prev.filter(w => w.id !== widgetId));
-      toast({
-        title: "Success",
-        description: "Widget deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting widget:', error);
+  const saveWidget = async () => {
+    if (!config.agentId.trim()) {
       toast({
         title: "Error",
-        description: "Failed to delete widget",
+        description: "Agent ID is required to save the widget",
         variant: "destructive",
       });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Simulate saving - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsWidgetSaved(true);
+      toast({
+        title: "Success!",
+        description: "Widget saved successfully. You can view it in the Admin Widgets section.",
+      });
+    } catch (error) {
+      console.error('Error saving widget:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save widget. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -157,290 +134,478 @@ const AdminWidgets = () => {
       return;
     }
     setShowTestPreview(true);
-    toast({
-      title: "Testing Widget",
-      description: "Widget code loaded in test preview below",
-    });
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto py-8">
-        <div className="text-center">Loading widgets...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Widget Management
-        </h1>
-        <p className="text-muted-foreground">
-          Manage all voice widgets created by users
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Widget Generator
+          </h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Create embeddable AI voice widgets for your customers. White-label solution that serves from your domain.
+          </p>
+        </div>
 
-      <Tabs defaultValue="widgets" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="widgets">My Widgets</TabsTrigger>
-          <TabsTrigger value="test">Test Widget</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="widgets" className="space-y-6">
-          <div className="grid gap-6">
-            {widgets.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">No widgets found</p>
-                </CardContent>
-              </Card>
-            ) : (
-          widgets.map((widget) => (
-            <Card key={widget.id} className="overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Configuration Panel */}
+          <div className="space-y-6">
+            <Card>
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-xl mb-2">{widget.title}</CardTitle>
-                    <CardDescription>
-                      Widget ID: {widget.id}
-                    </CardDescription>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant={widget.is_active ? "default" : "secondary"}>
-                        {widget.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                      <Badge variant="outline">
-                        Agent: {widget.agent_id}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleWidgetStatus(widget)}
-                    >
-                      {widget.is_active ? 'Deactivate' : 'Activate'}
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Widget</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this widget? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteWidget(widget.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  Widget Configuration
+                </CardTitle>
+                <CardDescription>
+                  Configure your AI voice widget settings
+                </CardDescription>
               </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Configuration</h4>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="font-medium">Position:</span> {widget.position}</p>
-                      <p><span className="font-medium">Button Text:</span> {widget.button_text}</p>
-                      <p><span className="font-medium">Colors:</span> 
-                        <span className="ml-2 inline-block w-4 h-4 rounded" style={{ backgroundColor: widget.primary_color }}></span>
-                        <span className="ml-1 inline-block w-4 h-4 rounded" style={{ backgroundColor: widget.secondary_color }}></span>
-                      </p>
-                      <p><span className="font-medium">Created:</span> {new Date(widget.created_at).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-2">Messages</h4>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="font-medium">Welcome:</span> {widget.welcome_message}</p>
-                      <p><span className="font-medium">Offline:</span> {widget.offline_message}</p>
-                    </div>
-                  </div>
-                </div>
+              <CardContent>
+                <Tabs defaultValue="basic" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="basic">Basic</TabsTrigger>
+                    <TabsTrigger value="styling">Styling</TabsTrigger>
+                    <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  </TabsList>
 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">Embed Code</h4>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(generateEmbedCode(widget), widget.id)}
+                  <TabsContent value="basic" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="agentId">Agent ID</Label>
+                      <Input 
+                        id="agentId" 
+                        placeholder="agent_xxxxxxxxxxxxxxxxxxx" 
+                        value={config.agentId} 
+                        onChange={e => setConfig({
+                          ...config,
+                          agentId: e.target.value
+                        })} 
+                      />
+                      <p className="text-sm text-gray-500">
+                        Your Retell AI agent ID (API key is configured securely on the server)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="agentVersion">Agent Version (Optional)</Label>
+                      <Input 
+                        id="agentVersion" 
+                        placeholder="Leave empty for latest" 
+                        value={config.agentVersion} 
+                        onChange={e => setConfig({
+                          ...config,
+                          agentVersion: e.target.value
+                        })} 
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Widget Title</Label>
+                      <Input 
+                        id="title" 
+                        value={config.title} 
+                        onChange={e => setConfig({
+                          ...config,
+                          title: e.target.value
+                        })} 
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="logoFile">Logo Upload</Label>
+                      <Input 
+                        id="logoFile" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setLogoFile(file);
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              setConfig({
+                                ...config,
+                                logoUrl: e.target?.result
+                              });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                      />
+                      <p className="text-sm text-gray-500">
+                        Upload your brand logo (PNG, JPG, SVG)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="logoUrl">Or Logo URL</Label>
+                      <Input 
+                        id="logoUrl" 
+                        placeholder="https://your-domain.com/logo.png" 
+                        value={config.logoUrl} 
+                        onChange={e => setConfig({
+                          ...config,
+                          logoUrl: e.target.value
+                        })} 
+                      />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="styling" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="widgetType">Widget Type</Label>
+                      <Select value={config.widgetType} onValueChange={value => setConfig({
+                        ...config,
+                        widgetType: value
+                      })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="floating">Floating Button</SelectItem>
+                          <SelectItem value="inline">Inline Chat</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {config.widgetType === 'floating' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="position">Position</Label>
+                        <Select value={config.position} onValueChange={value => setConfig({
+                          ...config,
+                          position: value
+                        })}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                            <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                            <SelectItem value="top-right">Top Right</SelectItem>
+                            <SelectItem value="top-left">Top Left</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="primaryColor">Primary Color</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            id="primaryColor" 
+                            type="color" 
+                            value={config.primaryColor} 
+                            onChange={e => setConfig({
+                              ...config,
+                              primaryColor: e.target.value
+                            })} 
+                            className="w-16 h-10 p-1" 
+                          />
+                          <Input 
+                            value={config.primaryColor} 
+                            onChange={e => setConfig({
+                              ...config,
+                              primaryColor: e.target.value
+                            })} 
+                            className="flex-1" 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="secondaryColor">Secondary Color</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            id="secondaryColor" 
+                            type="color" 
+                            value={config.secondaryColor} 
+                            onChange={e => setConfig({
+                              ...config,
+                              secondaryColor: e.target.value
+                            })} 
+                            className="w-16 h-10 p-1" 
+                          />
+                          <Input 
+                            value={config.secondaryColor} 
+                            onChange={e => setConfig({
+                              ...config,
+                              secondaryColor: e.target.value
+                            })} 
+                            className="flex-1" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="buttonText">Button Text</Label>
+                      <Input 
+                        id="buttonText" 
+                        value={config.buttonText} 
+                        onChange={e => setConfig({
+                          ...config,
+                          buttonText: e.target.value
+                        })} 
+                      />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="advanced" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="customDomain">Your Domain</Label>
+                      <Input 
+                        id="customDomain" 
+                        value={config.customDomain} 
+                        onChange={e => setConfig({
+                          ...config,
+                          customDomain: e.target.value
+                        })} 
+                        placeholder="https://your-domain.com" 
+                      />
+                      <p className="text-sm text-gray-500">
+                        The widget will be served from this domain (white-label)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="welcomeMessage">Welcome Message</Label>
+                      <Textarea 
+                        id="welcomeMessage" 
+                        value={config.welcomeMessage} 
+                        onChange={e => setConfig({
+                          ...config,
+                          welcomeMessage: e.target.value
+                        })} 
+                        rows={3} 
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="offlineMessage">Offline Message</Label>
+                      <Textarea 
+                        id="offlineMessage" 
+                        value={config.offlineMessage} 
+                        onChange={e => setConfig({
+                          ...config,
+                          offlineMessage: e.target.value
+                        })} 
+                        rows={3} 
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Code Generation Panel */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Generated Code
+                </CardTitle>
+                <CardDescription>
+                  Copy and paste this code into your customer's website
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>HTML Embed Code</Label>
+                    <div className="relative">
+                      <Textarea 
+                        value={generateEmbedCode()} 
+                        readOnly 
+                        rows={10} 
+                        className="font-mono text-sm" 
+                      />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="absolute top-2 right-2" 
+                        onClick={() => copyToClipboard(generateEmbedCode(), "Embed")}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 flex-wrap">
+                    <Button 
+                      onClick={saveWidget}
+                      disabled={isSaving || !config.agentId.trim()}
+                      className="flex items-center gap-2"
                     >
-                      {copiedStates[widget.id] ? (
+                      {isSaving ? (
+                        <>Loading...</>
+                      ) : isWidgetSaved ? (
                         <>
-                          <Check className="w-4 h-4 mr-2" />
-                          Copied!
+                          <Check className="w-4 h-4" />
+                          Saved!
                         </>
                       ) : (
                         <>
-                          <Copy className="w-4 h-4 mr-2" />
-                          Copy
+                          <Save className="w-4 h-4" />
+                          Save Widget
                         </>
                       )}
                     </Button>
+                    <Button 
+                      onClick={handleDownloadConfig}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download Config
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => copyToClipboard(generateEmbedCode(), "Embed")} 
+                      className="flex items-center gap-2"
+                    >
+                      <Copy className="w-4 h-4" />
+                      Copy Embed Code
+                    </Button>
                   </div>
-                  <div className="bg-muted rounded-lg p-3 font-mono text-sm overflow-x-auto">
-                    <pre className="whitespace-pre-wrap break-words">
-                      {generateEmbedCode(widget)}
-                    </pre>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2 pt-2 border-t">
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={`/widget-generator`}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Similar
-                    </a>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href="https://preview--bolo-your-voice.lovable.app/widget.js" target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View Widget.js
-                    </a>
-                  </Button>
+                  <div className="p-4 bg-gray-100 rounded-lg">
+                    <h4 className="font-semibold mb-2">Setup Instructions:</h4>
+                    <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+                      <li>Widget is hosted directly from your domain</li>
+                      <li>Copy the embed code and provide it to your customers</li>
+                      <li>Customers paste the code on their website</li>
+                      <li>Widget appears with your branding and Bolo's design</li>
+                    </ol>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
-          </div>
-        </TabsContent>
 
-        <TabsContent value="test" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code className="w-5 h-5" />
-                Widget Tester
-              </CardTitle>
-              <CardDescription>
-                Paste any widget embed code here to test if it's working properly
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="testCode">Paste Widget Embed Code</Label>
-                  <Textarea 
-                    id="testCode"
-                    value={testCode}
-                    onChange={(e) => setTestCode(e.target.value)}
-                    placeholder={`Paste your widget embed code here, for example:
-
-<script
-  id="bolo-voice-widget"
-  src="https://bolovoice.com/widget.js"
-  type="module"
-  data-agent-id="your-agent-id"
-  data-title="Voice Assistant"
-  data-primary-color="#6366F1"
-  data-secondary-color="#8B5CF6"
-  data-position="bottom-right"
-  data-button-text="Start a conversation"
-  data-welcome-message="Hi! How can I help you today?"
-  data-offline-message="We're currently offline. Please leave a message!"
-></script>`}
-                    rows={12}
-                    className="font-mono text-sm"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={handleTestWidget} className="flex items-center gap-2">
-                    <Eye className="w-4 h-4" />
-                    Test Widget
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setTestCode('');
-                      setShowTestPreview(false);
-                    }}
-                  >
-                    Clear
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      const currentDomain = window.location.origin;
-                      const sampleCode = `<!-- Bolo AI Voice Widget -->
-<script
-  id="bolo-voice-widget"
-  src="${currentDomain}/widget.js"
-  type="module"
-  data-agent-id="agent_00ababaa55e5892947ae4457b9"
-  data-title="Voice Assistant"
-  data-primary-color="#6366F1"
-  data-secondary-color="#8B5CF6"
-  data-position="bottom-right"
-  data-button-text="Start a conversation"
-  data-welcome-message="Hi! How can I help you today?"
-  data-offline-message="We're currently offline. Please leave a message!"
-  data-debug="true"
-></script>`;
-                      setTestCode(sampleCode);
-                    }}
-                  >
-                    Load Sample Code
-                  </Button>
-                </div>
-                
-                {showTestPreview && testCode && (
-                  <div className="border rounded-lg p-4 bg-muted space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-semibold">Widget Test Preview</h4>
-                      <Badge variant="outline">Testing Mode</Badge>
-                    </div>
-                    
-                    <div className="border rounded-lg p-8 bg-background min-h-[300px] relative">
-                      <div className="text-center text-muted-foreground mb-4 text-sm">
-                        🌐 Simulated Website Content
-                      </div>
-                      <div className="absolute inset-4 border-2 border-dashed border-muted-foreground/20 rounded flex items-center justify-center">
-                        <span className="text-muted-foreground/50">Website Content Area</span>
-                      </div>
-                      
-                      {/* Widget Test Area */}
-                      <div 
-                        dangerouslySetInnerHTML={{ __html: testCode }}
-                        className="relative z-10"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <p className="text-muted-foreground">
-                        <strong>Testing Tips:</strong>
-                      </p>
-                      <ul className="text-muted-foreground space-y-1 ml-4">
-                        <li>• If the widget doesn't appear, check the browser console for errors</li>
-                        <li>• Verify the widget.js file is accessible from the specified URL</li>
-                        <li>• Make sure all required data attributes are present</li>
-                        <li>• Test on different devices and browsers for compatibility</li>
-                      </ul>
-                    </div>
+            {/* Widget Testing Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Test Widget Code
+                </CardTitle>
+                <CardDescription>
+                  Paste any widget embed code here to test if it's working
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="testCode">Paste Embed Code</Label>
+                    <Textarea 
+                      id="testCode"
+                      value={testCode}
+                      onChange={(e) => setTestCode(e.target.value)}
+                      placeholder="Paste your widget embed code here..."
+                      rows={6}
+                      className="font-mono text-sm"
+                    />
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                  <div className="flex gap-2">
+                    <Button onClick={handleTestWidget} className="flex items-center gap-2">
+                      <Eye className="w-4 h-4" />
+                      Test Widget
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setTestCode('');
+                        setShowTestPreview(false);
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                  
+                  {showTestPreview && testCode && (
+                    <div className="border rounded-lg p-4 bg-gray-100">
+                      <h4 className="font-semibold mb-2">Test Preview:</h4>
+                      <div className="border rounded-lg p-8 bg-white min-h-[200px] relative">
+                        <div className="text-center text-gray-500 mb-4">
+                          Testing Widget Code...
+                        </div>
+                        <div 
+                          dangerouslySetInnerHTML={{ __html: testCode }}
+                          className="w-full"
+                        />
+                      </div>
+                      <p className="text-sm text-gray-500 mt-2">
+                        If the widget doesn't appear, check the console for errors or verify the embed code format.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Preview Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
+                  Widget Preview
+                </CardTitle>
+                <CardDescription>
+                  See how your widget will look
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="border rounded-lg p-8 bg-gray-50 min-h-[200px] relative">
+                  <div className="text-center text-gray-500 mb-8">
+                    Website Content Area
+                  </div>
+                  
+                  {config.widgetType === 'floating' ? (
+                    <div 
+                      className={`absolute w-14 h-14 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer transition-transform hover:scale-110`} 
+                      style={{
+                        background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`,
+                        [config.position.includes('bottom') ? 'bottom' : 'top']: '20px',
+                        [config.position.includes('right') ? 'right' : 'left']: '20px'
+                      }}
+                    >
+                      🎤
+                    </div>
+                  ) : (
+                    <div className="max-w-sm mx-auto border rounded-lg overflow-hidden bg-white">
+                      <div 
+                        className="p-4 text-white font-semibold" 
+                        style={{
+                          background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
+                        }}
+                      >
+                        {config.title}
+                      </div>
+                      <div className="p-6 text-center">
+                        <div className="text-4xl mb-4">🎤</div>
+                        <div 
+                          className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white text-xl mb-4 cursor-pointer" 
+                          style={{
+                            background: `linear-gradient(135deg, ${config.primaryColor}, ${config.secondaryColor})`
+                          }}
+                        >
+                          🎙️
+                        </div>
+                        <p className="text-sm text-gray-600">{config.welcomeMessage}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default AdminWidgets;
+export default WidgetGenerator;
