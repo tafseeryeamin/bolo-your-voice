@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Eye, Trash2, Edit, ExternalLink } from 'lucide-react';
+import { Copy, Check, Eye, Trash2, Edit, ExternalLink, Code } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Widget {
   id: string;
@@ -30,6 +33,8 @@ const AdminWidgets = () => {
   const [widgets, setWidgets] = useState<Widget[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
+  const [testCode, setTestCode] = useState('');
+  const [showTestPreview, setShowTestPreview] = useState(false);
 
   const fetchWidgets = async () => {
     try {
@@ -140,6 +145,22 @@ const AdminWidgets = () => {
     }
   };
 
+  const handleTestWidget = () => {
+    if (!testCode.trim()) {
+      toast({
+        title: "Error",
+        description: "Please paste the embed code to test",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowTestPreview(true);
+    toast({
+      title: "Testing Widget",
+      description: "Widget code loaded in test preview below",
+    });
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto py-8">
@@ -159,14 +180,21 @@ const AdminWidgets = () => {
         </p>
       </div>
 
-      <div className="grid gap-6">
-        {widgets.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No widgets found</p>
-            </CardContent>
-          </Card>
-        ) : (
+      <Tabs defaultValue="widgets" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="widgets">My Widgets</TabsTrigger>
+          <TabsTrigger value="test">Test Widget</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="widgets" className="space-y-6">
+          <div className="grid gap-6">
+            {widgets.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">No widgets found</p>
+                </CardContent>
+              </Card>
+            ) : (
           widgets.map((widget) => (
             <Card key={widget.id} className="overflow-hidden">
               <CardHeader>
@@ -288,7 +316,110 @@ const AdminWidgets = () => {
             </Card>
           ))
         )}
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="test" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Code className="w-5 h-5" />
+                Widget Tester
+              </CardTitle>
+              <CardDescription>
+                Paste any widget embed code here to test if it's working properly
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="testCode">Paste Widget Embed Code</Label>
+                  <Textarea 
+                    id="testCode"
+                    value={testCode}
+                    onChange={(e) => setTestCode(e.target.value)}
+                    placeholder={`Paste your widget embed code here, for example:
+
+<script
+  id="bolo-voice-widget"
+  src="https://bolovoice.com/widget.js"
+  type="module"
+  data-agent-id="your-agent-id"
+  data-title="Voice Assistant"
+  data-primary-color="#6366F1"
+  data-secondary-color="#8B5CF6"
+  data-position="bottom-right"
+  data-button-text="Start a conversation"
+  data-welcome-message="Hi! How can I help you today?"
+  data-offline-message="We're currently offline. Please leave a message!"
+></script>`}
+                    rows={12}
+                    className="font-mono text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleTestWidget} className="flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    Test Widget
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setTestCode('');
+                      setShowTestPreview(false);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setTestCode(widgets.length > 0 ? generateEmbedCode(widgets[0]) : '')}
+                    disabled={widgets.length === 0}
+                  >
+                    Load Sample Code
+                  </Button>
+                </div>
+                
+                {showTestPreview && testCode && (
+                  <div className="border rounded-lg p-4 bg-muted space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold">Widget Test Preview</h4>
+                      <Badge variant="outline">Testing Mode</Badge>
+                    </div>
+                    
+                    <div className="border rounded-lg p-8 bg-background min-h-[300px] relative">
+                      <div className="text-center text-muted-foreground mb-4 text-sm">
+                        🌐 Simulated Website Content
+                      </div>
+                      <div className="absolute inset-4 border-2 border-dashed border-muted-foreground/20 rounded flex items-center justify-center">
+                        <span className="text-muted-foreground/50">Website Content Area</span>
+                      </div>
+                      
+                      {/* Widget Test Area */}
+                      <div 
+                        dangerouslySetInnerHTML={{ __html: testCode }}
+                        className="relative z-10"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2 text-sm">
+                      <p className="text-muted-foreground">
+                        <strong>Testing Tips:</strong>
+                      </p>
+                      <ul className="text-muted-foreground space-y-1 ml-4">
+                        <li>• If the widget doesn't appear, check the browser console for errors</li>
+                        <li>• Verify the widget.js file is accessible from the specified URL</li>
+                        <li>• Make sure all required data attributes are present</li>
+                        <li>• Test on different devices and browsers for compatibility</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
