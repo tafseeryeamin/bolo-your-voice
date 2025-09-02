@@ -38,24 +38,34 @@ const TestAgent = () => {
     try {
       setIsCallActive(true);
       setCallStatus("Initiating call...");
-
-      const { data, error } = await supabase.functions.invoke('create-retell-web-call', {
-        body: { agent_id: agentId }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.success) {
-        setCallStatus("Call connected - Speak now!");
-        toast({
-          title: "Call Started",
-          description: "Your test call is now active. Start speaking!",
-        });
+      // Inject ElevenLabs widget script and auto-start
+      const existing = document.getElementById('bolo-eleven-widget');
+      if (!existing) {
+        const s = document.createElement('script');
+        s.id = 'bolo-eleven-widget';
+        s.src = '/eleven-widget.js';
+        s.defer = true;
+        s.setAttribute('data-agent-id', agentId);
+        s.setAttribute('data-api-url', 'https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1/create-eleven-web-call');
+        document.body.appendChild(s);
+        s.onload = () => {
+          // Try auto-start by simulating click once the button is mounted
+          setTimeout(() => {
+            const btn = document.getElementById('bolo-voice-button');
+            if (btn) (btn as HTMLButtonElement).click();
+          }, 500);
+        };
       } else {
-        throw new Error(data.error || "Failed to start call");
+        // If already injected, just click to start
+        const btn = document.getElementById('bolo-voice-button');
+        if (btn) (btn as HTMLButtonElement).click();
       }
+
+      setCallStatus("Call connected - Speak now!");
+      toast({
+        title: "Call Started",
+        description: "Your test call is now active. Start speaking!",
+      });
     } catch (error) {
       console.error("Error starting test call:", error);
       setIsCallActive(false);
@@ -75,6 +85,9 @@ const TestAgent = () => {
       title: "Call Ended",
       description: "Test call has been terminated.",
     });
+    // Toggle widget button to stop call if active
+    const btn = document.getElementById('bolo-voice-button');
+    if (btn) (btn as HTMLButtonElement).click();
     
     // Reset status after a delay
     setTimeout(() => {

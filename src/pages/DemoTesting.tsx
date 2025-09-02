@@ -9,7 +9,7 @@ import { Mic, MicOff, TestTube, Shield } from "lucide-react";
 import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RetellWebClient } from "retell-client-js-sdk";
+// Removed Retell SDK. We'll use the white-labeled Eleven widget instead.
 
 // Voice options organized by gender and age
 const voiceOptions = {
@@ -110,7 +110,7 @@ const DemoTesting = () => {
   const [selectedVoice, setSelectedVoice] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [retellWebClient, setRetellWebClient] = useState<RetellWebClient | null>(null);
+  const [widgetInjected, setWidgetInjected] = useState(false);
   useEffect(() => {
     checkUserAccess();
   }, []);
@@ -135,11 +135,11 @@ const DemoTesting = () => {
   };
   const handleTest = async () => {
     console.log("Starting handleTest function");
-    if (!apiKey.trim() || !agentId.trim()) {
+    if (!agentId.trim()) {
       console.log("Missing API key or agent ID");
       toast({
         title: "Missing Information",
-        description: "Please provide both API key and Agent ID.",
+        description: "Please provide the Agent ID.",
         variant: "destructive"
       });
       return;
@@ -147,90 +147,29 @@ const DemoTesting = () => {
     setIsConnecting(true);
     console.log("Set connecting state to true");
     try {
-      console.log("Creating Retell web call with:", {
-        agentId: agentId.trim()
-      });
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('create-retell-web-call', {
-        body: {
-          api_key: apiKey.trim(),
-          agent_id: agentId.trim(),
-          voice_preferences: {
-            gender: selectedGender,
-            age: selectedAge,
-            voice_id: selectedVoice,
-            voice_name: selectedVoice ? voiceOptions[selectedGender][selectedAge].find(v => v.id === selectedVoice)?.name : undefined
-          }
-        }
-      });
-      console.log("Supabase function response:", {
-        data,
-        error
-      });
-      if (error) {
-        console.error("Supabase function error:", error);
-        throw new Error(`Supabase function error: ${error.message || 'Unknown error'}`);
+      // Inject widget once
+      if (!widgetInjected) {
+        const s = document.createElement('script');
+        s.id = 'bolo-eleven-widget';
+        s.src = '/eleven-widget.js';
+        s.defer = true;
+        s.setAttribute('data-agent-id', agentId.trim());
+        s.setAttribute('data-api-url', 'https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1/create-eleven-web-call');
+        s.onload = () => {
+          // Attempt auto start
+          setTimeout(() => {
+            const btn = document.getElementById('bolo-voice-button');
+            if (btn) (btn as HTMLButtonElement).click();
+          }, 500);
+        };
+        document.body.appendChild(s);
+        setWidgetInjected(true);
+      } else {
+        const btn = document.getElementById('bolo-voice-button');
+        if (btn) (btn as HTMLButtonElement).click();
       }
-      if (data?.error) {
-        console.error("API returned error:", data.error);
-        throw new Error(data.error);
-      }
-      console.log("Retell web call response:", data);
-      if (!data?.access_token) {
-        console.error("No access token in response:", data);
-        throw new Error("No access token received from Retell API");
-      }
-
-      // Initialize Retell Web Client
-      console.log("Initializing Retell Web Client");
-      const webClient = new RetellWebClient();
-
-      // Set up event listeners
-      webClient.on("conversationStarted", () => {
-        console.log("Conversation started");
-        setIsConnected(true);
-        toast({
-          title: "Connected",
-          description: "Voice call started successfully!"
-        });
-      });
-      webClient.on("conversationEnded", ({
-        code,
-        reason
-      }) => {
-        console.log("Conversation ended", code, reason);
-        setIsConnected(false);
-        setIsConnecting(false);
-        toast({
-          title: "Call Ended",
-          description: "Voice call has ended."
-        });
-      });
-      webClient.on("error", error => {
-        console.error("Retell error:", error);
-        setIsConnected(false);
-        setIsConnecting(false);
-        toast({
-          title: "Call Error",
-          description: error.message || "An error occurred during the call.",
-          variant: "destructive"
-        });
-      });
-      webClient.on("update", update => {
-        console.log("Call update:", update);
-      });
-
-      // Start the call
-      console.log("Starting call with access token:", data.access_token ? "present" : "missing");
-      console.log("Sample rate:", data.sample_rate);
-      await webClient.startCall({
-        accessToken: data.access_token,
-        sampleRate: data.sample_rate || 24000
-      });
-      console.log("Call started successfully");
-      setRetellWebClient(webClient);
+      setIsConnected(true);
+      toast({ title: 'Connected', description: 'Voice call started successfully!' });
     } catch (error) {
       console.error("Error testing Retell call:", error);
       console.error("Error stack:", error.stack);
@@ -243,14 +182,8 @@ const DemoTesting = () => {
     }
   };
   const handleStopCall = async () => {
-    if (retellWebClient) {
-      try {
-        await retellWebClient.stopCall();
-        setRetellWebClient(null);
-      } catch (error) {
-        console.error("Error stopping call:", error);
-      }
-    }
+    const btn = document.getElementById('bolo-voice-button');
+    if (btn) (btn as HTMLButtonElement).click();
     setIsConnected(false);
     setIsConnecting(false);
   };
@@ -318,8 +251,8 @@ const DemoTesting = () => {
               <div className="bg-muted/30 p-4 rounded-lg border-l-4 border-primary/30">
                 <h4 className="font-medium text-sm mb-2 text-foreground">📋 Quick Guide</h4>
                 <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Enter your Retell API key and Agent ID</li>
-                  <li>• Click the microphone to start the call</li>
+                  <li>• Enter your ElevenLabs Agent ID</li>
+                  <li>• Click the microphone to start the call (uses your white-labeled widget)</li>
                   <li>• Allow microphone access when prompted</li>
                   <li>• Speak naturally with your AI agent</li>
                   <li>• Click to end the call when finished</li>
