@@ -33,6 +33,7 @@ serve(async (req: Request) => {
       const {
         rtc_session_id,
         client_secret,
+        agent_id,
         offer,
       } = payload || {};
 
@@ -47,13 +48,21 @@ serve(async (req: Request) => {
         return json({ error: "ELEVENLABS_JOIN_URL not set on server" }, 500);
       }
 
+      // Build join payload with flexible shapes supported by ElevenLabs:
+      // - If rtc_session_id/client_secret exist, include them.
+      // - Otherwise include agent_id + offer (ElevenLabs may create session implicitly).
+      const joinBody: Record<string, unknown> = { offer };
+      if (rtc_session_id) joinBody.rtc_session_id = rtc_session_id;
+      if (client_secret) joinBody.client_secret = client_secret;
+      if (agent_id) joinBody.agent_id = agent_id;
+
       const res = await fetch(joinUrl, {
         method: "POST",
         headers: {
           "xi-api-key": apiKey,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ rtc_session_id, client_secret, offer }),
+        body: JSON.stringify(joinBody),
       });
 
       const text = await res.text();

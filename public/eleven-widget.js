@@ -122,6 +122,7 @@
           action: 'join',
           rtc_session_id,
           client_secret,
+          agent_id: config.agentId,
           offer: { sdp: offer.sdp, type: offer.type }
         })
       });
