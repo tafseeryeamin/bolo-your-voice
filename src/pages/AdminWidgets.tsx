@@ -62,10 +62,11 @@ const AdminWidgets = () => {
   }, []);
 
   const generateEmbedCode = (widget: Widget) => {
+    const currentDomain = window.location.origin;
     return `<!-- Bolo AI Voice Widget -->
 <script
   id="bolo-voice-widget"
-  src="https://bolovoice.com/widget.js"
+  src="${currentDomain}/widget.js"
   type="module"
   data-public-key="${widget.public_key}"
   data-agent-id="${widget.agent_id}"
@@ -77,6 +78,7 @@ const AdminWidgets = () => {
   data-button-text="${widget.button_text}"
   data-welcome-message="${widget.welcome_message}"
   data-offline-message="${widget.offline_message}"
+  data-debug="true"
 ></script>`;
   };
 
@@ -373,8 +375,25 @@ const AdminWidgets = () => {
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => setTestCode(widgets.length > 0 ? generateEmbedCode(widgets[0]) : '')}
-                    disabled={widgets.length === 0}
+                    onClick={() => {
+                      const currentDomain = window.location.origin;
+                      const sampleCode = `<!-- Bolo AI Voice Widget -->
+<script
+  id="bolo-voice-widget"
+  src="${currentDomain}/widget.js"
+  type="module"
+  data-agent-id="agent_00ababaa55e5892947ae4457b9"
+  data-title="Voice Assistant"
+  data-primary-color="#6366F1"
+  data-secondary-color="#8B5CF6"
+  data-position="bottom-right"
+  data-button-text="Start a conversation"
+  data-welcome-message="Hi! How can I help you today?"
+  data-offline-message="We're currently offline. Please leave a message!"
+  data-debug="true"
+></script>`;
+                      setTestCode(sampleCode);
+                    }}
                   >
                     Load Sample Code
                   </Button>
