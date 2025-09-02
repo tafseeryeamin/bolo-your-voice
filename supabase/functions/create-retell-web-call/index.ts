@@ -1,3 +1,4 @@
+// supabase/functions/create-retell-web-call/index.ts
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -7,27 +8,35 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { agent_id } = await req.json();
-    
     const api_key = Deno.env.get('RETELL_API_KEY');
     
     if (!api_key) {
-      throw new Error('RETELL_API_KEY is not configured');
+      console.error('RETELL_API_KEY is not configured');
+      return new Response(JSON.stringify({ 
+        error: 'Retell API key not configured. Please contact administrator.' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     
     if (!agent_id) {
-      throw new Error('agent_id is required');
+      return new Response(JSON.stringify({ 
+        error: 'agent_id is required' 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    console.log('Creating Retell web call with agent_id:', agent_id);
+    console.log('Creating Retell web call for agent:', agent_id);
 
-    // Create web call using Retell API
     const response = await fetch('https://api.retellai.com/v2/create-web-call', {
       method: 'POST',
       headers: {
@@ -42,18 +51,40 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Retell API error:', response.status, errorText);
-      throw new Error(`Retell API error: ${response.status} - ${errorText}`);
+      
+      // Handle specific Retell API errors
+      let errorMessage = `Retell API error: ${response.status}`;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorMessage;
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+
+      return new Response(JSON.stringify({ 
+        error: errorMessage,
+        status: response.status 
+      }), {
+        status: response.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const data = await response.json();
-    console.log('Retell web call created successfully:', data);
+    console.log('Retell web call created successfully');
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify({
+      success: true,
+      ...data
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
     console.error('Error creating Retell call:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'Internal server error' 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
