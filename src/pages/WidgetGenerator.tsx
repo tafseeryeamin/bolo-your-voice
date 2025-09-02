@@ -33,6 +33,8 @@ const WidgetGenerator = () => {
   const [preview, setPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isWidgetSaved, setIsWidgetSaved] = useState(false);
+  const [testCode, setTestCode] = useState('');
+  const [showTestPreview, setShowTestPreview] = useState(false);
   const generateEmbedCode = () => {
     const widgetUrl = `${config.customDomain}/widget.js`;
     return `<!-- AI Voice Widget -->
@@ -78,6 +80,75 @@ const WidgetGenerator = () => {
       title: "File downloaded!",
       description: `${filename} has been downloaded.`
     });
+  };
+
+  const saveWidget = async () => {
+    if (!config.agentId.trim()) {
+      toast({
+        title: "Error",
+        description: "Agent ID is required to save the widget",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save widgets",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('widgets')
+        .insert({
+          user_id: user.id,
+          agent_id: config.agentId,
+          title: config.title,
+          logo_url: config.logoUrl || null,
+          primary_color: config.primaryColor,
+          secondary_color: config.secondaryColor,
+          position: config.position,
+          button_text: config.buttonText,
+          welcome_message: config.welcomeMessage,
+          offline_message: config.offlineMessage,
+          public_key: crypto.randomUUID(),
+        });
+
+      if (error) throw error;
+
+      setIsWidgetSaved(true);
+      toast({
+        title: "Success!",
+        description: "Widget saved successfully. You can view it in the Admin Widgets section.",
+      });
+    } catch (error) {
+      console.error('Error saving widget:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save widget. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTestWidget = () => {
+    if (!testCode.trim()) {
+      toast({
+        title: "Error",
+        description: "Please paste the embed code to test",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowTestPreview(true);
   };
   return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -307,9 +378,29 @@ const WidgetGenerator = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
+                    <Button 
+                      onClick={saveWidget}
+                      disabled={isSaving || !config.agentId.trim()}
+                      className="flex items-center gap-2"
+                    >
+                      {isSaving ? (
+                        <>Loading...</>
+                      ) : isWidgetSaved ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Saved!
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4" />
+                          Save Widget
+                        </>
+                      )}
+                    </Button>
                     <Button 
                       onClick={handleDownloadConfig}
+                      variant="outline"
                       className="flex items-center gap-2"
                     >
                       <Download className="w-4 h-4" />
@@ -330,6 +421,67 @@ const WidgetGenerator = () => {
                       <li>Widget appears with your branding and Bolo's design</li>
                     </ol>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Widget Testing Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Test Widget Code
+                </CardTitle>
+                <CardDescription>
+                  Paste any widget embed code here to test if it's working
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="testCode">Paste Embed Code</Label>
+                    <Textarea 
+                      id="testCode"
+                      value={testCode}
+                      onChange={(e) => setTestCode(e.target.value)}
+                      placeholder="Paste your widget embed code here..."
+                      rows={6}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={handleTestWidget} className="flex items-center gap-2">
+                      <Eye className="w-4 h-4" />
+                      Test Widget
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setTestCode('');
+                        setShowTestPreview(false);
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                  
+                  {showTestPreview && testCode && (
+                    <div className="border rounded-lg p-4 bg-muted">
+                      <h4 className="font-semibold mb-2">Test Preview:</h4>
+                      <div className="border rounded-lg p-8 bg-background min-h-[200px] relative">
+                        <div className="text-center text-muted-foreground mb-4">
+                          Testing Widget Code...
+                        </div>
+                        <div 
+                          dangerouslySetInnerHTML={{ __html: testCode }}
+                          className="w-full"
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        If the widget doesn't appear, check the console for errors or verify the embed code format.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
