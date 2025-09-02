@@ -24,6 +24,7 @@ const WidgetGenerator = () => {
     widgetType: 'floating',
     position: 'bottom-right',
     customDomain: window.location.origin,
+    supabaseFunctionsUrl: 'https://gcqrnvllzfdkspjfwmng.supabase.co/functions/v1',
     buttonText: 'Start a conversation',
     welcomeMessage: 'Hi there, How can we help?',
     offlineMessage: 'We\'re currently offline. Please leave a message!'
@@ -36,20 +37,20 @@ const WidgetGenerator = () => {
   const [testCode, setTestCode] = useState('');
   const [showTestPreview, setShowTestPreview] = useState(false);
   const generateEmbedCode = () => {
-    const widgetUrl = `${config.customDomain}/widget.js`;
-    return `<!-- AI Voice Widget -->
+    const widgetUrl = `${config.customDomain}/eleven-widget.js`;
+    const apiUrl = `${config.supabaseFunctionsUrl}/create-elevenlabs-session`;
+    return `<!-- ElevenLabs Voice Widget (white-labeled) -->
 <script
-  id="bolo-voice-widget"
+  id="bolo-eleven-widget"
   src="${widgetUrl}"
   data-agent-id="${config.agentId}"
+  data-api-url="${apiUrl}"
   data-title="${config.title}"
   ${config.logoUrl ? `data-logo-url="${config.logoUrl}"` : ''}
   data-primary-color="${config.primaryColor}"
   data-secondary-color="${config.secondaryColor}"
   data-position="${config.position}"
   data-button-text="${config.buttonText}"
-  data-welcome-message="${config.welcomeMessage}"
-  data-offline-message="${config.offlineMessage}"
 ></script>`;
   };
   const copyToClipboard = (text: string, type: string) => {
@@ -192,7 +193,7 @@ const WidgetGenerator = () => {
                       agentId: e.target.value
                     })} />
                       <p className="text-sm text-muted-foreground">
-                        Your Retell AI agent ID (API key is configured securely on the server)
+                        Your ElevenLabs Agent ID (API key is configured securely on the server)
                       </p>
                     </div>
 
@@ -334,20 +335,17 @@ const WidgetGenerator = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="welcomeMessage">Welcome Message</Label>
-                      <Textarea id="welcomeMessage" value={config.welcomeMessage} onChange={e => setConfig({
+                      <Label htmlFor="supabaseFunctionsUrl">Supabase Functions URL</Label>
+                      <Input id="supabaseFunctionsUrl" value={config.supabaseFunctionsUrl} onChange={e => setConfig({
                       ...config,
-                      welcomeMessage: e.target.value
-                    })} rows={3} />
+                      supabaseFunctionsUrl: e.target.value
+                    })} placeholder="https://YOUR-PROJECT.functions.supabase.co" />
+                      <p className="text-sm text-muted-foreground">
+                        We call your Edge Function to mint ElevenLabs session tokens.
+                      </p>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="offlineMessage">Offline Message</Label>
-                      <Textarea id="offlineMessage" value={config.offlineMessage} onChange={e => setConfig({
-                      ...config,
-                      offlineMessage: e.target.value
-                    })} rows={3} />
-                    </div>
+                    {/* ElevenLabs widget does not use welcome/offline texts in this simple button version */}
                   </TabsContent>
                 </Tabs>
               </CardContent>

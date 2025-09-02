@@ -14,6 +14,7 @@ import CreateAgent from "./pages/CreateAgent";
 import TestAgent from "./pages/TestAgent";
 import DemoTesting from "./pages/DemoTesting";
 import WidgetGenerator from "./pages/WidgetGenerator";
+import ElevenPreview from "./pages/ElevenPreview";
 import AdminWidgets from "./pages/AdminWidgets";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingElements from "./components/FloatingElements";
@@ -61,6 +62,11 @@ const App = () => (
           <Route path="/widget-generator" element={
             <ProtectedRoute>
               <WidgetGenerator />
+            </ProtectedRoute>
+          } />
+          <Route path="/preview/eleven" element={
+            <ProtectedRoute>
+              <ElevenPreview />
             </ProtectedRoute>
           } />
           <Route path="/admin/widgets" element={
