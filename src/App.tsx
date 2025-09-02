@@ -11,10 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import Pricing from "./pages/Pricing";
 import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
-import TestAgent from "./pages/TestAgent";
-import DemoTesting from "./pages/DemoTesting";
-import WidgetGenerator from "./pages/WidgetGenerator";
-import ElevenPreview from "./pages/ElevenPreview";
 import AdminWidgets from "./pages/AdminWidgets";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingElements from "./components/FloatingElements";
@@ -44,31 +40,12 @@ const App = () => (
               <CreateAgent />
             </ProtectedRoute>
           } />
-          <Route path="/test-agent" element={
-            <ProtectedRoute>
-              <TestAgent />
-            </ProtectedRoute>
-          } />
           <Route path="/agent-config" element={
             <ProtectedRoute>
               <AgentConfig />
             </ProtectedRoute>
           } />
-          <Route path="/demo-testing" element={
-            <ProtectedRoute>
-              <DemoTesting />
-            </ProtectedRoute>
-          } />
-          <Route path="/widget-generator" element={
-            <ProtectedRoute>
-              <WidgetGenerator />
-            </ProtectedRoute>
-          } />
-          <Route path="/preview/eleven" element={
-            <ProtectedRoute>
-              <ElevenPreview />
-            </ProtectedRoute>
-          } />
+          {/* Removed testing and embedding routes */}
           <Route path="/admin/widgets" element={
             <ProtectedRoute>
               <AdminWidgets />
