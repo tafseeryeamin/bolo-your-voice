@@ -1,32 +1,5 @@
 import { Check, Phone, Globe, Zap, BarChart3, Shield, Clock, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-const Header = () => {
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="text-2xl font-bold text-white">
-          VoiceAI Pro
-        </div>
-        <nav className="hidden md:flex items-center space-x-8">
-          <a href="#" className="text-white/80 hover:text-white transition-colors">Features</a>
-          <a href="#" className="text-white/80 hover:text-white transition-colors">Pricing</a>
-          <a href="#" className="text-white/80 hover:text-white transition-colors">Documentation</a>
-          <a href="#" className="text-white/80 hover:text-white transition-colors">Support</a>
-        </nav>
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="text-white hover:bg-white/10">
-            Sign In
-          </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700 text-white">
-            Get Started
-          </Button>
-        </div>
-      </div>
-    </header>
-  );
-};
 
 const Pricing = () => {
   const features = [{
@@ -92,9 +65,7 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      <Header />
-      
-      <main className="pt-20">
+      <main className="pt-0">
         {/* Hero Section */}
         <section className="py-20 px-4 bg-gradient-to-br from-teal-600/20 via-transparent to-blue-600/20">
           <div className="container mx-auto max-w-4xl text-center">
@@ -178,14 +149,7 @@ const Pricing = () => {
                     ))}
                     
                     <div className="pt-6">
-                      <Button 
-                        className={`w-full ${tier.popular 
-                          ? 'bg-teal-600 hover:bg-teal-700 text-white' 
-                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                        }`}
-                      >
-                        {tier.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
-                      </Button>
+                      
                     </div>
                   </CardContent>
                 </Card>
@@ -227,72 +191,12 @@ const Pricing = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 px-4 bg-gradient-to-br from-teal-600/10 to-blue-600/10">
-          <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Ready to Transform Your Business?
-            </h2>
-            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-              Join hundreds of businesses already using our AI assistant to automate customer interactions and drive growth.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg">
-                Start Your Free Demo
-              </Button>
-              <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-3 text-lg">
-                Schedule Consultation
-              </Button>
-            </div>
-            <div className="mt-8 text-sm text-white/60">
-              <p>✓ 30-day money-back guarantee  ✓ No setup fees for first 100 customers</p>
-            </div>
-          </div>
-        </section>
+        
+
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-white/10">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="text-2xl font-bold text-white mb-4">VoiceAI Pro</div>
-              <p className="text-white/60 text-sm">
-                Revolutionizing business communication with intelligent AI assistants.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
-              <div className="space-y-2 text-sm text-white/60">
-                <div><a href="#" className="hover:text-white transition-colors">Features</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Pricing</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">API</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Integrations</a></div>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Support</h4>
-              <div className="space-y-2 text-sm text-white/60">
-                <div><a href="#" className="hover:text-white transition-colors">Documentation</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Help Center</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Contact Us</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Status</a></div>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <div className="space-y-2 text-sm text-white/60">
-                <div><a href="#" className="hover:text-white transition-colors">About</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Blog</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Careers</a></div>
-                <div><a href="#" className="hover:text-white transition-colors">Privacy</a></div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-white/10 mt-8 pt-8 text-center text-sm text-white/60">
-            <p>&copy; 2025 VoiceAI Pro. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 };
