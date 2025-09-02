@@ -23,7 +23,7 @@ const WidgetGenerator = () => {
     secondaryColor: '#8B5CF6',
     widgetType: 'floating',
     position: 'bottom-right',
-    customDomain: window.location.origin,
+    customDomain: 'https://bolovoice.com',
     buttonText: 'Start a conversation',
     welcomeMessage: 'Hi there, How can we help?',
     offlineMessage: 'We\'re currently offline. Please leave a message!'

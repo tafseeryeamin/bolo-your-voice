@@ -60,7 +60,7 @@ const AdminWidgets = () => {
     return `<!-- Bolo AI Voice Widget -->
 <script
   id="bolo-voice-widget"
-  src="https://preview--bolo-your-voice.lovable.app/widget.js"
+  src="https://bolovoice.com/widget.js"
   type="module"
   data-public-key="${widget.public_key}"
   data-agent-id="${widget.agent_id}"
