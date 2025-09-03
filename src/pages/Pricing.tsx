@@ -1,5 +1,6 @@
 import { Check, Phone, Globe, Zap, BarChart3, Shield, Clock, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Header from "@/components/Header";
 
 const Pricing = () => {
   const features = [{
@@ -39,7 +40,7 @@ const Pricing = () => {
   const pricingTiers = [{
     name: "Starter",
     description: "Complete AI assistant for small businesses",
-    price: "$200",
+    price: "$250",
     unit: "per month",
     setupFee: "$600",
     minutes: "100 minutes included",
@@ -47,24 +48,25 @@ const Pricing = () => {
   }, {
     name: "Premium",
     description: "Advanced solution for growing businesses",
-    price: "$450",
+    price: "$500",
     unit: "per month",
     setupFee: "$600", 
     minutes: "250 minutes included",
     popular: true,
-    features: ["Everything in Starter", "Expanded conversation time", "Priority support", "Advanced analytics", "Custom voice training", "Multi-language support", "API integrations", "White-label options"]
+    features: ["Everything in Starter", "Expanded conversation time", "Priority support", "Advanced analytics", "Multi-language support"]
   }, {
     name: "Enterprise",
     description: "Full-scale solution for large organizations",
-    price: "$1,800",
+    price: "$2,000",
     unit: "per month",
     setupFee: "$600",
     minutes: "1000 minutes included",
-    features: ["Everything in Premium", "Maximum conversation capacity", "Dedicated infrastructure", "24/7 phone support", "Custom integrations", "SLA guarantees", "Multiple bot instances", "Advanced reporting"]
+    features: ["Everything in Premium", "Maximum conversation capacity", "Dedicated infrastructure", "24/7 phone support", "Multiple bot instances", "Advanced reporting"]
   }];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+      <Header />
       <main className="pt-0">
         {/* Hero Section */}
         <section className="py-20 px-4 bg-gradient-to-br from-teal-600/20 via-transparent to-blue-600/20">
