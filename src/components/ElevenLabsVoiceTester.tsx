@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Mic, MicOff, Phone, PhoneOff } from "lucide-react";
 import { useConversation } from "@11labs/react";
 
@@ -41,7 +41,7 @@ const ElevenLabsVoiceTester = ({ apiKey, agentId }: ElevenLabsVoiceTesterProps) 
       console.error("ElevenLabs conversation error:", error);
       toast({
         title: "Error",
-        description: error.message || "An error occurred with the voice conversation",
+        description: typeof error === 'string' ? error : "An error occurred with the voice conversation",
         variant: "destructive",
       });
     },
@@ -85,7 +85,7 @@ const ElevenLabsVoiceTester = ({ apiKey, agentId }: ElevenLabsVoiceTesterProps) 
       }
 
       // Start the conversation using the signed URL
-      const convId = await conversation.startSession({ url: signedUrl });
+      const convId = await conversation.startSession({ signedUrl });
       setConversationId(convId);
       
       toast({
