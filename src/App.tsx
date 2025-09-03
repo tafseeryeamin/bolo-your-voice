@@ -46,6 +46,16 @@ const App = () => (
             </ProtectedRoute>
           } />
           {/* Removed testing and embedding routes */}
+          <Route path="/demo-testing" element={
+            <ProtectedRoute>
+              <AdminWidgets />
+            </ProtectedRoute>
+          } />
+          <Route path="/widget-generator" element={
+            <ProtectedRoute>
+              <AdminWidgets />
+            </ProtectedRoute>
+          } />
           <Route path="/admin/widgets" element={
             <ProtectedRoute>
               <AdminWidgets />

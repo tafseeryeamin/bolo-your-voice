@@ -12,6 +12,8 @@ import { Copy, Download, Eye, Settings, Code, Palette, Save, Check, Trash2, Edit
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import Header from '@/components/Header';
+import ElevenLabsVoiceTester from '@/components/ElevenLabsVoiceTester';
 
 interface Widget {
   id: string;
@@ -38,9 +40,13 @@ const AdminWidgets = () => {
   const [widgets, setWidgets] = useState<Widget[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
-  const [activeTab, setActiveTab] = useState<'list' | 'generator'>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'generator' | 'elevenlabs'>('list');
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // ElevenLabs testing state
+  const [elevenLabsApiKey, setElevenLabsApiKey] = useState("");
+  const [elevenLabsAgentId, setElevenLabsAgentId] = useState("");
 
   // Widget Generator State
   const [config, setConfig] = useState({
@@ -355,27 +361,30 @@ const AdminWidgets = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Widget Management</h1>
-            <p className="text-muted-foreground">
-              Manage voice widgets and generate new ones
-            </p>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold">Demo & Testing Center</h1>
+              <p className="text-muted-foreground">
+                Manage widgets, generate new ones, and test ElevenLabs voice agents
+              </p>
+            </div>
+            <Button onClick={() => navigate('/admin')} variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Admin
+            </Button>
           </div>
-          <Button onClick={() => navigate('/admin')} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Admin
-          </Button>
-        </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'list' | 'generator')}>
-          <TabsList>
-            <TabsTrigger value="list">Widget List</TabsTrigger>
-            <TabsTrigger value="generator">Widget Generator</TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'list' | 'generator' | 'elevenlabs')}>
+            <TabsList>
+              <TabsTrigger value="list">Widget List</TabsTrigger>
+              <TabsTrigger value="generator">Widget Generator</TabsTrigger>
+              <TabsTrigger value="elevenlabs">ElevenLabs Testing</TabsTrigger>
+            </TabsList>
 
           <TabsContent value="list" className="space-y-6">
             <Card>
@@ -983,8 +992,56 @@ const AdminWidgets = () => {
                 </Card>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+
+            <TabsContent value="elevenlabs" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>ElevenLabs Voice Testing</CardTitle>
+                  <CardDescription>
+                    Test ElevenLabs voice agents with API key and agent ID
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="elevenlabs-api-key">
+                      ElevenLabs API Key
+                    </Label>
+                    <Input
+                      id="elevenlabs-api-key"
+                      type="password"
+                      placeholder="Enter your ElevenLabs API key"
+                      value={elevenLabsApiKey}
+                      onChange={(e) => setElevenLabsApiKey(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="elevenlabs-agent-id">
+                      Agent ID
+                    </Label>
+                    <Input
+                      id="elevenlabs-agent-id"
+                      placeholder="Enter agent ID"
+                      value={elevenLabsAgentId}
+                      onChange={(e) => setElevenLabsAgentId(e.target.value)}
+                    />
+                  </div>
+                  {elevenLabsApiKey && elevenLabsAgentId && (
+                    <ElevenLabsVoiceTester 
+                      apiKey={elevenLabsApiKey} 
+                      agentId={elevenLabsAgentId} 
+                    />
+                  )}
+                  {(!elevenLabsApiKey || !elevenLabsAgentId) && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Please enter both API key and Agent ID to start testing
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
