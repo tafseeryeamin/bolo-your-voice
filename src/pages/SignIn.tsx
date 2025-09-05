@@ -30,14 +30,26 @@ const SignIn = () => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Redirect authenticated users
+        // Redirect authenticated users based on their role
         if (session?.user) {
-          const userEmail = session.user.email;
-          if (userEmail === "tafser.yeamin.tiu@gmail.com") {
-            navigate("/admin");
-          } else {
-            navigate("/dashboard");
-          }
+          // Check if user has admin role
+          const checkRoleAndRedirect = async () => {
+            try {
+              const { data: isAdmin } = await supabase.rpc('has_role', { 
+                _user_id: session.user.id, 
+                _role: 'admin' 
+              });
+              if (isAdmin) {
+                navigate("/admin");
+              } else {
+                navigate("/dashboard");
+              }
+            } catch (error) {
+              // Default to dashboard if role check fails
+              navigate("/dashboard");
+            }
+          };
+          checkRoleAndRedirect();
         }
       }
     );
@@ -47,14 +59,26 @@ const SignIn = () => {
       setSession(session);
       setUser(session?.user ?? null);
       
-      // Redirect if already authenticated
+      // Redirect if already authenticated based on role
       if (session?.user) {
-        const userEmail = session.user.email;
-        if (userEmail === "tafser.yeamin.tiu@gmail.com") {
-          navigate("/admin");
-        } else {
-          navigate("/dashboard");
-        }
+        // Check if user has admin role
+        const checkRoleAndRedirect = async () => {
+          try {
+            const { data: isAdmin } = await supabase.rpc('has_role', { 
+              _user_id: session.user.id, 
+              _role: 'admin' 
+            });
+            if (isAdmin) {
+              navigate("/admin");
+            } else {
+              navigate("/dashboard");
+            }
+          } catch (error) {
+            // Default to dashboard if role check fails
+            navigate("/dashboard");
+          }
+        };
+        checkRoleAndRedirect();
       }
     });
 
