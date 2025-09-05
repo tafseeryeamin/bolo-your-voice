@@ -8,7 +8,7 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
-import Pricing from "./pages/Pricing";
+
 import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
 import AdminWidgets from "./pages/AdminWidgets";
@@ -27,7 +27,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/sign-in/pricing" element={<Pricing />} />
+          
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/agents" element={
