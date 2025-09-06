@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Building2, Users, Headphones, MessageSquare, BarChart, Shield } from "lucide-react";
 import websiteDemo from "@/assets/website-demo.jpg";
-import salesBot from "@/assets/sales-bot.jpg";
+import boloLogo from "@/assets/bolo-logo.jpg";
 import { motion } from "framer-motion";
 
 const FeaturesSection = () => {
@@ -101,12 +101,12 @@ const FeaturesSection = () => {
             <div className="relative">
               <div className="w-32 h-32 rounded-full bg-gradient-to-br from-voice-accent/20 to-neon-cyan/20 flex items-center justify-center border border-voice-accent/30 shadow-lg">
                 <img 
-                  src={salesBot} 
-                  alt="AI Sales Assistant Bot"
+                  src={boloLogo} 
+                  alt="Bolo Voice Logo"
                   className="w-24 h-24 rounded-full object-cover"
                 />
               </div>
-              <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-voice-accent/20 to-neon-cyan/20 blur-lg animate-pulse" />
+              <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-voice-accent/30 to-neon-cyan/30 blur-xl animate-pulse opacity-75" />
             </div>
           </motion.div>
         </div>

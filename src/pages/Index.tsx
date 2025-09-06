@@ -5,6 +5,7 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import DeploymentSection from "@/components/DeploymentSection";
 import CTASection from "@/components/CTASection";
 import VoiceCallButton from "@/components/VoiceCallButton";
+import FloatingLogo from "@/components/FloatingLogo";
 const Index = () => {
   return <div className="min-h-screen bg-background">
       <Header />
@@ -14,8 +15,7 @@ const Index = () => {
         <HowItWorksSection />
         <DeploymentSection />
         <CTASection />
-        {/* Add the voice call button */}
-        
+        <FloatingLogo />
       </main>
     </div>;
 };
