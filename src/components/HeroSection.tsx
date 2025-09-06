@@ -50,8 +50,17 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          Turn Visitors into Customers with AI Voice Solutions
+          500X Your Sales with AI Salesman Integration
         </motion.h1>
+        
+        <motion.p 
+          className="text-2xl md:text-3xl mb-8 text-voice-accent font-semibold"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+        >
+          Turn Every Website Visitor into a Paying Customer
+        </motion.p>
         
         <motion.div 
           className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed min-h-[80px] flex items-center justify-center"
