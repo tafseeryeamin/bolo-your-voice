@@ -3,43 +3,33 @@ import { Building2, Users, Headphones, MessageSquare, BarChart, Shield } from "l
 import websiteDemoWithLogo from "@/assets/website-demo-with-logo.jpg";
 import boloLogo from "@/assets/bolo-logo.jpg";
 import { motion } from "framer-motion";
-
 const FeaturesSection = () => {
-  const features = [
-    {
-      icon: Building2,
-      title: "Company Representation",
-      description: "Let AI voice assistants introduce your company, share your mission, and communicate your values to potential customers and partners."
-    },
-    {
-      icon: Users,
-      title: "Personal Branding",
-      description: "Create a voice presence that represents you professionally, sharing your expertise and building meaningful connections."
-    },
-    {
-      icon: Headphones,
-      title: "24/7 Availability",
-      description: "Your voice assistant works around the clock, ensuring no opportunity is missed to connect with your audience."
-    },
-    {
-      icon: MessageSquare,
-      title: "Intelligent Conversations",
-      description: "Advanced AI understands context and provides relevant information about your business or personal brand."
-    },
-    {
-      icon: BarChart,
-      title: "Analytics & Insights",
-      description: "Track engagement metrics and understand how people interact with your voice assistant to optimize performance."
-    },
-    {
-      icon: Shield,
-      title: "Secure & Reliable",
-      description: "Enterprise-grade security ensures your brand information and user interactions remain protected."
-    }
-  ];
-
-  return (
-    <section className="py-24 px-6">
+  const features = [{
+    icon: Building2,
+    title: "Company Representation",
+    description: "Let AI voice assistants introduce your company, share your mission, and communicate your values to potential customers and partners."
+  }, {
+    icon: Users,
+    title: "Personal Branding",
+    description: "Create a voice presence that represents you professionally, sharing your expertise and building meaningful connections."
+  }, {
+    icon: Headphones,
+    title: "24/7 Availability",
+    description: "Your voice assistant works around the clock, ensuring no opportunity is missed to connect with your audience."
+  }, {
+    icon: MessageSquare,
+    title: "Intelligent Conversations",
+    description: "Advanced AI understands context and provides relevant information about your business or personal brand."
+  }, {
+    icon: BarChart,
+    title: "Analytics & Insights",
+    description: "Track engagement metrics and understand how people interact with your voice assistant to optimize performance."
+  }, {
+    icon: Shield,
+    title: "Secure & Reliable",
+    description: "Enterprise-grade security ensures your brand information and user interactions remain protected."
+  }];
+  return <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">
@@ -51,68 +41,70 @@ const FeaturesSection = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-border/50 hover:border-voice-accent/30 transition-all duration-300 hover:shadow-lg group">
+          {features.map((feature, index) => <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-border/50 hover:border-voice-accent/30 transition-all duration-300 hover:shadow-lg group">
               <div className="w-16 h-16 rounded-full bg-voice-accent/20 flex items-center justify-center mb-6 group-hover:bg-voice-accent/30 transition-colors">
                 <feature.icon className="w-8 h-8 text-voice-accent" />
               </div>
               <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
               <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-            </Card>
-          ))}
+            </Card>)}
         </div>
 
         {/* Sales Demo Section */}
         <div className="mt-24 text-center">
-          <motion.h3 
-            className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
+          <motion.h3 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent" initial={{
+          opacity: 0,
+          y: 30
+        }} whileInView={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.6
+        }} viewport={{
+          once: true
+        }}>
             500X Your Sales Integrating an AI Salesman to Your Website
           </motion.h3>
           
-          <motion.div 
-            className="relative max-w-4xl mx-auto mb-12"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
+          <motion.div className="relative max-w-4xl mx-auto mb-12" initial={{
+          opacity: 0,
+          scale: 0.9
+        }} whileInView={{
+          opacity: 1,
+          scale: 1
+        }} transition={{
+          duration: 0.6,
+          delay: 0.2
+        }} viewport={{
+          once: true
+        }}>
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50">
-              <img 
-                src={websiteDemoWithLogo}
-                alt="Professional website with AI integration"
-                className="w-full h-auto"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+              <img src={websiteDemoWithLogo} alt="Professional website with AI integration" className="w-full h-auto" />
+              
             </div>
           </motion.div>
 
-          <motion.div 
-            className="flex justify-center"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
+          <motion.div className="flex justify-center" initial={{
+          opacity: 0,
+          y: 30
+        }} whileInView={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.6,
+          delay: 0.4
+        }} viewport={{
+          once: true
+        }}>
             <div className="relative">
               <div className="w-32 h-32 rounded-full bg-gradient-to-br from-voice-accent/20 to-neon-cyan/20 flex items-center justify-center border border-voice-accent/30 shadow-lg">
-                <img 
-                  src={boloLogo} 
-                  alt="Bolo Voice Logo"
-                  className="w-24 h-24 rounded-full object-cover"
-                />
+                <img src={boloLogo} alt="Bolo Voice Logo" className="w-24 h-24 rounded-full object-cover" />
               </div>
               <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-voice-accent/30 to-neon-cyan/30 blur-xl animate-pulse opacity-75" />
             </div>
           </motion.div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default FeaturesSection;
