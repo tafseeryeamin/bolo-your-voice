@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Building2, Users, Headphones, MessageSquare, BarChart, Shield } from "lucide-react";
-import websiteDemo from "@/assets/website-demo.jpg";
+import websiteDemoWithLogo from "@/assets/website-demo-with-logo.jpg";
 import boloLogo from "@/assets/bolo-logo.jpg";
 import { motion } from "framer-motion";
 
@@ -83,7 +83,7 @@ const FeaturesSection = () => {
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50">
               <img 
-                src={websiteDemo} 
+                src={websiteDemoWithLogo}
                 alt="Professional website with AI integration"
                 className="w-full h-auto"
               />

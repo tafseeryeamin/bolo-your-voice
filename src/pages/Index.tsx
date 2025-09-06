@@ -15,7 +15,6 @@ const Index = () => {
         <HowItWorksSection />
         <DeploymentSection />
         <CTASection />
-        <FloatingLogo />
       </main>
     </div>;
 };
