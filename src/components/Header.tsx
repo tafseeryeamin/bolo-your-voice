@@ -55,11 +55,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
           <div className="p-4 rounded-full glassmorphism neon-border animate-neon-pulse">
-            <img 
-              src="/src/assets/bolo-logo.jpg" 
-              alt="Bolo Voice Logo"
-              className="w-6 h-6 rounded-full object-cover"
-            />
+            <Mic className="w-6 h-6 text-voice-accent" />
           </div>
           <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO VOICE</span>
         </div>
