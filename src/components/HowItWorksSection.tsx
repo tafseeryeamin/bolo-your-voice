@@ -92,168 +92,164 @@ const HowItWorksSection = () => {
   const step4Progress = useTransform(scrollYProgress, [0.6, 0.8], [0, 1]);
   const step5Progress = useTransform(scrollYProgress, [0.8, 1], [0, 1]);
   const progressSteps = [step1Progress, step2Progress, step3Progress, step4Progress, step5Progress];
-  return <section ref={sectionRef} className="py-20 px-4 bg-gradient-to-b from-background to-background/50">
+  return (
+    <section ref={sectionRef} className="py-24 px-4 bg-gradient-to-b from-background to-secondary/5">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 30
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} viewport={{
-        once: true
-      }} transition={{
-        duration: 0.6
-      }} className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-teal-300">
-            No more missing leads.
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          viewport={{ once: true }} 
+          transition={{ duration: 0.6 }} 
+          className="text-center mb-20"
+        >
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <Zap className="w-4 h-4" />
+            Convert More Visitors
+          </div>
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent">
+            How It Works
           </h2>
-          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Do you know you are just getting 1–17% of your website visitors to buy your service or product? 
-            Here is a solution: we will implement an AI Sales Assistant. Check how it works.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Transform your website visitors into customers with our AI-powered conversation flow. 
+            Increase your conversion rate from 1-17% to 30%+ with intelligent engagement.
           </p>
         </motion.div>
 
-        {/* Interactive Flow Diagram */}
-        <TooltipProvider>
-          <div className="relative max-w-4xl mx-auto">
-            {/* Vertical Flow */}
-            <div className="relative">
-              {flowSteps.map((step, index) => <motion.div key={step.id} className="relative mb-20 last:mb-0" initial={{
-              opacity: 0,
-              x: index % 2 === 0 ? -100 : 100
-            }} whileInView={{
-              opacity: 1,
-              x: 0
-            }} viewport={{
-              once: true,
-              margin: "-100px"
-            }} transition={{
-              duration: 0.8,
-              delay: index * 0.1
-            }}>
-                  <div className={`flex items-center gap-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                    {/* Step Card */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <motion.div whileHover={{
-                      scale: 1.02,
-                      y: -5
-                    }} onMouseEnter={() => setHoveredStep(step.id)} onMouseLeave={() => setHoveredStep(null)} className={`
-                            relative bg-card/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50
-                            cursor-pointer transition-all duration-500 w-80 h-56 hover:shadow-xl
-                            ${hoveredStep === step.id ? 'border-primary/50 bg-card' : ''}
-                          `}>
-                          {/* Step Number */}
-                          <div className="absolute -top-3 -left-3 w-10 h-10 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
-                            {step.id}
-                          </div>
-
-                          {/* Icon */}
-                          <div className="mb-4 flex justify-center">
-                            <motion.div className={`p-3 rounded-xl ${hoveredStep === step.id ? 'bg-primary/10 scale-110' : 'bg-secondary/50'} transition-all duration-300`} whileHover={{
-                          rotate: [0, -10, 10, 0]
-                        }}>
-                              <step.icon className={`w-8 h-8 ${hoveredStep === step.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                            </motion.div>
-                          </div>
-
-                          {/* Content */}
-                          <div className="text-center">
-                            <h3 className="font-semibold text-xl mb-2">{step.title}</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-                          </div>
-
-                          {/* Interactive Options for step 3 */}
-                          {step.options && <motion.div initial={{
-                        opacity: 0,
-                        scale: 0.8
-                      }} animate={{
-                        opacity: hoveredStep === step.id ? 1 : 0,
-                        scale: hoveredStep === step.id ? 1 : 0.8
-                      }} className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-3">
-                              {step.options.map((option, idx) => <motion.div key={idx} initial={{
-                          x: -20
-                        }} animate={{
-                          x: hoveredStep === step.id ? 0 : -20
-                        }} transition={{
-                          delay: idx * 0.1
-                        }} className="flex items-center gap-3 bg-card p-3 rounded-xl shadow-lg border border-border/50 backdrop-blur-sm min-w-48">
-                                  <option.icon className={`w-5 h-5 ${option.color}`} />
-                                  <span className="text-sm font-medium">{option.label}</span>
-                                </motion.div>)}
-                            </motion.div>}
-                        </motion.div>
-                      </TooltipTrigger>
-                      <TooltipContent side={index % 2 === 0 ? "right" : "left"}>
-                        <p>{step.tooltip}</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    {/* Descriptive Transition */}
-                    {index < flowSteps.length - 1 && <div className="flex-1 relative">
-                        <motion.div className="flex items-center justify-center px-8" initial={{
-                    opacity: 0
-                  }} whileInView={{
-                    opacity: 1
-                  }} viewport={{
-                    once: true
-                  }} transition={{
-                    delay: index * 0.2 + 0.5
-                  }}>
-                          <div className="text-center bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/30 shadow-sm">
-                            <motion.div animate={{
-                        rotate: 360
-                      }} transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "linear"
-                      }} className="mb-2 flex justify-center">
-                              <Zap className="w-5 h-5 text-primary" />
-                            </motion.div>
-                            <p className="text-sm text-muted-foreground font-medium">
-                              {index === 0 && "Instant connection established"}
-                              {index === 1 && "AI analyzes visitor intent"}
-                              {index === 2 && "Personalized engagement begins"}
-                              {index === 3 && "Lead nurturing activated"}
-                            </p>
-                          </div>
-                        </motion.div>
-
-                        {/* Arrow */}
-                        <motion.div className="absolute right-4 top-1/2 transform -translate-y-1/2" animate={{
-                    y: [0, -5, 0]
-                  }} transition={{
-                    duration: 1.5,
-                    repeat: Infinity
-                  }}>
-                          <ArrowDown className="w-6 h-6 text-primary rotate-90" />
-                        </motion.div>
-                      </div>}
+        {/* Steps Grid */}
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-12 mb-20">
+          {flowSteps.slice(0, 3).map((step, index) => (
+            <motion.div
+              key={step.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className="relative"
+            >
+              {/* Step Number */}
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold shadow-lg z-10">
+                {step.id}
+              </div>
+              
+              {/* Card */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 h-full group hover:border-primary/30">
+                {/* Icon */}
+                <div className="mb-6 flex justify-center">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-all duration-300">
+                    <step.icon className="w-8 h-8 text-primary" />
                   </div>
-                </motion.div>)}
+                </div>
+                
+                {/* Content */}
+                <div className="text-center">
+                  <h3 className="font-bold text-xl mb-4 text-foreground">{step.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed mb-6">{step.description}</p>
+                  
+                  {/* Options for step 3 */}
+                  {step.options && (
+                    <div className="space-y-3">
+                      {step.options.map((option, idx) => (
+                        <div key={idx} className="flex items-center gap-3 bg-secondary/50 p-3 rounded-xl">
+                          <option.icon className={`w-5 h-5 ${option.color}`} />
+                          <span className="text-sm font-medium">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Arrow */}
+              {index < 2 && (
+                <div className="hidden md:block absolute top-1/2 -right-6 lg:-right-8 transform -translate-y-1/2">
+                  <motion.div
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-8 h-8 text-primary/60"
+                  >
+                    <ArrowDown className="w-full h-full rotate-90" />
+                  </motion.div>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Follow-up Steps */}
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+          {flowSteps.slice(3).map((step, index) => (
+            <motion.div
+              key={step.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className="relative"
+            >
+              {/* Step Number */}
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold shadow-lg z-10">
+                {step.id}
+              </div>
+              
+              {/* Card */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 h-full group hover:border-primary/30">
+                {/* Icon */}
+                <div className="mb-6 flex justify-center">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-all duration-300">
+                    <step.icon className="w-8 h-8 text-primary" />
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="text-center">
+                  <h3 className="font-bold text-xl mb-4 text-foreground">{step.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                </div>
+              </div>
+              
+              {/* Arrow */}
+              {index === 0 && (
+                <div className="hidden md:block absolute top-1/2 -right-6 lg:-right-8 transform -translate-y-1/2">
+                  <motion.div
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-8 h-8 text-primary/60"
+                  >
+                    <ArrowDown className="w-full h-full rotate-90" />
+                  </motion.div>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Results Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-20 text-center bg-gradient-to-r from-primary/5 to-accent/5 rounded-3xl p-12 border border-border/30"
+        >
+          <h3 className="text-3xl font-bold mb-6 text-foreground">The Result?</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <div className="text-4xl font-bold text-primary mb-2">30%+</div>
+              <p className="text-muted-foreground">Conversion Rate</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-accent mb-2">24/7</div>
+              <p className="text-muted-foreground">AI Availability</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-secondary mb-2">0</div>
+              <p className="text-muted-foreground">Missed Opportunities</p>
             </div>
           </div>
-        </TooltipProvider>
-
-        {/* Bottom CTA */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 30
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} viewport={{
-        once: true
-      }} transition={{
-        duration: 0.6,
-        delay: 0.5
-      }} className="text-center mt-20">
-          
-          
         </motion.div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default HowItWorksSection;
