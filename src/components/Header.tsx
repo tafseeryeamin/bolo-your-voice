@@ -54,11 +54,11 @@ const Header = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
-          <div className="p-2 rounded-full glassmorphism neon-border">
+          <div className="p-4 rounded-full glassmorphism neon-border animate-neon-pulse">
             <img 
               src="/src/assets/bolo-logo.jpg" 
               alt="Bolo Voice Logo"
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-6 h-6 rounded-full object-cover"
             />
           </div>
           <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO VOICE</span>
