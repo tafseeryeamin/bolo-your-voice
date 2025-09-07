@@ -54,8 +54,16 @@ const Header = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
-          <div className="p-2 rounded-lg bg-voice-accent/20">
-            <Mic className="w-6 h-6 text-voice-accent" />
+          <div className="relative group">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-voice-accent/20 to-neon-cyan/20 flex items-center justify-center border border-voice-accent/30 shadow-lg backdrop-blur-sm hover:scale-110 transition-all duration-300">
+              <img 
+                src="/src/assets/bolo-logo.jpg" 
+                alt="Bolo Voice Logo"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            </div>
+            <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-voice-accent/40 to-neon-cyan/40 blur-lg animate-pulse opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-voice-accent/20 to-neon-cyan/20 blur-md animate-ping opacity-30" />
           </div>
           <span className="text-2xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">BOLO VOICE</span>
         </div>
