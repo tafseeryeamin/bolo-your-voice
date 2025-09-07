@@ -93,7 +93,7 @@ const HowItWorksSection = () => {
   const step5Progress = useTransform(scrollYProgress, [0.8, 1], [0, 1]);
   const progressSteps = [step1Progress, step2Progress, step3Progress, step4Progress, step5Progress];
   return (
-    <section ref={sectionRef} className="py-24 px-4 bg-gradient-to-b from-background to-secondary/5">
+    <section ref={sectionRef} className="py-24 px-4 bg-gradient-to-b from-background to-background/50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div 
@@ -103,11 +103,11 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.6 }} 
           className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-voice-accent/10 text-voice-accent px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="w-4 h-4" />
             Convert More Visitors
           </div>
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-voice-accent to-neon-cyan bg-clip-text text-transparent">
             How It Works
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -128,16 +128,16 @@ const HowItWorksSection = () => {
               className="relative"
             >
               {/* Step Number */}
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold shadow-lg z-10">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-voice-accent to-neon-cyan text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg z-10">
                 {step.id}
               </div>
               
               {/* Card */}
-              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 h-full group hover:border-primary/30">
+              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 h-full group hover:border-voice-accent/30">
                 {/* Icon */}
                 <div className="mb-6 flex justify-center">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-all duration-300">
-                    <step.icon className="w-8 h-8 text-primary" />
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-voice-accent/10 to-neon-cyan/10 group-hover:from-voice-accent/20 group-hover:to-neon-cyan/20 transition-all duration-300">
+                    <step.icon className="w-8 h-8 text-voice-accent" />
                   </div>
                 </div>
                 
@@ -188,16 +188,16 @@ const HowItWorksSection = () => {
               className="relative"
             >
               {/* Step Number */}
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent text-primary-foreground rounded-full flex items-center justify-center text-lg font-bold shadow-lg z-10">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-voice-accent to-neon-cyan text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg z-10">
                 {step.id}
               </div>
               
               {/* Card */}
-              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 h-full group hover:border-primary/30">
+              <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 h-full group hover:border-voice-accent/30">
                 {/* Icon */}
                 <div className="mb-6 flex justify-center">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-all duration-300">
-                    <step.icon className="w-8 h-8 text-primary" />
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-voice-accent/10 to-neon-cyan/10 group-hover:from-voice-accent/20 group-hover:to-neon-cyan/20 transition-all duration-300">
+                    <step.icon className="w-8 h-8 text-voice-accent" />
                   </div>
                 </div>
                 
@@ -214,7 +214,7 @@ const HowItWorksSection = () => {
                   <motion.div
                     animate={{ x: [0, 5, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-8 h-8 text-primary/60"
+                    className="w-8 h-8 text-voice-accent/60"
                   >
                     <ArrowDown className="w-full h-full rotate-90" />
                   </motion.div>
@@ -230,20 +230,20 @@ const HowItWorksSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-20 text-center bg-gradient-to-r from-primary/5 to-accent/5 rounded-3xl p-12 border border-border/30"
+          className="mt-20 text-center bg-gradient-to-r from-voice-accent/5 to-neon-cyan/5 rounded-3xl p-12 border border-border/30"
         >
           <h3 className="text-3xl font-bold mb-6 text-foreground">The Result?</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">30%+</div>
+              <div className="text-4xl font-bold text-voice-accent mb-2">30%+</div>
               <p className="text-muted-foreground">Conversion Rate</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-accent mb-2">24/7</div>
+              <div className="text-4xl font-bold text-neon-cyan mb-2">24/7</div>
               <p className="text-muted-foreground">AI Availability</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-secondary mb-2">0</div>
+              <div className="text-4xl font-bold text-voice-accent/80 mb-2">0</div>
               <p className="text-muted-foreground">Missed Opportunities</p>
             </div>
           </div>
