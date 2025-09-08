@@ -47,12 +47,12 @@ const DeploymentSection = () => {
   }, {
     name: "Premium",
     description: "Advanced solution for growing businesses",
-    price: "$500",
+    price: "$600",
     unit: "per month",
     setupFee: "$600", 
     minutes: "250 minutes included",
     popular: true,
-    features: ["Everything in Starter", "Expanded conversation time", "Priority support", "Advanced analytics", "Multi-language support"]
+    features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs voice", "GPT-4 powered AI"]
   }, {
     name: "Enterprise",
     description: "Full-scale solution for large organizations",
