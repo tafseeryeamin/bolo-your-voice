@@ -3,7 +3,33 @@ import { Building2, Users, Headphones, MessageSquare, BarChart, Shield } from "l
 import websiteDemoWithLogo from "@/assets/website-demo-with-logo.jpg";
 import boloLogo from "@/assets/bolo-logo.jpg";
 import { motion } from "framer-motion";
+import { useState } from "react";
 const FeaturesSection = () => {
+  const dashboardImages = [
+    { 
+      src: "/lovable-uploads/152165cd-54f0-41df-bd31-9d56f6c75a38.png", 
+      alt: "Analytics Dashboard",
+      title: "Analytics"
+    },
+    { 
+      src: "/lovable-uploads/a88d3dea-6669-4e2c-8ea1-378967e5b160.png", 
+      alt: "Conversations Dashboard",
+      title: "Conversations"
+    },
+    { 
+      src: "/lovable-uploads/6364c4ff-8f61-4b8f-9f95-83168bcb6a04.png", 
+      alt: "Conversation Details",
+      title: "Details"
+    },
+    { 
+      src: "/lovable-uploads/b47af239-03bc-4ca2-9cf3-fb190e261633.png", 
+      alt: "Advanced Analytics",
+      title: "Advanced Analytics"
+    }
+  ];
+
+  const [selectedImage, setSelectedImage] = useState(0);
+
   const features = [{
     icon: Building2,
     title: "Company Representation",
@@ -103,18 +129,36 @@ const FeaturesSection = () => {
               You will get full access of your dashboard and monitor your agent activities
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <img src="/lovable-uploads/152165cd-54f0-41df-bd31-9d56f6c75a38.png" alt="Analytics Dashboard" className="w-full h-auto" />
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <img src="/lovable-uploads/a88d3dea-6669-4e2c-8ea1-378967e5b160.png" alt="Conversations Dashboard" className="w-full h-auto" />
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <img src="/lovable-uploads/6364c4ff-8f61-4b8f-9f95-83168bcb6a04.png" alt="Conversation Details" className="w-full h-auto" />
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 md:col-span-2">
-                <img src="/lovable-uploads/b47af239-03bc-4ca2-9cf3-fb190e261633.png" alt="Advanced Analytics" className="w-full h-auto" />
+            {/* Dashboard Image Thumbnails */}
+            <div className="flex justify-center gap-4 mb-8 flex-wrap">
+              {dashboardImages.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`relative rounded-lg overflow-hidden transition-all duration-300 border-2 ${
+                    selectedImage === index 
+                      ? 'border-voice-accent shadow-lg scale-105' 
+                      : 'border-border/50 hover:border-voice-accent/50'
+                  }`}
+                >
+                  <img 
+                    src={image.src} 
+                    alt={image.alt} 
+                    className="w-20 h-16 object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity" />
+                </button>
+              ))}
+            </div>
+            
+            {/* Large Preview Image */}
+            <div className="flex justify-center">
+              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden shadow-2xl max-w-4xl">
+                <img 
+                  src={dashboardImages[selectedImage].src} 
+                  alt={dashboardImages[selectedImage].alt} 
+                  className="w-full h-auto" 
+                />
               </div>
             </div>
           </motion.div>
