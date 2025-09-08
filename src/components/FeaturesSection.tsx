@@ -50,7 +50,25 @@ const FeaturesSection = () => {
             </Card>)}
         </div>
 
+        {/* Voice Interface Demo */}
         <div className="mt-24 text-center">
+          <motion.div className="relative max-w-2xl mx-auto mb-12" initial={{
+          opacity: 0,
+          scale: 0.9
+        }} whileInView={{
+          opacity: 1,
+          scale: 1
+        }} transition={{
+          duration: 0.6,
+          delay: 0.2
+        }} viewport={{
+          once: true
+        }}>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50">
+              <img src="/lovable-uploads/c50a9cb1-a416-4e5c-8987-c2c1249f8ace.png" alt="Voice interface demo showing conversation starter" className="w-full h-auto" />
+            </div>
+          </motion.div>
+
           <motion.h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent" initial={{
           opacity: 0,
           y: 30
