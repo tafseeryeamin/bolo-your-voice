@@ -43,24 +43,24 @@ const DeploymentSection = () => {
     unit: "per month",
     setupFee: "$600",
     minutes: "100 minutes included",
-    features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs voice", "GPT-4 powered AI"]
+    features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs premium voice", "GPT-4 powered AI"]
   }, {
     name: "Premium",
     description: "Advanced solution for growing businesses",
-    price: "$600",
+    price: "$500",
     unit: "per month",
     setupFee: "$600", 
     minutes: "250 minutes included",
     popular: true,
-    features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs voice", "GPT-4 powered AI"]
+    features: ["Everything in Starter", "Expanded conversation time", "Priority support", "Advanced analytics", "Multi-language support"]
   }, {
     name: "Enterprise",
     description: "Full-scale solution for large organizations",
-    price: "$2,000",
+    price: "$2,100",
     unit: "per month",
     setupFee: "$600",
     minutes: "1000 minutes included",
-    features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs voice", "GPT-4 powered AI"]
+    features: ["Everything in Premium", "Maximum conversation capacity", "Dedicated infrastructure", "24/7 phone support", "Multiple bot instances", "Advanced reporting", "Maximum Conversations", "Advance Analytics"]
   }];
 
   return (
