@@ -52,7 +52,21 @@ const FeaturesSection = () => {
 
         {/* Voice Interface Demo */}
         <div className="mt-24 text-center">
-          <motion.div className="relative max-w-2xl mx-auto mb-12" initial={{
+          <motion.h3 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent" initial={{
+          opacity: 0,
+          y: 30
+        }} whileInView={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.6
+        }} viewport={{
+          once: true
+        }}>
+            BOLO VOICE OUTLOOK FULLY CUSTOMIZEABLE
+          </motion.h3>
+          
+          <motion.div className="relative max-w-xl mx-auto" initial={{
           opacity: 0,
           scale: 0.9
         }} whileInView={{
@@ -68,20 +82,6 @@ const FeaturesSection = () => {
               <img src="/lovable-uploads/c50a9cb1-a416-4e5c-8987-c2c1249f8ace.png" alt="Voice interface demo showing conversation starter" className="w-full h-auto" />
             </div>
           </motion.div>
-
-          <motion.h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent" initial={{
-          opacity: 0,
-          y: 30
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.6
-        }} viewport={{
-          once: true
-        }}>
-            BOLO VOICE OUTLOOK FULLY CUSTOMIZEABLE
-          </motion.h3>
         </div>
       </div>
     </section>;
