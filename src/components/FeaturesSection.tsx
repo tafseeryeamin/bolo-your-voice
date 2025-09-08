@@ -50,9 +50,8 @@ const FeaturesSection = () => {
             </Card>)}
         </div>
 
-        {/* Sales Demo Section */}
         <div className="mt-24 text-center">
-          <motion.h3 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent" initial={{
+          <motion.h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent" initial={{
           opacity: 0,
           y: 30
         }} whileInView={{
@@ -63,46 +62,8 @@ const FeaturesSection = () => {
         }} viewport={{
           once: true
         }}>
-            500X Your Sales Integrating an AI Salesman to Your Website
+            BOLO VOICE OUTLOOK FULLY CUSTOMIZEABLE
           </motion.h3>
-          
-          <motion.div className="relative max-w-4xl mx-auto mb-12" initial={{
-          opacity: 0,
-          scale: 0.9
-        }} whileInView={{
-          opacity: 1,
-          scale: 1
-        }} transition={{
-          duration: 0.6,
-          delay: 0.2
-        }} viewport={{
-          once: true
-        }}>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50">
-              <img src={websiteDemoWithLogo} alt="Professional website with AI integration" className="w-full h-auto" />
-              
-            </div>
-          </motion.div>
-
-          <motion.div className="flex justify-center" initial={{
-          opacity: 0,
-          y: 30
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.6,
-          delay: 0.4
-        }} viewport={{
-          once: true
-        }}>
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-voice-accent/20 to-neon-cyan/20 flex items-center justify-center border border-voice-accent/30 shadow-lg">
-                <img src={boloLogo} alt="Bolo Voice Logo" className="w-24 h-24 rounded-full object-cover" />
-              </div>
-              <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-voice-accent/30 to-neon-cyan/30 blur-xl animate-pulse opacity-75" />
-            </div>
-          </motion.div>
         </div>
       </div>
     </section>;
