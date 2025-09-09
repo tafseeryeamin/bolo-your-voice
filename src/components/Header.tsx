@@ -61,7 +61,9 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          
+          <Button variant="ghost" onClick={() => navigate("/demos")}>
+            Demos
+          </Button>
           {user && <>
               <Button variant="ghost" onClick={() => navigate("/agents")}>
                 My Agents
@@ -72,6 +74,9 @@ const Header = () => {
                   </Button>
                   <Button variant="ghost" onClick={() => navigate("/demo-testing")}>
                     Demo & Testing
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/admin/demos")}>
+                    Manage Demos
                   </Button>
                   
                 </>}
