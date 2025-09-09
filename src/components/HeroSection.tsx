@@ -3,6 +3,7 @@ import { ArrowRight, Mic, Zap, Calendar, ShoppingCart, Navigation } from "lucide
 import heroImage from "@/assets/hero-voice-ai.jpg";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import AnimatedTextSlider from "@/components/AnimatedTextSlider";
+import ScrollingLogos from "@/components/ScrollingLogos";
 import { motion } from "framer-motion";
 const HeroSection = () => {
   return (
@@ -131,6 +132,16 @@ const HeroSection = () => {
               <p className="text-muted-foreground text-sm">{feature.description}</p>
             </motion.div>
           ))}
+        </motion.div>
+        
+        {/* Scrolling Logos Section */}
+        <motion.div
+          className="mt-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+        >
+          <ScrollingLogos />
         </motion.div>
       </motion.div>
     </section>
