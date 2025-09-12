@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import boloLogo from "@/assets/bolo-logo.jpg";
+import { Mic } from "lucide-react";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -80,13 +80,9 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
                 }}
               />
               
-              {/* Logo image */}
-              <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-voice-accent/20 shadow-2xl">
-                <img
-                  src={boloLogo}
-                  alt="Bolo Voice"
-                  className="w-full h-full object-cover"
-                />
+              {/* Logo icon */}
+              <div className="relative p-8 rounded-full glassmorphism border-4 border-voice-accent/20 shadow-2xl">
+                <Mic className="w-16 h-16 md:w-20 md:h-20 text-voice-accent" />
               </div>
             </motion.div>
 
