@@ -6,8 +6,6 @@ import FeaturesSection from "@/components/FeaturesSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import DeploymentSection from "@/components/DeploymentSection";
 import CTASection from "@/components/CTASection";
-import VoiceCallButton from "@/components/VoiceCallButton";
-import FloatingLogo from "@/components/FloatingLogo";
 import SplashScreen from "@/components/SplashScreen";
 
 const Index = () => {
@@ -38,8 +36,6 @@ const Index = () => {
               <DeploymentSection />
               <CTASection />
             </main>
-            <VoiceCallButton />
-            <FloatingLogo />
           </motion.div>
         )}
       </AnimatePresence>
