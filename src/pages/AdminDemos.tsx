@@ -185,6 +185,31 @@ const AdminDemos = () => {
     }
   };
 
+  const togglePublishStatus = async (post: DemoPost) => {
+    try {
+      const { error } = await supabase
+        .from('demo_posts')
+        .update({ is_published: !post.is_published })
+        .eq('id', post.id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: `Demo post ${!post.is_published ? 'published' : 'unpublished'} successfully`,
+      });
+      
+      fetchDemoPosts();
+    } catch (error) {
+      console.error('Error updating publish status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update publish status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDialogOpenChange = (open: boolean) => {
     setIsDialogOpen(open);
     if (!open) {
@@ -349,6 +374,18 @@ const AdminDemos = () => {
                     >
                       <Edit className="w-3 h-3 mr-1" />
                       Edit
+                    </Button>
+                    <Button
+                      variant={post.is_published ? "secondary" : "default"}
+                      size="sm"
+                      onClick={() => togglePublishStatus(post)}
+                      className="shrink-0"
+                    >
+                      {post.is_published ? (
+                        <><EyeOff className="w-3 h-3" /></>
+                      ) : (
+                        <><Eye className="w-3 h-3" /></>
+                      )}
                     </Button>
                     <Button
                       variant="outline"
