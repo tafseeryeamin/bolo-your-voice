@@ -146,7 +146,7 @@ const FeaturesSection = () => {
                     alt={image.alt} 
                     className="w-20 h-16 object-cover" 
                   />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity" />
+                  
                 </button>
               ))}
             </div>
