@@ -35,7 +35,7 @@ const HeroSection = () => {
       >
         {/* Voice Icon */}
         <motion.div 
-          className="flex justify-center mb-8"
+          className="flex justify-center mb-8 mt-16"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
