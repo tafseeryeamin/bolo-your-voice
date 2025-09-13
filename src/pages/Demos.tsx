@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Play, Calendar, User } from "lucide-react";
 import { motion } from "framer-motion";
+import Header from "@/components/Header";
 
 interface DemoPost {
   id: string;
@@ -64,8 +65,9 @@ const Demos = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       {/* Header */}
-      <section className="relative py-24 px-6 bg-gradient-to-br from-background via-background/95 to-primary/5">
+      <section className="relative py-24 px-6 bg-gradient-to-br from-background via-background/95 to-primary/5 mt-20">
         <div className="max-w-6xl mx-auto text-center">
           <motion.h1 
             className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent"
