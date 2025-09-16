@@ -68,7 +68,14 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>(() => {
+    // Auto-detect language from browser settings
+    const browserLang = navigator.language || navigator.languages?.[0];
+    if (browserLang?.startsWith('ja')) {
+      return 'ja';
+    }
+    return 'en';
+  });
 
   const t = (key: string): string => {
     return translations[language][key] || key;
