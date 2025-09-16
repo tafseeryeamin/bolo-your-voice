@@ -4,7 +4,9 @@ import websiteDemoWithLogo from "@/assets/website-demo-with-logo.jpg";
 import boloLogo from "@/assets/bolo-logo.jpg";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 const FeaturesSection = () => {
+  const { t } = useLanguage();
   const dashboardImages = [
     { 
       src: "/lovable-uploads/152165cd-54f0-41df-bd31-9d56f6c75a38.png", 
@@ -32,37 +34,37 @@ const FeaturesSection = () => {
 
   const features = [{
     icon: Building2,
-    title: "Company Representation",
-    description: "Let AI voice assistants introduce your company, share your mission, and communicate your values to potential customers and partners."
+    title: t('features.companyRep.title'),
+    description: t('features.companyRep.description')
   }, {
     icon: Users,
-    title: "Personal Branding",
-    description: "Create a voice presence that represents you professionally, sharing your expertise and building meaningful connections."
+    title: t('features.personalBranding.title'),
+    description: t('features.personalBranding.description')
   }, {
     icon: Headphones,
-    title: "24/7 Availability",
-    description: "Your voice assistant works around the clock, ensuring no opportunity is missed to connect with your audience."
+    title: t('features.availability.title'),
+    description: t('features.availability.description')
   }, {
     icon: MessageSquare,
-    title: "Intelligent Conversations",
-    description: "Advanced AI understands context and provides relevant information about your business or personal brand."
+    title: t('features.conversations.title'),
+    description: t('features.conversations.description')
   }, {
     icon: BarChart,
-    title: "Analytics & Insights",
-    description: "Track engagement metrics and understand how people interact with your voice assistant to optimize performance."
+    title: t('features.analytics.title'),
+    description: t('features.analytics.description')
   }, {
     icon: Shield,
-    title: "Secure & Reliable",
-    description: "Enterprise-grade security ensures your brand information and user interactions remain protected."
+    title: t('features.security.title'),
+    description: t('features.security.description')
   }];
   return <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">
-            Powerful Voice AI Features
+            {t('features.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Everything you need to create an intelligent voice presence that represents your brand and connects with your audience.
+            {t('features.subtitle')}
           </p>
         </div>
         
@@ -89,7 +91,7 @@ const FeaturesSection = () => {
         }} viewport={{
           once: true
         }}>
-            BOLO VOICE OUTLOOK FULLY CUSTOMIZEABLE
+            {t('features.customizable')}
           </motion.h3>
           
           <motion.div className="relative max-w-xl mx-auto" initial={{
@@ -123,10 +125,10 @@ const FeaturesSection = () => {
           once: true
         }}>
             <h4 className="text-2xl md:text-3xl font-bold mb-6 bg-gradient-to-r from-foreground to-voice-accent bg-clip-text text-transparent">
-              Dashboard Overview
+              {t('features.dashboardTitle')}
             </h4>
             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-              You will get full access of your dashboard and monitor your agent activities
+              {t('features.dashboardSubtitle')}
             </p>
             
             {/* Dashboard Image Thumbnails */}

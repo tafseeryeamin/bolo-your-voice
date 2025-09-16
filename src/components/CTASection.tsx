@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CTASection = () => {
+  const { t } = useLanguage();
   return (
     <section className="relative py-20 overflow-hidden">
       {/* Background Gradient */}
@@ -26,7 +28,7 @@ const CTASection = () => {
           transition={{ delay: 0.2, duration: 0.8 }}
           viewport={{ once: true }}
         >
-          Bolo makes your website talk, sell, and support — all in one
+          {t('cta.title')}
         </motion.h2>
         <motion.p 
           className="text-lg text-muted-foreground mb-8"
@@ -35,7 +37,7 @@ const CTASection = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           viewport={{ once: true }}
         >
-          Transform visitor interactions with intelligent voice solutions that convert, engage, and delight your customers.
+          {t('cta.subtitle')}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -51,7 +53,7 @@ const CTASection = () => {
             data-cal-config='{"layout":"month_view"}'
           >
             <Mail className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-            Book a Demo
+            {t('cta.bookDemo')}
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </motion.div>

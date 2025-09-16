@@ -2,7 +2,9 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { User, MessageCircle, Calendar, HelpCircle, Headphones, ShoppingCart, Mail, Bell, ArrowDown, Zap, Target, Users } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useState, useRef } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 const HowItWorksSection = () => {
+  const { t } = useLanguage();
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
   const [activeStep, setActiveStep] = useState<number>(1);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -14,8 +16,8 @@ const HowItWorksSection = () => {
   });
   const flowSteps = [{
     id: 1,
-    title: "Visitor Arrives",
-    description: "Website visitor lands on your page looking for solutions",
+    title: t('howItWorks.step1.title'),
+    description: t('howItWorks.step1.description'),
     icon: Users,
     tooltip: "Your potential customers discover your website through search, ads, or referrals",
     color: "from-blue-400 to-blue-600",
@@ -25,8 +27,8 @@ const HowItWorksSection = () => {
     }
   }, {
     id: 2,
-    title: "Click to Talk",
-    description: "Visitor clicks the AI chat button",
+    title: t('howItWorks.step2.title'),
+    description: t('howItWorks.step2.description'),
     icon: MessageCircle,
     tooltip: "One-click access to your AI Sales Assistant - no forms, no waiting",
     color: "from-green-400 to-green-600",
@@ -36,8 +38,8 @@ const HowItWorksSection = () => {
     }
   }, {
     id: 3,
-    title: "AI Offers Options",
-    description: "AI presents 3 helpful pathways",
+    title: t('howItWorks.step3.title'),
+    description: t('howItWorks.step3.description'),
     icon: Target,
     tooltip: "Smart routing based on visitor intent and behavior patterns",
     color: "from-purple-400 to-purple-600",
@@ -63,8 +65,8 @@ const HowItWorksSection = () => {
     }]
   }, {
     id: 4,
-    title: "Collect Contact",
-    description: "AI captures email for follow-up",
+    title: t('howItWorks.step4.title'),
+    description: t('howItWorks.step4.description'),
     icon: Mail,
     tooltip: "Seamless contact collection with high conversion rates",
     color: "from-orange-400 to-orange-600",
@@ -74,8 +76,8 @@ const HowItWorksSection = () => {
     }
   }, {
     id: 5,
-    title: "Smart Follow-up",
-    description: "Automated reminders & nurturing",
+    title: t('howItWorks.step5.title'),
+    description: t('howItWorks.step5.description'),
     icon: Bell,
     tooltip: "Intelligent follow-up sequences to convert leads into customers",
     color: "from-pink-400 to-pink-600",
@@ -105,14 +107,13 @@ const HowItWorksSection = () => {
         >
           <div className="inline-flex items-center gap-2 bg-voice-accent/10 text-voice-accent px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="w-4 h-4" />
-            Convert More Visitors
+            {t('howItWorks.badge')}
           </div>
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-voice-accent to-neon-cyan bg-clip-text text-transparent">
-            How It Works
+            {t('howItWorks.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Transform your website visitors into customers with our AI-powered conversation flow. 
-            Increase your conversion rate from 1-17% to 30%+ with intelligent engagement.
+            {t('howItWorks.subtitle')}
           </p>
         </motion.div>
 
@@ -232,19 +233,19 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.6 }}
           className="mt-20 text-center bg-gradient-to-r from-voice-accent/5 to-neon-cyan/5 rounded-3xl p-12 border border-border/30"
         >
-          <h3 className="text-3xl font-bold mb-6 text-foreground">The Result?</h3>
+          <h3 className="text-3xl font-bold mb-6 text-foreground">{t('howItWorks.result.title')}</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div>
               <div className="text-4xl font-bold text-voice-accent mb-2">30%+</div>
-              <p className="text-muted-foreground">Conversion Rate</p>
+              <p className="text-muted-foreground">{t('howItWorks.result.conversion')}</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-neon-cyan mb-2">24/7</div>
-              <p className="text-muted-foreground">AI Availability</p>
+              <p className="text-muted-foreground">{t('howItWorks.result.availability')}</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-voice-accent/80 mb-2">0</div>
-              <p className="text-muted-foreground">Missed Opportunities</p>
+              <p className="text-muted-foreground">{t('howItWorks.result.missed')}</p>
             </div>
           </div>
         </motion.div>
