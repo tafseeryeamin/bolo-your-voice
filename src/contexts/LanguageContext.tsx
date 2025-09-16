@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Language = 'en' | 'ja';
 
@@ -68,14 +68,31 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>(() => {
-    // Auto-detect language from browser settings
-    const browserLang = navigator.language || navigator.languages?.[0];
-    if (browserLang?.startsWith('ja')) {
-      return 'ja';
-    }
-    return 'en';
-  });
+  const [language, setLanguage] = useState<Language>('en');
+
+  useEffect(() => {
+    const detectLanguage = async () => {
+      // First check browser language
+      const browserLang = navigator.language || navigator.languages?.[0];
+      if (browserLang?.startsWith('ja')) {
+        setLanguage('ja');
+        return;
+      }
+
+      // Then check location via IP geolocation
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        if (data.country_code === 'JP') {
+          setLanguage('ja');
+        }
+      } catch (error) {
+        console.log('Location detection failed, using browser language');
+      }
+    };
+
+    detectLanguage();
+  }, []);
 
   const t = (key: string): string => {
     return translations[language][key] || key;
