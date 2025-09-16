@@ -1,12 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Mic, Settings } from "lucide-react";
+import { Mic, Settings, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
   useEffect(() => {
     checkAuth();
 
@@ -62,21 +70,21 @@ const Header = () => {
         
         <nav className="hidden md:flex items-center space-x-8">
           <Button variant="ghost" onClick={() => navigate("/demos")}>
-            Demos
+            {t('header.demos')}
           </Button>
           {user && <>
               <Button variant="ghost" onClick={() => navigate("/agents")}>
-                My Agents
+                {t('header.myAgents')}
               </Button>
               {isAdmin && <>
                   <Button variant="ghost" onClick={() => navigate("/admin")}>
-                    Admin
+                    {t('header.admin')}
                   </Button>
                   <Button variant="ghost" onClick={() => navigate("/demo-testing")}>
-                    Demo & Testing
+                    {t('header.demoTesting')}
                   </Button>
                   <Button variant="ghost" onClick={() => navigate("/admin/demos")}>
-                    Manage Demos
+                    {t('header.manageDemos')}
                   </Button>
                   
                 </>}
@@ -84,22 +92,40 @@ const Header = () => {
         </nav>
         
         <div className="flex items-center space-x-4">
+          {/* Language Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                <Globe className="w-4 h-4" />
+                <span className="text-sm">{language === 'en' ? 'EN' : 'JP'}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setLanguage('en')}>
+                🇺🇸 English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('ja')}>
+                🇯🇵 日本語
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {user ? <div className="flex items-center space-x-4">
               <span className="text-sm text-muted-foreground">
-                Welcome, {user.email}
+                {t('header.welcome')}, {user.email}
               </span>
               <Button variant="ghost" onClick={async () => {
               await supabase.auth.signOut();
               navigate("/");
             }}>
-                Sign Out
+                {t('header.signOut')}
               </Button>
             </div> : <>
               <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/sign-in")}>
-                Sign In
+                {t('header.signIn')}
               </Button>
               <Button variant="voice" data-cal-link="tafser-yeamin-8jqc8u/bolo" data-cal-namespace="bolo" data-cal-config='{"layout":"month_view"}'>
-                Get Started
+                {t('header.getStarted')}
               </Button>
             </>}
         </div>

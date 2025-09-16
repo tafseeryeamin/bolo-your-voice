@@ -5,7 +5,9 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import AnimatedTextSlider from "@/components/AnimatedTextSlider";
 import ScrollingLogos from "@/components/ScrollingLogos";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 const HeroSection = () => {
+  const { t } = useLanguage();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
@@ -51,7 +53,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          Turn Visitors into Customers with AI Voice Solutions
+          {t('hero.title')}
         </motion.h1>
         
         <motion.div 
@@ -62,9 +64,9 @@ const HeroSection = () => {
         >
           <AnimatedTextSlider 
             texts={[
-              "Missing leads despite ad spend?",
-              "Website feels boring or hard to navigate?", 
-              "Want to stay ahead with AI?"
+              t('hero.subtitle1'),
+              t('hero.subtitle2'), 
+              t('hero.subtitle3')
             ]}
             className="text-center"
           />
@@ -84,7 +86,7 @@ const HeroSection = () => {
             data-cal-namespace="bolo" 
             data-cal-config='{"layout":"month_view"}'
           >
-            Book a Demo
+            {t('hero.bookDemo')}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </motion.div>
@@ -99,18 +101,18 @@ const HeroSection = () => {
           {[
             {
               icon: Calendar,
-              title: "Booking, FAQ & Inquiries",
-              description: "Let customers instantly book, ask questions, and get answers with voice."
+              title: t('feature1.title'),
+              description: t('feature1.description')
             },
             {
               icon: ShoppingCart,
-              title: "E-commerce Product Info",
-              description: "Help shoppers find products, learn details, and get recommendations hands-free."
+              title: t('feature2.title'),
+              description: t('feature2.description')
             },
             {
               icon: Navigation,
-              title: "Redirect & Track Orders",
-              description: "Guide users to the right pages and track orders via voice in real-time."
+              title: t('feature3.title'),
+              description: t('feature3.description')
             }
           ].map((feature, index) => (
             <motion.div
