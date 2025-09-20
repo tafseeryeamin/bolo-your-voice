@@ -22,7 +22,7 @@ const ScrollingLogos = () => {
   const duplicatedLogos = [...logos, ...logos];
 
   return (
-    <div className="relative overflow-hidden py-8 w-full">
+    <div className="relative overflow-hidden py-8 w-screen -mx-[50vw] left-1/2 right-1/2">
       <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background z-10" />
       
       <motion.div
