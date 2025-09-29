@@ -155,6 +155,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en');
+  
+  console.log('LanguageProvider rendering with language:', language);
 
   useEffect(() => {
     const detectLanguage = async () => {
@@ -193,7 +195,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
+  console.log('useLanguage called, context:', context);
   if (context === undefined) {
+    console.error('useLanguage hook called outside of LanguageProvider');
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
