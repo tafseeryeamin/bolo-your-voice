@@ -7,7 +7,6 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import DeploymentSection from "@/components/DeploymentSection";
 import CTASection from "@/components/CTASection";
 import SplashScreen from "@/components/SplashScreen";
-import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -17,32 +16,30 @@ const Index = () => {
   };
 
   return (
-    <LanguageProvider>
-      <div className="min-h-screen bg-background">
-        {/* Splash Screen */}
-        {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
-        
-        {/* Main Content */}
-        <AnimatePresence>
-          {!showSplash && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Header />
-              <main className="pt-20">
-                <HeroSection />
-                <FeaturesSection />
-                <HowItWorksSection />
-                <DeploymentSection />
-                <CTASection />
-              </main>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </LanguageProvider>
+    <div className="min-h-screen bg-background">
+      {/* Splash Screen */}
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+      
+      {/* Main Content */}
+      <AnimatePresence>
+        {!showSplash && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Header />
+            <main className="pt-20">
+              <HeroSection />
+              <FeaturesSection />
+              <HowItWorksSection />
+              <DeploymentSection />
+              <CTASection />
+            </main>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
