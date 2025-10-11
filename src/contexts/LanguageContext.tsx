@@ -80,7 +80,7 @@ const translations = {
     'cta.bookDemo': 'Book a Demo',
     
     // Voice Feature Card
-    'voiceFeatureCard.title': 'Powerful Voice AI Features',
+    'voiceFeatureCard.title': 'TALK TO OUR AI',
     'voiceFeatureCard.testButton': 'Test Bolo',
     'voiceFeatureCard.subtitle': 'Talk to our AI and let\'s see if it can convince you to buy our product',
     'voiceFeatureCard.connecting': 'Connecting...',
@@ -161,7 +161,7 @@ const translations = {
     'cta.bookDemo': 'デモを予約',
     
     // Voice Feature Card
-    'voiceFeatureCard.title': '強力なボイスAI機能',
+    'voiceFeatureCard.title': '私たちのAIと話す',
     'voiceFeatureCard.testButton': 'Boloをテスト',
     'voiceFeatureCard.subtitle': '私たちのAIと話して、製品の購入を説得できるか見てみましょう',
     'voiceFeatureCard.connecting': '接続中...',
