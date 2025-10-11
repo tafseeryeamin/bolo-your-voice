@@ -78,6 +78,17 @@ const translations = {
     'cta.title': 'Bolo makes your website talk, sell, and support — all in one',
     'cta.subtitle': 'Transform visitor interactions with intelligent voice solutions that convert, engage, and delight your customers.',
     'cta.bookDemo': 'Book a Demo',
+    
+    // Voice Feature Card
+    'voiceFeatureCard.title': 'Powerful Voice AI Features',
+    'voiceFeatureCard.testButton': 'Test Bolo',
+    'voiceFeatureCard.subtitle': 'Talk to our AI and let\'s see if it can convince you to buy our product',
+    'voiceFeatureCard.connecting': 'Connecting...',
+    'voiceFeatureCard.connected': 'Connected',
+    'voiceFeatureCard.active': 'Voice call active',
+    'voiceFeatureCard.inactive': 'Click to start voice interaction',
+    'voiceFeatureCard.aiSpeaking': 'AI is speaking...',
+    'voiceFeatureCard.endCall': 'End Call',
   },
   ja: {
     // Header
@@ -148,6 +159,17 @@ const translations = {
     'cta.title': 'Boloはあなたのウェブサイトを話し、販売し、サポートさせます — すべて1つで',
     'cta.subtitle': 'コンバート、エンゲージ、顧客を喜ばせるインテリジェントなボイスソリューションで訪問者インタラクションを変換します。',
     'cta.bookDemo': 'デモを予約',
+    
+    // Voice Feature Card
+    'voiceFeatureCard.title': '強力なボイスAI機能',
+    'voiceFeatureCard.testButton': 'Boloをテスト',
+    'voiceFeatureCard.subtitle': '私たちのAIと話して、製品の購入を説得できるか見てみましょう',
+    'voiceFeatureCard.connecting': '接続中...',
+    'voiceFeatureCard.connected': '接続済み',
+    'voiceFeatureCard.active': '音声通話アクティブ',
+    'voiceFeatureCard.inactive': 'クリックして音声インタラクションを開始',
+    'voiceFeatureCard.aiSpeaking': 'AIが話しています...',
+    'voiceFeatureCard.endCall': '通話を終了',
   }
 };
 

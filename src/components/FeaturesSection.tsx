@@ -5,6 +5,7 @@ import boloLogo from "@/assets/bolo-logo.jpg";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import VoiceAIFeatureCard from "./VoiceAIFeatureCard";
 const FeaturesSection = () => {
   const { t } = useLanguage();
   const dashboardImages = [
@@ -77,6 +78,9 @@ const FeaturesSection = () => {
               <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
             </Card>)}
         </div>
+
+        {/* Voice AI Feature Card */}
+        <VoiceAIFeatureCard />
 
         {/* Voice Interface Demo */}
         <div className="mt-24 text-center">

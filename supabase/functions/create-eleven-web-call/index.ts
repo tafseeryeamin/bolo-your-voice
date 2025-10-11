@@ -82,18 +82,17 @@ serve(async (req: Request) => {
     }
   }
 
-  // Branch 2: Issue a ConvAI conversation token (token-only)
+  // Branch 2: Get signed URL for conversation
   try {
     const { agent_id } = payload || {};
     if (!agent_id) return json({ error: "agent_id is required" }, 400);
 
-    // ElevenLabs ConvAI token endpoint
-    const url = "https://api.elevenlabs.io/v1/convai/conversation/token";
+    // ElevenLabs ConvAI get signed URL endpoint
+    const url = `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agent_id}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "xi-api-key": apiKey,
-        "Content-Type": "application/json",
       },
     });
     if (!response.ok) {
@@ -101,7 +100,7 @@ serve(async (req: Request) => {
       return json({ error: errorText, status: response.status }, response.status);
     }
     const data = await response.json();
-    return json({ success: true, ...data }, 200);
+    return json({ success: true, signed_url: data.signed_url }, 200);
   } catch (err: any) {
     return json({ error: err?.message || "Internal server error" }, 500);
   }
