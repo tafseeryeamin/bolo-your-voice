@@ -63,9 +63,9 @@ const VoiceAIFeatureCard = () => {
         throw new Error('No signed URL received from server');
       }
 
-      console.log('Starting session with signed URL');
+      console.log('Starting session with signed URL:', data.signed_url);
 
-      // Start the conversation using the signed URL
+      // Start the conversation using signed URL
       const conversationId = await conversation.startSession({
         signedUrl: data.signed_url,
       });
