@@ -40,22 +40,37 @@ const VoiceAIFeatureCard = () => {
   const startConversation = async () => {
     try {
       setIsLoading(true);
+      console.log('Starting conversation...');
 
       // Request microphone permissions
       await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Microphone access granted');
 
       // Get signed URL from edge function
       const { data, error } = await supabase.functions.invoke('create-eleven-web-call', {
         body: { agent_id: 'agent_7701k7945tnbe40v97yr1n9t7dq4' },
       });
 
-      if (error) throw error;
-      if (!data?.signed_url) throw new Error('No signed URL received');
+      console.log('Edge function response:', { data, error });
 
-      // Start the conversation
-      await conversation.startSession({
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+      
+      if (!data?.signed_url) {
+        console.error('No signed URL in response:', data);
+        throw new Error('No signed URL received from server');
+      }
+
+      console.log('Starting session with signed URL');
+
+      // Start the conversation using the signed URL
+      const conversationId = await conversation.startSession({
         signedUrl: data.signed_url,
       });
+
+      console.log('Conversation started with ID:', conversationId);
 
     } catch (error) {
       console.error('Error starting conversation:', error);
@@ -70,6 +85,7 @@ const VoiceAIFeatureCard = () => {
   };
 
   const endConversation = async () => {
+    console.log('Ending conversation...');
     await conversation.endSession();
   };
 
