@@ -47,7 +47,7 @@ const VoiceAIFeatureCard = () => {
       console.log('Microphone access granted');
 
       // Get signed URL from edge function
-      const { data, error } = await supabase.functions.invoke('create-eleven-web-call', {
+      const { data, error } = await supabase.functions.invoke('start-voice-conversation', {
         body: { agent_id: 'agent_7701k7945tnbe40v97yr1n9t7dq4' },
       });
 
