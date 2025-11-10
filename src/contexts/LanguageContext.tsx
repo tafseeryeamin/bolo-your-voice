@@ -180,29 +180,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   
   console.log('LanguageProvider rendering with language:', language);
 
-  useEffect(() => {
-    const detectLanguage = async () => {
-      // First check browser language
-      const browserLang = navigator.language || navigator.languages?.[0];
-      if (browserLang?.startsWith('ja')) {
-        setLanguage('ja');
-        return;
-      }
-
-      // Then check location via IP geolocation
-      try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        if (data.country_code === 'JP') {
-          setLanguage('ja');
-        }
-      } catch (error) {
-        console.log('Location detection failed, using browser language');
-      }
-    };
-
-    detectLanguage();
-  }, []);
+  // Language is now set to 'en' by default in useState
 
   const t = (key: string): string => {
     return translations[language][key] || key;
