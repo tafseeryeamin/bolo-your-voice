@@ -9,8 +9,9 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
-import Demos from "./pages/Demos";
-import AdminDemos from "./pages/AdminDemos";
+import Portfolio from "./pages/Portfolio";
+import PortfolioDetail from "./pages/PortfolioDetail";
+import AdminPortfolio from "./pages/AdminPortfolio";
 import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
 import AdminWidgets from "./pages/AdminWidgets";
@@ -31,7 +32,8 @@ const App = () => {
           <BrowserRouter>
             <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/demos" element={<Demos />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/sign-in" element={<SignIn />} />
             
             <Route path="/admin" element={<Admin />} />
@@ -67,9 +69,9 @@ const App = () => {
                 <AdminWidgets />
               </ProtectedRoute>
             } />
-            <Route path="/admin/demos" element={
+            <Route path="/admin/portfolio" element={
               <ProtectedRoute>
-                <AdminDemos />
+                <AdminPortfolio />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
