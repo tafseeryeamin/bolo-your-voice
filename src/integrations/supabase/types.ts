@@ -109,6 +109,7 @@ export type Database = {
       }
       demo_posts: {
         Row: {
+          agent_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -120,6 +121,7 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          agent_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -131,6 +133,7 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          agent_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
