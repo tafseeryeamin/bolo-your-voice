@@ -5,83 +5,84 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
-import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
-import Portfolio from "./pages/Portfolio";
-import PortfolioDetail from "./pages/PortfolioDetail";
-import AdminPortfolio from "./pages/AdminPortfolio";
 import AgentConfig from "./pages/AgentConfig";
 import CreateAgent from "./pages/CreateAgent";
+import Admin from "./pages/Admin";
 import AdminWidgets from "./pages/AdminWidgets";
+import AdminPortfolio from "./pages/AdminPortfolio";
+import Demos from "./pages/Demos";
+import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import FloatingElements from "./components/FloatingElements";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  console.log('App component rendering');
-  return (
-    <QueryClientProvider client={queryClient}>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <LanguageProvider>
       <TooltipProvider>
-        <LanguageProvider>
-          <FloatingElements />
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/sign-in" element={<SignIn />} />
-            
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/agents" element={
-              <ProtectedRoute>
-                <CreateAgent />
-              </ProtectedRoute>
-            } />
-            <Route path="/create-agent" element={
-              <ProtectedRoute>
-                <CreateAgent />
-              </ProtectedRoute>
-            } />
-            <Route path="/agent-config" element={
-              <ProtectedRoute>
-                <AgentConfig />
-              </ProtectedRoute>
-            } />
-            {/* Removed testing and embedding routes */}
-            <Route path="/demo-testing" element={
-              <ProtectedRoute>
-                <AdminWidgets />
-              </ProtectedRoute>
-            } />
-            <Route path="/widget-generator" element={
-              <ProtectedRoute>
-                <AdminWidgets />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/widgets" element={
-              <ProtectedRoute>
-                <AdminWidgets />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/portfolio" element={
-              <ProtectedRoute>
-                <AdminPortfolio />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/demos" element={<Demos />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agent-config/:id"
+              element={
+                <ProtectedRoute>
+                  <AgentConfig />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create-agent"
+              element={
+                <ProtectedRoute>
+                  <CreateAgent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/widgets"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminWidgets />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/portfolio"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminPortfolio />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-        </LanguageProvider>
       </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
+    </LanguageProvider>
+  </QueryClientProvider>
+);
 
 export default App;
