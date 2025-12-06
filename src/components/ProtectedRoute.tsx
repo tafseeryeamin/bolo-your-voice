@@ -5,11 +5,13 @@ import { User } from '@supabase/supabase-js';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requireAdmin?: boolean;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,8 +23,23 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate("/sign-in");
-      } else {
-        setUser(user);
+        return;
+      }
+      
+      setUser(user);
+
+      // Check admin role if required
+      if (requireAdmin) {
+        const { data: hasRole, error } = await supabase.rpc('has_role', {
+          _user_id: user.id,
+          _role: 'admin'
+        });
+        
+        if (error || !hasRole) {
+          navigate("/dashboard");
+          return;
+        }
+        setIsAdmin(true);
       }
     } catch (error) {
       console.error("Auth check error:", error);
@@ -41,7 +58,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!user) {
-    return null; // Will redirect to sign-in
+    return null;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return null;
   }
 
   return <>{children}</>;

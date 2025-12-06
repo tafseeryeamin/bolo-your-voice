@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, Calendar, Eye, EyeOff } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Calendar, Eye, EyeOff, Mic, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface PortfolioItem {
   id: string;
@@ -46,6 +47,7 @@ const AdminPortfolio = () => {
   });
   
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPortfolioItems();
@@ -107,7 +109,7 @@ const AdminPortfolio = () => {
         
         toast({
           title: "Success",
-          description: "Portfolio item updated successfully",
+          description: "AI Agent updated successfully",
         });
       } else {
         const { error } = await supabase
@@ -125,7 +127,7 @@ const AdminPortfolio = () => {
         
         toast({
           title: "Success",
-          description: "Portfolio item created successfully",
+          description: "AI Agent created successfully",
         });
       }
 
@@ -136,7 +138,7 @@ const AdminPortfolio = () => {
       console.error('Error saving portfolio item:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save portfolio item",
+        description: error instanceof Error ? error.message : "Failed to save AI Agent",
         variant: "destructive",
       });
     } finally {
@@ -157,7 +159,7 @@ const AdminPortfolio = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this portfolio item?")) return;
+    if (!confirm("Are you sure you want to delete this AI Agent?")) return;
 
     try {
       const { error } = await supabase
@@ -169,7 +171,7 @@ const AdminPortfolio = () => {
 
       toast({
         title: "Success",
-        description: "Portfolio item deleted successfully",
+        description: "AI Agent deleted successfully",
       });
       
       fetchPortfolioItems();
@@ -177,7 +179,7 @@ const AdminPortfolio = () => {
       console.error('Error deleting portfolio item:', error);
       toast({
         title: "Error",
-        description: "Failed to delete portfolio item",
+        description: "Failed to delete AI Agent",
         variant: "destructive",
       });
     }
@@ -194,7 +196,7 @@ const AdminPortfolio = () => {
 
       toast({
         title: "Success",
-        description: `Portfolio item ${!item.is_published ? 'published' : 'unpublished'} successfully`,
+        description: `AI Agent ${!item.is_published ? 'published' : 'unpublished'} successfully`,
       });
       
       fetchPortfolioItems();
@@ -218,7 +220,7 @@ const AdminPortfolio = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin text-voice-accent" />
       </div>
     );
   }
@@ -227,24 +229,37 @@ const AdminPortfolio = () => {
     <div className="min-h-screen bg-background py-12 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Manage Portfolio</h1>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/admin')}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Admin
+          </Button>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-voice-accent/20">
+              <Mic className="w-6 h-6 text-voice-accent" />
+            </div>
+            <h1 className="text-4xl font-bold">Manage AI Agents</h1>
+          </div>
           <p className="text-muted-foreground">
-            Create and manage voice AI portfolio items with ElevenLabs integration
+            Create and manage voice AI agents with ElevenLabs integration for the public demo page
           </p>
         </div>
 
         <div className="mb-8">
           <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 bg-voice-accent hover:bg-voice-accent/90">
                 <Plus className="w-4 h-4" />
-                Add Portfolio Item
+                Add AI Agent
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
-                  {editingItem ? "Edit Portfolio Item" : "Create Portfolio Item"}
+                  {editingItem ? "Edit AI Agent" : "Create AI Agent"}
                 </DialogTitle>
                 <DialogDescription>
                   Add company information and ElevenLabs agent ID for voice conversations
@@ -253,12 +268,12 @@ const AdminPortfolio = () => {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Company Name *</Label>
+                  <Label htmlFor="title">Company/Agent Name *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Enter company name"
+                    placeholder="Enter company or agent name"
                     required
                   />
                 </div>
@@ -269,13 +284,13 @@ const AdminPortfolio = () => {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Brief description of the company"
+                    placeholder="Brief description of the AI agent"
                     rows={3}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="image_url">Company Logo URL</Label>
+                  <Label htmlFor="image_url">Logo/Image URL</Label>
                   <Input
                     id="image_url"
                     value={formData.image_url}
@@ -295,7 +310,7 @@ const AdminPortfolio = () => {
                     required
                   />
                   <p className="text-sm text-muted-foreground">
-                    Get your agent ID from ElevenLabs dashboard
+                    Get your agent ID from your ElevenLabs Conversational AI dashboard
                   </p>
                 </div>
 
@@ -306,14 +321,14 @@ const AdminPortfolio = () => {
                     onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
                   />
                   <Label htmlFor="is_published" className="cursor-pointer">
-                    Publish immediately
+                    Publish immediately (visible on demo page)
                   </Label>
                 </div>
 
                 <DialogFooter>
-                  <Button type="submit" disabled={submitting}>
+                  <Button type="submit" disabled={submitting} className="bg-voice-accent hover:bg-voice-accent/90">
                     {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    {editingItem ? "Update" : "Create"}
+                    {editingItem ? "Update Agent" : "Create Agent"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -322,11 +337,14 @@ const AdminPortfolio = () => {
         </div>
 
         {portfolioItems.length === 0 ? (
-          <Card>
+          <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <p className="text-muted-foreground mb-4">No portfolio items yet</p>
+              <div className="p-4 rounded-full bg-voice-accent/20 mb-4">
+                <Mic className="w-8 h-8 text-voice-accent" />
+              </div>
+              <p className="text-muted-foreground mb-4">No AI agents yet</p>
               <Button onClick={() => setIsDialogOpen(true)} variant="outline">
-                Create your first portfolio item
+                Create your first AI Agent
               </Button>
             </CardContent>
           </Card>
@@ -339,7 +357,7 @@ const AdminPortfolio = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow border-border/50">
                   {item.image_url && (
                     <div className="aspect-video bg-muted">
                       <img
@@ -353,9 +371,9 @@ const AdminPortfolio = () => {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-lg">{item.title}</CardTitle>
-                      <Badge variant={item.is_published ? "default" : "secondary"}>
+                      <Badge variant={item.is_published ? "default" : "secondary"} className={item.is_published ? "bg-green-500/20 text-green-400 border-green-500/30" : ""}>
                         {item.is_published ? (
-                          <><Eye className="w-3 h-3 mr-1" /> Published</>
+                          <><Eye className="w-3 h-3 mr-1" /> Live</>
                         ) : (
                           <><EyeOff className="w-3 h-3 mr-1" /> Draft</>
                         )}
@@ -367,7 +385,7 @@ const AdminPortfolio = () => {
                       </CardDescription>
                     )}
                     {item.agent_id && (
-                      <p className="text-xs text-muted-foreground font-mono mt-2">
+                      <p className="text-xs text-voice-accent font-mono mt-2 truncate">
                         Agent: {item.agent_id}
                       </p>
                     )}
@@ -396,7 +414,7 @@ const AdminPortfolio = () => {
                         className="flex-1"
                       >
                         {item.is_published ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
-                        {item.is_published ? 'Unpublish' : 'Publish'}
+                        {item.is_published ? 'Hide' : 'Publish'}
                       </Button>
                       <Button
                         variant="destructive"
