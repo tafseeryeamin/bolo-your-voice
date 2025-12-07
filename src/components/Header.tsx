@@ -79,9 +79,7 @@ const Header = () => {
                   <Button variant="ghost" onClick={() => navigate("/admin")}>
                     {t('header.admin')}
                   </Button>
-                  <Button variant="ghost" onClick={() => navigate("/demo-testing")}>
-                    {t('header.demoTesting')}
-                  </Button>
+                  
                   
                 </>}
             </>}
