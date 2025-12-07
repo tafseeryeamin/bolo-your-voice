@@ -45,14 +45,14 @@ const DeploymentSection = () => {
     },
     {
       range: "20-30 pages",
-      setupCost: 100,
-      monthlyCost: 50,
+      setupCost: 167,
+      monthlyCost: 83,
       description: "Additional complexity handling"
     },
     {
       range: "30-50 pages",
-      setupCost: 200,
-      monthlyCost: 100,
+      setupCost: 333,
+      monthlyCost: 167,
       description: "Enhanced navigation system"
     },
     {
@@ -67,14 +67,14 @@ const DeploymentSection = () => {
     name: "Starter",
     description: "Complete AI assistant for small businesses",
     basePrice: 250,
-    baseSetup: 600,
+    baseSetup: 1000,
     minutes: "100 minutes included",
     features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs premium voice", "GPT-4 powered AI"]
   }, {
     name: "Premium",
     description: "Advanced solution for growing businesses",
     basePrice: 600,
-    baseSetup: 600,
+    baseSetup: 1000,
     minutes: "250 minutes included",
     popular: true,
     features: ["Booking system integration", "CRM management", "Email automation", "Website navigation", "Custom dashboard", "Bot control panel", "ElevenLabs voice", "GPT-4 powered AI"]
@@ -82,7 +82,7 @@ const DeploymentSection = () => {
     name: "Enterprise",
     description: "Full-scale solution for large organizations",
     basePrice: 2100,
-    baseSetup: 600,
+    baseSetup: 1000,
     minutes: "1000 minutes included",
     features: ["Everything in Premium", "Maximum conversation capacity", "Dedicated infrastructure", "24/7 phone support", "Multiple bot instances", "Advanced reporting", "Maximum Conversations", "Advance Analytics"]
   }];
