@@ -82,9 +82,6 @@ const Header = () => {
                   <Button variant="ghost" onClick={() => navigate("/demo-testing")}>
                     {t('header.demoTesting')}
                   </Button>
-                  <Button variant="ghost" onClick={() => navigate("/admin/demos")}>
-                    {t('header.manageDemos')}
-                  </Button>
                   
                 </>}
             </>}
